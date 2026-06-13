@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ERP 이전 시대의 기업 운영</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #003366;
+    --bg: #f0f3f8;
+    --white: #ffffff;
+    --text: #333333;
+    --gray: #6b7280;
+    --border: #d9e1ee;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  h1, h2, h3, .serif {
+    font-family: 'DM Serif Display', 'Noto Sans KR', serif;
+    font-weight: 400;
+    color: var(--navy);
+  }
+
+  /* ---------- Header ---------- */
+  header {
+    background: var(--navy);
+    color: var(--white);
+    padding: 48px 24px 36px;
+    text-align: center;
+  }
+  header .eyebrow {
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 12px;
+  }
+  header h1 {
+    color: var(--white);
+    font-size: 42px;
+    margin-bottom: 12px;
+  }
+  header p {
+    font-size: 16px;
+    opacity: 0.85;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  /* ---------- Sticky Nav ---------- */
+  nav.tabs {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  }
+  nav.tabs a {
+    flex: 1 0 auto;
+    text-align: center;
+    padding: 14px 10px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gray);
+    text-decoration: none;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    transition: 0.15s;
+  }
+  nav.tabs a:hover { color: var(--navy); background: #f7f9fc; }
+  nav.tabs a.active {
+    color: var(--navy);
+    border-bottom-color: var(--navy);
+  }
+
+  /* ---------- Layout ---------- */
+  main {
+    max-width: 840px;
+    margin: 0 auto;
+    padding: 40px 20px 100px;
+  }
+
+  section.module {
+    margin-bottom: 64px;
+    scroll-margin-top: 60px;
+  }
+
+  .module-header {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 8px;
+  }
+  .module-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 30px;
+    color: var(--navy);
+    line-height: 1;
+  }
+  section.module h2 {
+    font-size: 30px;
+  }
+  .module-tagline {
+    font-size: 16px;
+    color: var(--gray);
+    margin-bottom: 28px;
+    padding-left: 4px;
+    border-left: 3px solid var(--navy);
+    padding-left: 12px;
+    margin-left: 2px;
+  }
+
+  /* ---------- Scenario Card ---------- */
+  .scenario-card {
+    background: var(--white);
+    border-radius: 6px;
+    padding: 22px 24px;
+    margin-bottom: 24px;
+    border: 1px solid var(--border);
+    position: relative;
+  }
+  .scenario-card .label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .scenario-card p {
+    font-size: 15px;
+    color: var(--text);
+  }
+  .scenario-card .name-tag {
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  /* ---------- Generic content card ---------- */
+  .card {
+    background: var(--white);
+    border-radius: 6px;
+    padding: 24px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+  }
+  .card h3 {
+    font-size: 20px;
+    margin-bottom: 12px;
+  }
+  .card ul, .card ol {
+    padding-left: 22px;
+    margin-top: 8px;
+  }
+  .card li { margin-bottom: 6px; }
+  .card p { margin-bottom: 10px; }
+  .card p:last-child { margin-bottom: 0; }
+
+  /* ---------- Callout ---------- */
+  .callout {
+    background: #eaf0f8;
+    border-left: 4px solid var(--navy);
+    border-radius: 0 6px 6px 0;
+    padding: 16px 20px;
+    margin: 20px 0;
+    font-size: 14px;
+  }
+  .callout .label {
+    font-weight: 700;
+    color: var(--navy);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  /* ---------- Flow Diagram ---------- */
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin: 24px 0;
+  }
+  .flow-step {
+    background: var(--white);
+    border: 1.5px solid var(--navy);
+    border-radius: 6px;
+    padding: 14px 16px;
+    font-size: 13px;
+    text-align: center;
+    flex: 1 1 140px;
+    min-width: 120px;
+  }
+  .flow-step.problem {
+    border-color: #b9382c;
+    color: #b9382c;
+  }
+  .flow-step.solution {
+    background: var(--navy);
+    color: var(--white);
+  }
+  .flow-step .step-title {
+    font-weight: 700;
+    margin-bottom: 4px;
+    display: block;
+  }
+  .flow-arrow {
+    flex: 0 0 auto;
+    padding: 0 8px;
+    color: var(--navy);
+    font-size: 20px;
+    font-weight: 700;
+  }
+  @media (max-width: 640px) {
+    .flow { flex-direction: column; }
+    .flow-arrow { transform: rotate(90deg); padding: 4px 0; }
+    .flow-step { width: 100%; }
+  }
+
+  /* ---------- Limitation list ---------- */
+  .limit-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin: 16px 0;
+  }
+  @media (max-width: 600px) {
+    .limit-grid { grid-template-columns: 1fr; }
+  }
+  .limit-item {
+    background: #fbf3f2;
+    border: 1px solid #e8c9c4;
+    border-radius: 6px;
+    padding: 14px 16px;
+    font-size: 13.5px;
+  }
+  .limit-item .x-mark {
+    color: #b9382c;
+    font-weight: 700;
+    margin-right: 6px;
+  }
+
+  /* ---------- Era Timeline marker ---------- */
+  .era-tag {
+    display: inline-block;
+    background: var(--navy);
+    color: var(--white);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 3px;
+    letter-spacing: 0.04em;
+    margin-bottom: 12px;
+  }
+
+  /* ---------- Comparison Table ---------- */
+  .table-wrap {
+    overflow-x: auto;
+    margin: 20px 0;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+  table.compare {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--white);
+    font-size: 13.5px;
+    min-width: 640px;
+  }
+  table.compare th, table.compare td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    vertical-align: top;
+  }
+  table.compare th {
+    background: var(--navy);
+    color: var(--white);
+    font-weight: 700;
+    font-size: 13px;
+  }
+  table.compare tr:last-child td { border-bottom: none; }
+  table.compare td:first-child {
+    font-weight: 700;
+    color: var(--navy);
+    white-space: nowrap;
+  }
+  table.compare tr:nth-child(even) td { background: #f7f9fc; }
+
+  /* ---------- Quiz ---------- */
+  .quiz {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 24px;
+    margin: 24px 0;
+  }
+  .quiz .label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .quiz-question { font-weight: 700; margin-bottom: 14px; font-size: 15px; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-option {
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.15s;
+    background: var(--bg);
+  }
+  .quiz-option:hover { border-color: var(--navy); }
+  .quiz-option.correct {
+    border-color: #2e7d32;
+    background: #eaf6ec;
+    color: #2e7d32;
+    font-weight: 700;
+  }
+  .quiz-option.incorrect {
+    border-color: #c0392b;
+    background: #fdecea;
+    color: #c0392b;
+  }
+  .quiz-feedback {
+    margin-top: 14px;
+    font-size: 13.5px;
+    padding: 12px 14px;
+    border-radius: 5px;
+    display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct-fb { background: #eaf6ec; color: #2e7d32; }
+  .quiz-feedback.incorrect-fb { background: #fdecea; color: #c0392b; }
+
+  /* ---------- Drill toggle ---------- */
+  .drill {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin: 16px 0;
+    overflow: hidden;
+    background: var(--white);
+  }
+  .drill summary {
+    padding: 14px 18px;
+    cursor: pointer;
+    font-weight: 700;
+    color: var(--navy);
+    font-size: 14px;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .drill summary::after {
+    content: '+';
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--navy);
+  }
+  .drill[open] summary::after { content: '−'; }
+  .drill summary::-webkit-details-marker { display: none; }
+  .drill-content {
+    padding: 0 18px 18px;
+    font-size: 14px;
+    color: var(--text);
+  }
+
+  /* ---------- Bridge / connector ---------- */
+  .bridge {
+    text-align: center;
+    margin: 36px 0;
+    padding: 20px;
+    border-top: 1px dashed var(--border);
+    border-bottom: 1px dashed var(--border);
+  }
+  .bridge .serif {
+    font-size: 22px;
+    margin-bottom: 6px;
+  }
+  .bridge p {
+    font-size: 14px;
+    color: var(--gray);
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  /* ---------- Footer nav ---------- */
+  .module-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 32px;
+    font-size: 13px;
+  }
+  .module-nav a {
+    color: var(--navy);
+    text-decoration: none;
+    font-weight: 700;
+  }
+  .module-nav a:hover { text-decoration: underline; }
+
+  footer {
+    text-align: center;
+    padding: 32px 20px;
+    font-size: 12px;
+    color: var(--gray);
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">SECTION 07 · ERP 기초</div>
+  <h1>ERP 이전 시대의 기업 운영</h1>
+  <p>통합 시스템이 없던 시절, 기업은 어떻게 운영되었을까? 수기장부부터 MRP까지 — ERP가 "왜" 필요했는지를 이해하는 출발점</p>
+</header>
+
+<nav class="tabs">
+  <a href="#intro" class="tab-link">개요</a>
+  <a href="#manual" class="tab-link">수기장부</a>
+  <a href="#mainframe" class="tab-link">메인프레임</a>
+  <a href="#as400" class="tab-link">AS/400</a>
+  <a href="#mrp" class="tab-link">MRP/MRP II</a>
+  <a href="#erp" class="tab-link">ERP 등장</a>
+  <a href="#summary" class="tab-link">종합 비교</a>
+</nav>
+
+<main>
+
+  <!-- ============ INTRO ============ -->
+  <section class="module" id="intro">
+    <div class="module-header">
+      <span class="module-num">00</span>
+      <h2>왜 이 모듈부터 시작하는가</h2>
+    </div>
+    <div class="module-tagline">ERP는 "당연한 것"이 아니라, 수십 년에 걸친 문제 해결의 결과물입니다</div>
+
+    <div class="card">
+      <p>여러분이 처음 프로젝트에 투입되면, ERP는 이미 "있는 것"으로 주어집니다. 주문을 입력하면 재고가 줄고, 재고가 줄면 회계 전표가 자동으로 생성되는 흐름이 너무 당연해서, "이게 왜 대단한 일인지" 느끼기 어렵습니다.</p>
+      <p>하지만 이 흐름이 당연해지기 전, 기업들은 수십 년간 <strong>"각 부서는 자기 일을 잘 처리하는데, 왜 전체 그림은 보이지 않을까?"</strong>라는 문제와 씨름했습니다. 이 모듈에서는 그 여정을 따라가며, 매 시대마다 등장한 해결책이 동시에 새로운 한계를 만들어내는 패턴을 확인합니다.</p>
+      <div class="callout">
+        <span class="label">학습 목표</span>
+        ERP 등장 이전 5단계(수기장부 → 메인프레임 → AS/400 → MRP/MRP II → ERP)의 운영 방식과 각 단계의 핵심 한계를 설명할 수 있다. 이후 Universal Journal 모듈에서 다루는 "통합"의 의미를 이 역사적 맥락 위에서 이해한다.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 1. 수기장부 ============ -->
+  <section class="module" id="manual">
+    <div class="era-tag">ERA 1 · ~1960년대</div>
+    <div class="module-header">
+      <span class="module-num">01</span>
+      <h2>수기장부 시대</h2>
+    </div>
+    <div class="module-tagline">거래 하나가 여러 장부에 "손으로" 중복 기록되던 시대 — 데이터 일관성은 사람의 정확성에 의존</div>
+
+    <div class="scenario-card">
+      <span class="label">한 장면</span>
+      <p><span class="name-tag">경리과 김 주임</span>은 거래처에 제품을 판매한 영수증을 받으면, 먼저 <strong>매출장</strong>에 기록하고, 다시 <strong>재고장</strong>에 출고 수량을 적고, 월말이 되면 이 둘을 <strong>총계정원장</strong>에 옮겨 적습니다. 만약 매출장과 재고장의 숫자가 다르면, 김 주임은 한 달 치 거래를 처음부터 다시 대조해야 합니다.</p>
+    </div>
+
+    <div class="card">
+      <h3>전기(Posting) 흐름</h3>
+      <div class="flow">
+        <div class="flow-step"><span class="step-title">분개장</span>거래 발생 순서대로 1차 기록</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><span class="step-title">원장(G/L)</span>계정별로 재분류하여 전기</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><span class="step-title">보조부</span>매출장·매입장·재고장 등 별도 관리</div>
+      </div>
+      <p>각 부책(冊)은 <strong>별도의 물리적 장부</strong>로 존재했기 때문에, 동일한 거래 정보를 여러 번 옮겨 적는 과정에서 오류가 발생할 가능성이 항상 존재했습니다.</p>
+    </div>
+
+    <div class="card">
+      <h3>왜 "월말 마감"이 그렇게 중요했을까</h3>
+      <p>월말/연말 마감의 핵심 작업은 바로 <strong>대조(Reconciliation)</strong>였습니다. 매출장의 합계와 총계정원장의 매출 계정 합계가 일치하는지, 재고장의 기말 재고와 실물 재고가 일치하는지 — 이 대조 작업이 끝나야 비로소 "마감"이 가능했습니다.</p>
+      <p>오늘날 우리가 ACDOCA(Universal Journal)에서 "재무와 관리회계가 자동으로 일치한다"는 점을 당연하게 여기는 것과 정반대의 세계였습니다.</p>
+    </div>
+
+    <div class="callout">
+      <span class="label">정보 지연(Information Lag)</span>
+      경영진이 "지난달 매출이 얼마였는가"를 알기 위해서는, 모든 보조부의 마감과 대조가 끝나야 했습니다. 거래량이 많은 기업일수록 이 과정은 수일에서 수주가 걸렸고, 의사결정은 항상 "한 달 전 데이터"를 기준으로 이루어졌습니다.
+    </div>
+
+    <div class="card">
+      <h3>한계 요약</h3>
+      <div class="limit-grid">
+        <div class="limit-item"><span class="x-mark">✕</span>거래량 증가 시 인적 오류가 기하급수적으로 누적</div>
+        <div class="limit-item"><span class="x-mark">✕</span>부서 간 데이터 불일치 상시 발생, 대조에 막대한 시간 소요</div>
+        <div class="limit-item"><span class="x-mark">✕</span>감사 추적(Audit Trail) — 누가 언제 무엇을 근거로 기록했는지 추적 곤란</div>
+        <div class="limit-item"><span class="x-mark">✕</span>경영 의사결정이 항상 "과거 시점" 데이터에 기반</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2. 메인프레임 ============ -->
+  <section class="module" id="mainframe">
+    <div class="era-tag">ERA 2 · 1960~70년대</div>
+    <div class="module-header">
+      <span class="module-num">02</span>
+      <h2>메인프레임 시대</h2>
+    </div>
+    <div class="module-tagline">컴퓨터가 등장했지만, "부서별 칸막이"라는 본질적 구조는 그대로 유지됨</div>
+
+    <div class="scenario-card">
+      <span class="label">한 장면</span>
+      <p><span class="name-tag">전산실의 박 과장</span>은 매일 저녁, 낮 동안 발생한 거래 데이터를 천공카드(Punch Card) 더미로 정리해 메인프레임에 입력합니다. 처리는 밤새 진행되고, 다음 날 아침 출력된 리포트를 각 부서에 배포합니다. 만약 입력 데이터에 오류가 있었다면, 그 오류는 다음 날 아침이 되어야 발견됩니다.</p>
+    </div>
+
+    <div class="card">
+      <h3>왜 "야간 배치(Batch)"가 표준이었을까</h3>
+      <p>1960~70년대 메인프레임은 매우 고가의 자원이었고, 실시간(Real-time) 트랜잭션 처리에 필요한 컴퓨팅 파워를 일반 업무용으로 상시 할당하기 어려웠습니다. 따라서 낮 동안 발생한 데이터를 모아두고, 시스템 부하가 낮은 야간에 <strong>일괄 처리(Batch Processing)</strong>하는 방식이 표준이 되었습니다.</p>
+      <p>이는 단순한 기술적 제약을 넘어, "오늘 입력한 데이터는 내일 반영된다"는 <strong>하루 단위의 정보 지연</strong>을 구조적으로 내재화한 것이었습니다.</p>
+    </div>
+
+    <div class="card">
+      <h3>Silo System — 부서별 독립 시스템</h3>
+      <p>메인프레임이 도입되었다고 해서 "통합"이 이루어진 것은 아니었습니다. 오히려 각 부서가 <strong>자신의 업무에 최적화된 별도 시스템</strong>을 각자 구축하는 양상이 나타났습니다.</p>
+      <div class="flow">
+        <div class="flow-step">회계 시스템<br><span style="font-size:12px;color:var(--gray)">자체 DB</span></div>
+        <div class="flow-step">생산관리 시스템<br><span style="font-size:12px;color:var(--gray)">자체 DB</span></div>
+        <div class="flow-step">인사 시스템<br><span style="font-size:12px;color:var(--gray)">자체 DB</span></div>
+      </div>
+      <p>예를 들어, 생산관리 시스템에서 "제품 A를 100개 생산했다"는 정보는 그 시스템의 DB에만 기록되며, 회계 시스템에는 별도의 입력 작업(Duplicate Data Entry)을 통해 다시 전달되어야 했습니다.</p>
+    </div>
+
+    <div class="callout">
+      <span class="label">왜 지금도 레거시 시스템이 남아있는가</span>
+      COBOL로 작성된 메인프레임 시스템은 안정성이 높고, 한 번 구축하면 수십 년간 운영 가능했습니다. 이 때문에 일부 대형 금융기관·제조사는 핵심 트랜잭션 처리에 아직 메인프레임을 사용하며, ERP 전환 프로젝트에서 이 레거시와의 인터페이스 구축이 별도의 큰 과제로 다뤄지는 경우가 많습니다.
+    </div>
+
+    <div class="card">
+      <h3>한계 요약</h3>
+      <div class="limit-grid">
+        <div class="limit-item"><span class="x-mark">✕</span>야간 배치 구조로 인한 최소 하루 단위의 정보 지연</div>
+        <div class="limit-item"><span class="x-mark">✕</span>부서별 독립 DB(Silo) — 시스템은 도입했지만 칸막이는 그대로</div>
+        <div class="limit-item"><span class="x-mark">✕</span>동일 데이터를 여러 시스템에 중복 입력해야 하는 비효율</div>
+        <div class="limit-item"><span class="x-mark">✕</span>높은 도입·유지 비용으로 대기업 중심으로만 보급</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3. AS/400 ============ -->
+  <section class="module" id="as400">
+    <div class="era-tag">ERA 3 · 1980~90년대</div>
+    <div class="module-header">
+      <span class="module-num">03</span>
+      <h2>AS/400 시대</h2>
+    </div>
+    <div class="module-tagline">중소·중견기업의 "부서 통합 첫걸음" — 그러나 여전히 기업 전체 통합과는 거리가 있었음</div>
+
+    <div class="scenario-card">
+      <span class="label">한 장면</span>
+      <p><span class="name-tag">제조업체 생산관리팀의 이 차장</span>은 AS/400 단말기에서 재고 현황과 구매 발주 내역을 동시에 조회할 수 있습니다. 더 이상 재고 담당자에게 전화로 물어볼 필요가 없습니다. 하지만 이번 달 원가가 얼마나 발생했는지는, 여전히 회계팀에서 별도 시스템으로 마감 후에야 확인할 수 있습니다.</p>
+    </div>
+
+    <div class="card">
+      <h3>IBM AS/400의 포지셔닝</h3>
+      <p>IBM AS/400(현재의 IBM i)은 메인프레임만큼 강력하지는 않지만, 메인프레임보다 훨씬 저렴하고 안정적인 <strong>중견기업용 비즈니스 컴퓨터</strong>로 포지셔닝되었습니다. 1988년 출시 이후 전 세계 중소·중견 제조업체의 표준 플랫폼으로 자리잡았습니다.</p>
+      <div class="callout">
+        <span class="label">메인프레임 대비 진전된 부분</span>
+        AS/400은 <strong>통합 데이터베이스(Integrated DB2)</strong>를 운영체제 차원에서 기본 내장했습니다. 즉, 별도의 DB 소프트웨어를 구매·구성하지 않아도 애플리케이션이 동일한 데이터베이스를 공유할 수 있는 구조였습니다 — 이는 이전 시대의 "부서별 독립 DB" 문제를 부분적으로 해소한 진전이었습니다.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>그러나 — "기업 내 일부 기능"의 통합</h3>
+      <p>AS/400 기반 시스템에서는 보통 <strong>재고·구매·생산관리</strong> 영역이 같은 DB 위에서 통합되어 운영되는 경우가 많았습니다. 하지만 <strong>회계(재무)</strong>는 별도 패키지 또는 별도 시스템으로 운영되는 경우가 흔했고, 두 영역 간 데이터 연계는 여전히 배치 인터페이스나 수동 입력에 의존했습니다.</p>
+      <div class="flow">
+        <div class="flow-step solution"><span class="step-title">재고 · 구매 · 생산</span>AS/400 단일 DB 내 통합</div>
+        <div class="flow-arrow">⇢</div>
+        <div class="flow-step problem"><span class="step-title">회계</span>별도 시스템, 단절된 연계</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>자체 개발 시스템(In-house System) 문화</h3>
+      <p>AS/400은 RPG라는 프로그래밍 언어를 통해 기업이 자신의 업무 프로세스에 맞춰 애플리케이션을 직접 개발하는 것이 비교적 용이했습니다. 이로 인해 많은 제조업체들이 "패키지 도입"이 아닌 <strong>"우리 회사 맞춤 자체 개발"</strong> 시스템을 구축하는 문화가 형성되었습니다.</p>
+    </div>
+
+    <div class="drill">
+      <summary>한국 기업 맥락 — AS/400과 ERP 전환의 연결점</summary>
+      <div class="drill-content">
+        <p>1990년대 국내 중견 제조사들 중 상당수는 AS/400 기반의 자체 개발 시스템을 오랜 기간 운영해왔습니다. 이후 ERP(특히 SAP) 도입 프로젝트를 진행할 때, 이 AS/400 시스템에 축적된 수십 년치 마스터 데이터(자재 마스터, BOM, 거래처 마스터 등)를 어떻게 SAP로 마이그레이션할 것인가가 핵심 과제로 등장하는 경우가 많습니다.</p>
+        <p>특히 AS/400 시스템은 코드 체계나 마스터 데이터 구조가 SAP의 표준 구조와 다른 경우가 많아, 단순 데이터 이전이 아니라 <strong>코드 매핑·정합성 검증</strong> 작업이 프로젝트 초기 일정의 상당 부분을 차지하게 됩니다. 여러분이 향후 데이터 마이그레이션 워크스트림에 참여하게 된다면, "왜 이렇게 마스터 데이터 정비에 시간이 오래 걸리는가"에 대한 배경 중 하나가 바로 이런 레거시 시스템의 역사입니다.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>한계 요약</h3>
+      <div class="limit-grid">
+        <div class="limit-item"><span class="x-mark">✕</span>운영(생산·재고·구매)과 재무 간 데이터 연계 단절 지속</div>
+        <div class="limit-item"><span class="x-mark">✕</span>자체 개발 시스템 의존도가 높아 표준화 부족</div>
+        <div class="limit-item"><span class="x-mark">✕</span>다국가·다통화·다회사 운영에는 구조적으로 적합하지 않음</div>
+        <div class="limit-item"><span class="x-mark">✕</span>훗날 ERP 전환 시 마스터 데이터 마이그레이션의 부담으로 이어짐</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4. MRP/MRP II ============ -->
+  <section class="module" id="mrp">
+    <div class="era-tag">ERA 4 · 1970~80년대</div>
+    <div class="module-header">
+      <span class="module-num">04</span>
+      <h2>MRP / MRP II 시대</h2>
+    </div>
+    <div class="module-tagline">"생산"이라는 단일 도메인 내에서는 통합이 이루어졌으나, 재무와는 단절</div>
+
+    <div class="scenario-card">
+      <span class="label">한 장면</span>
+      <p><span class="name-tag">생산계획팀의 정 과장</span>은 MRP 시스템을 돌려, 다음 달 생산계획을 충족하기 위해 어떤 부품을 얼마나, 언제까지 발주해야 하는지 정확히 산출합니다. 시스템은 "부품 X 500개를 2주 후까지 입고"라고 알려줍니다. 하지만 "이 생산계획을 수행하면 이번 달 제조원가가 얼마가 될지"는 정 과장의 화면에 나타나지 않습니다 — 그건 회계팀의 영역입니다.</p>
+    </div>
+
+    <div class="card">
+      <h3>MRP(Material Requirements Planning) — 1970년대</h3>
+      <p>MRP의 핵심 로직은 명확합니다: <strong>BOM(자재명세서) + 현재고 + 생산계획(MPS)</strong>을 입력으로 받아, "무엇을, 언제까지, 얼마나" 발주하거나 생산 지시해야 하는지를 역산(逆算)하는 것입니다.</p>
+      <div class="flow">
+        <div class="flow-step">BOM<br><span style="font-size:12px;color:var(--gray)">제품 구성 정보</span></div>
+        <div class="flow-step">현재고<br><span style="font-size:12px;color:var(--gray)">보유 재고량</span></div>
+        <div class="flow-step">생산계획(MPS)<br><span style="font-size:12px;color:var(--gray)">무엇을 언제 만들 것인가</span></div>
+      </div>
+      <div style="text-align:center; font-size:22px; color: var(--navy); margin: 4px 0;">↓ MRP 로직 (전개 · 차감) ↓</div>
+      <div class="flow">
+        <div class="flow-step solution"><span class="step-title">발주/생산 지시</span>무엇을, 언제, 얼마나</div>
+      </div>
+      <div class="callout">
+        <span class="label">BOM 모듈과의 연결</span>
+        앞서 학습한 SAP BOM 모듈에서 다룬 정전개(Forward Explosion)·역전개(Reverse Explosion) 개념이 바로 이 MRP 로직의 핵심 메커니즘입니다. MRP는 BOM 구조를 따라 상위 제품의 생산계획을 하위 부품 단위로 "분해"하여 필요 수량을 계산합니다.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>MRP II(Manufacturing Resource Planning) — 1980년대 확장</h3>
+      <p>MRP II는 자재 소요량 계산을 넘어, <strong>생산능력계획(Capacity Planning)</strong>과 <strong>일정계획(Scheduling)</strong>까지 포괄하는 "제조 자원 전체"에 대한 계획 체계로 확장되었습니다. "자재는 충분한데 그 시점에 설비/인력이 부족하다면?"이라는 질문에 답할 수 있게 된 것이 핵심 진전입니다.</p>
+    </div>
+
+    <div class="card">
+      <h3>결정적 한계 — 재무회계와의 단절</h3>
+      <p>MRP/MRP II가 아무리 정교해져도, 그 결과는 <strong>물량(Quantity) 단위</strong>의 계획이었습니다. 이를 금액으로 환산하여 재무에 반영하는 것은 별도의 프로세스였습니다.</p>
+      <div class="limit-grid">
+        <div class="limit-item"><span class="x-mark">✕</span>생산팀은 "몇 개를 언제 만들 수 있는가"는 알지만, "그것이 재무적으로 얼마의 비용/이익인가"는 별도 계산 영역</div>
+        <div class="limit-item"><span class="x-mark">✕</span>표준원가(Standard Cost)와 실제원가(Actual Cost)의 차이가 재무에 자동·실시간으로 반영되지 않음</div>
+      </div>
+      <p>즉, "생산"이라는 도메인 안에서는 자재-재고-생산계획이 통합되었지만, 이 통합의 경계는 <strong>재무회계 직전에서 끊어졌습니다.</strong> 이것이 바로 "전사적(Enterprise-wide)" 자원관리로 확장되어야 하는 필요성의 직접적 근거가 됩니다.</p>
+    </div>
+  </section>
+
+  <!-- ============ Bridge to ERP ============ -->
+  <div class="bridge">
+    <div class="serif">"기능별로는 완벽했지만, 전체로는 아니었다"</div>
+    <p>수기장부, 메인프레임, AS/400, MRP/MRP II — 각 시대는 그 시대의 문제를 해결했지만, 동시에 "기업 전체를 하나의 그림으로 보는 것"이라는 더 큰 문제를 남겼습니다.</p>
+  </div>
+
+  <!-- ============ 5. ERP 등장 배경 ============ -->
+  <section class="module" id="erp">
+    <div class="era-tag">ERA 5 · 1990년대 ~</div>
+    <div class="module-header">
+      <span class="module-num">05</span>
+      <h2>ERP 등장 배경</h2>
+    </div>
+    <div class="module-tagline">"기능별 최적화는 되었지만, 기업 전체 관점의 단일 진실(Single Source of Truth)이 없다"</div>
+
+    <div class="card">
+      <h3>ERP라는 용어의 등장</h3>
+      <p>1990년, 가트너(Gartner)는 기존의 MRP II를 한 단계 더 확장한 개념으로 "ERP(Enterprise Resource Planning)"라는 용어를 제시했습니다. 핵심은 더 이상 "생산"이라는 단일 도메인이 아니라, <strong>영업·생산·구매·재고·인사·회계 전체를 포괄하는 전사적 자원관리</strong>였습니다.</p>
+    </div>
+
+    <div class="card">
+      <h3>ERP의 본질적 차별점 — 단일 데이터베이스 + 실시간 통합</h3>
+      <p>ERP가 이전 시스템들과 근본적으로 다른 지점은 바로 이것입니다: <strong>모든 업무 영역이 하나의 데이터베이스를 공유하며, 한 영역의 트랜잭션이 다른 영역에 실시간으로 반영된다.</strong></p>
+      <div class="flow">
+        <div class="flow-step">영업: 주문 입력</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">생산: 생산계획 자동 반영</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">자재: 발주 트리거</div>
+      </div>
+      <div class="flow">
+        <div class="flow-step">재고: 변동 반영</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step solution">회계: 전표 자동 생성</div>
+      </div>
+      <p>이 모든 과정이 <strong>하나의 트랜잭션</strong>으로 연결되며, 별도의 데이터 재입력이나 야간 배치 대조 작업 없이 진행됩니다. 수기장부 시대의 "여러 장부에 손으로 중복 기록"하던 문제가, 100여 년 만에 "하나의 입력이 전체 시스템에 즉시 반영"되는 구조로 도달한 것입니다.</p>
+    </div>
+
+    <div class="card">
+      <h3>1990년대 ERP 확산의 배경</h3>
+      <ul>
+        <li><strong>글로벌화(Globalization)</strong>: 다국가·다통화·다법인을 운영하는 기업이 늘어나면서, 각 법인의 시스템을 개별 관리하는 방식의 한계가 명확해짐</li>
+        <li><strong>Y2K 문제(2000년 연도 표기 문제)</strong>: 기존 레거시 시스템(특히 메인프레임 COBOL 시스템)의 연도 표기 결함을 해결하는 대신, 이를 계기로 신규 ERP 시스템으로 전면 교체하는 기업이 급증</li>
+        <li><strong>경쟁 환경 변화</strong>: 시장 변화에 더 빠르게 대응하기 위해, "한 달 전 데이터"가 아닌 "지금 이 순간의 데이터"에 기반한 의사결정 필요성 증대</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>SAP R/3와 "실시간(Real-time)" 패러다임</h3>
+      <p>1992년 출시된 SAP R/3는 클라이언트-서버 구조와 통합 데이터베이스를 기반으로, 위에서 설명한 ERP의 비전을 상업적으로 구현한 대표적 사례였습니다. "R"은 Realtime(실시간)을 의미하며, 이는 단순한 브랜드명이 아니라 이전 시대의 배치(Batch) 처리 패러다임과의 단절을 선언하는 이름이었습니다.</p>
+    </div>
+
+    <div class="callout">
+      <span class="label">다음 모듈로 이어지는 질문</span>
+      ERP는 "업무 프로세스의 실시간 통합"을 가능하게 했습니다. 그렇다면 회계 관점에서, 이 통합은 구체적으로 어떤 형태로 구현될까요? 재무회계(FI)와 관리회계(CO)가 별도의 테이블에 각각 기록되던 구조에서, 어떻게 "하나의 원장(Single Ledger)"으로 수렴하게 되었을까요? — 다음 모듈 <strong>Universal Journal</strong>에서 이 질문에서부터 시작합니다.
+    </div>
+  </section>
+
+  <!-- ============ 종합 비교 ============ -->
+  <section class="module" id="summary">
+    <div class="module-header">
+      <span class="module-num">06</span>
+      <h2>종합 비교</h2>
+    </div>
+    <div class="module-tagline">각 시대의 해결책은 다음 시대의 출발점이 되었고, 동시에 새로운 한계를 남겼습니다</div>
+
+    <div class="card">
+      <p>아래 표는 5개 시대를 <strong>데이터 통합 수준</strong>, <strong>처리 방식</strong>, <strong>재무 연계성</strong> 세 축으로 비교한 것입니다. 시대가 거듭될수록 "통합의 범위"가 점진적으로 확대되어 왔으며, ERP에서 비로소 운영(Operation)과 재무(Finance)가 하나의 트랜잭션으로 연결되었다는 흐름에 주목해 주세요.</p>
+    </div>
+
+    <div class="table-wrap">
+      <table class="compare">
+        <tr>
+          <th>시대</th>
+          <th>데이터 통합 수준</th>
+          <th>처리 방식</th>
+          <th>재무 연계성</th>
+        </tr>
+        <tr>
+          <td>수기장부</td>
+          <td>통합 없음 — 거래마다 분개장·원장·보조부에 개별 수기 기록</td>
+          <td>완전 수동 — 월말 대조를 통해서만 정합성 확인</td>
+          <td>재무가 곧 장부 자체 — 단, 보조부와의 대조에 막대한 시간 소요</td>
+        </tr>
+        <tr>
+          <td>메인프레임</td>
+          <td>부서별 독립 DB(Silo) — 시스템화는 되었으나 부서 간 데이터는 분리</td>
+          <td>야간 배치(Batch) — 최소 하루 단위 정보 지연 발생</td>
+          <td>각 부서 데이터를 회계 시스템에 별도 입력(Duplicate Entry)</td>
+        </tr>
+        <tr>
+          <td>AS/400</td>
+          <td>일부 영역 통합 — 재고·구매·생산이 통합 DB(DB2) 공유</td>
+          <td>온라인 조회 가능 + 일부 배치 처리 병행</td>
+          <td>회계는 별도 시스템 — 운영-재무 간 연계는 여전히 단절</td>
+        </tr>
+        <tr>
+          <td>MRP / MRP II</td>
+          <td>생산 도메인 내부 통합 — BOM·재고·생산계획·능력계획 연결</td>
+          <td>계획 로직 기반 — 물량(Quantity) 단위 산출</td>
+          <td>물량 계획 결과가 금액으로 환산되어 재무에 자동 반영되지 않음</td>
+        </tr>
+        <tr>
+          <td>ERP</td>
+          <td>전사 통합 — 영업·생산·구매·재고·인사·회계가 단일 DB 공유</td>
+          <td>실시간(Real-time) — 하나의 트랜잭션이 전 영역에 즉시 반영</td>
+          <td>운영 트랜잭션 발생 시 회계 전표가 자동·동시 생성</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="callout">
+      <span class="label">핵심 패턴</span>
+      각 시대의 "해결책"은 항상 특정 범위(부서, 도메인) 안에서의 통합이었고, 그 범위의 경계 밖은 다음 시대의 과제로 남았습니다. ERP는 이 경계를 "전사(Enterprise)" 수준으로 확장한 것이며, 다음 모듈에서는 이 통합이 회계 영역에서 구체적으로 어떻게 구현되는지(Universal Journal)를 다룹니다.
+    </div>
+  </section>
+
+  <!-- ============ Quiz ============ -->
+  <section class="module" id="quiz-section">
+    <div class="module-header">
+      <span class="module-num">Q</span>
+      <h2>확인 퀴즈</h2>
+    </div>
+
+    <div class="quiz">
+      <span class="label">Question 1</span>
+      <div class="quiz-question">MRP/MRP II 시대의 가장 결정적인 한계는 무엇이었습니까?</div>
+      <div class="quiz-options">
+        <div class="quiz-option" onclick="checkAnswer(this, false, 'q1')">BOM 데이터를 전산화할 수 없었다</div>
+        <div class="quiz-option" onclick="checkAnswer(this, true, 'q1')">물량 계획은 정교해졌지만, 그 결과가 재무회계에 자동·실시간으로 반영되지 않았다</div>
+        <div class="quiz-option" onclick="checkAnswer(this, false, 'q1')">생산능력계획(Capacity Planning) 기능 자체가 존재하지 않았다</div>
+      </div>
+      <div class="quiz-feedback" id="q1-fb"></div>
+    </div>
+
+    <div class="quiz">
+      <span class="label">Question 2</span>
+      <div class="quiz-question">AS/400이 메인프레임 시대 대비 가져온 진전은 무엇입니까?</div>
+      <div class="quiz-options">
+        <div class="quiz-option" onclick="checkAnswer(this, false, 'q2')">회계와 생산관리를 포함한 기업 전체 기능의 완전한 통합 달성</div>
+        <div class="quiz-option" onclick="checkAnswer(this, true, 'q2')">운영체제 차원에서 통합 데이터베이스(DB2)를 내장하여, 일부 업무 영역(재고·구매·생산 등) 간 데이터 공유가 가능해짐</div>
+        <div class="quiz-option" onclick="checkAnswer(this, false, 'q2')">실시간 처리(Real-time)를 최초로 구현한 시스템이었다</div>
+      </div>
+      <div class="quiz-feedback" id="q2-fb"></div>
+    </div>
+
+    <div class="quiz">
+      <span class="label">Question 3</span>
+      <div class="quiz-question">ERP가 이전 시스템들과 본질적으로 구별되는 가장 핵심적인 특징은 무엇입니까?</div>
+      <div class="quiz-options">
+        <div class="quiz-option" onclick="checkAnswer(this, false, 'q3')">더 많은 보고서를 출력할 수 있게 되었다</div>
+        <div class="quiz-option" onclick="checkAnswer(this, false, 'q3')">컴퓨터 처리 속도가 메인프레임보다 빨라졌다는 점 뿐이다</div>
+        <div class="quiz-option" onclick="checkAnswer(this, true, 'q3')">단일 데이터베이스를 기반으로 한 영역의 트랜잭션이 다른 영역에 실시간으로 반영되는 통합 구조</div>
+      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
+    </div>
+  </section>
+
+  <div class="module-nav">
+    <span></span>
+    <span style="color:var(--gray);">다음: Universal Journal (작성 예정)</span>
+  </div>
+
+</main>
+
+<footer>
+  ASPN BAC Education Portal · Section 07 — ERP 기초
+</footer>
+
+<script>
+  // Sticky nav active state on scroll
+  const sections = document.querySelectorAll('section.module');
+  const links = document.querySelectorAll('nav.tabs a');
+
+  function onScroll() {
+    let current = '';
+    sections.forEach(sec => {
+      const rect = sec.getBoundingClientRect();
+      if (rect.top <= 80 && rect.bottom > 80) {
+        current = sec.id;
+      }
+    });
+    links.forEach(link => {
+      link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+    });
+  }
+  window.addEventListener('scroll', onScroll);
+  onScroll();
+
+  // Quiz logic
+  const quizExplain = {
+    q1: "MRP/MRP II는 물량(Quantity) 단위의 계획을 정교화했지만, 표준원가와 실제원가의 차이가 재무회계에 자동·실시간으로 반영되지 않는 구조적 한계가 있었습니다.",
+    q2: "AS/400은 운영체제 차원에서 DB2를 통합 내장하여, 재고·구매·생산 등 일부 영역 간 데이터 공유를 가능하게 했지만 회계와의 완전한 통합에는 이르지 못했습니다.",
+    q3: "ERP의 본질은 단일 데이터베이스를 기반으로 한 영역의 트랜잭션이 다른 영역(예: 회계)에 실시간으로 반영되는 통합 구조에 있습니다."
+  };
+
+  function checkAnswer(el, isCorrect, qid) {
+    const options = el.parentElement.querySelectorAll('.quiz-option');
+    options.forEach(o => {
+      o.style.pointerEvents = 'none';
+      o.classList.remove('correct', 'incorrect');
+    });
+
+    if (isCorrect) {
+      el.classList.add('correct');
+    } else {
+      el.classList.add('incorrect');
+      options.forEach(o => {
+        if (o.getAttribute('onclick').includes('true')) {
+          o.classList.add('correct');
+        }
+      });
+    }
+
+    const fb = document.getElementById(qid + '-fb');
+    if (fb) {
+      fb.textContent = (isCorrect ? '✓ 정답입니다. ' : '✕ 오답입니다. ') + quizExplain[qid];
+      fb.classList.remove('correct-fb', 'incorrect-fb');
+      fb.classList.add('show', isCorrect ? 'correct-fb' : 'incorrect-fb');
+    }
+  }
+</script>
+
+</body>
+</html>
