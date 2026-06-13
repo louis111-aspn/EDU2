@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>경영정보시스템(MIS)의 역사 - SAC 교육 자료</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #003366;
+    --navy-light: #e8eef5;
+    --bg: #f0f3f8;
+    --white: #ffffff;
+    --text: #2c2c2c;
+    --gray: #6b7280;
+    --border: #d6dde8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans KR', 'JetBrains Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.7;
+    padding-bottom: 80px;
+    overflow-x: hidden;
+  }
+  h1, h2, h3, .serif { font-family: 'DM Serif Display', 'Noto Sans KR', serif; }
+
+  /* ===== HEADER ===== */
+  .hero {
+    background: var(--navy);
+    color: white;
+    padding: 60px 24px 40px;
+    text-align: center;
+  }
+  .hero .eyebrow {
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 14px;
+  }
+  .hero h1 { font-size: 42px; margin-bottom: 14px; }
+  .hero p { font-size: 16px; opacity: 0.85; max-width: 640px; margin: 0 auto; }
+
+  /* ===== STICKY NAV ===== */
+  .nav-bar {
+    position: sticky; top: 0; z-index: 100;
+    background: white;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .nav-bar-inner { display: flex; max-width: 900px; margin: 0 auto; }
+  .nav-tab {
+    flex: none;
+    padding: 14px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gray);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all .2s;
+  }
+  .nav-tab:hover { color: var(--navy); background: var(--navy-light); }
+  .nav-tab.active { color: var(--navy); border-bottom-color: var(--navy); background: var(--navy-light); }
+
+  /* ===== LAYOUT ===== */
+  .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+  section.module {
+    background: white;
+    border-radius: 12px;
+    margin: 32px 0;
+    padding: 36px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    border: 1px solid var(--border);
+  }
+  .module-tag {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+    background: var(--navy-light);
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+    letter-spacing: 1px;
+  }
+  .section-title { font-size: 30px; color: var(--navy); margin-bottom: 8px; }
+  .subtitle { font-size: 16px; color: var(--gray); margin-bottom: 24px; }
+
+  /* ===== TIMELINE ===== */
+  .timeline-wrap { margin: 36px 0; }
+  .timeline-track {
+    position: relative;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    margin: 0 10px 0;
+  }
+  .timeline-fill {
+    position: absolute; left: 0; top: 0; height: 6px;
+    background: var(--navy); border-radius: 3px;
+    width: 0%; transition: width .4s;
+  }
+  .timeline-points {
+    display: flex; justify-content: space-between;
+    margin-top: 10px; flex-wrap: wrap; gap: 6px;
+  }
+  .tpoint {
+    flex: 1 1 auto; min-width: 60px; text-align: center; cursor: pointer;
+    font-size: 11px; font-weight: 700; color: var(--gray);
+    padding: 8px 2px; border-radius: 8px; transition: all .2s;
+  }
+  .tpoint .dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--border); margin: 0 auto 6px;
+    transition: all .2s; border: 3px solid white;
+  }
+  .tpoint.active { color: var(--navy); }
+  .tpoint.active .dot { background: var(--navy); transform: scale(1.3); }
+  .tpoint:hover { background: var(--navy-light); }
+
+  /* ===== ERA CARD ===== */
+  .era-card {
+    display: none;
+    animation: fadeIn .4s;
+  }
+  .era-card.show { display: block; }
+  @keyframes fadeIn { from {opacity:0; transform: translateY(8px);} to {opacity:1; transform: translateY(0);} }
+
+  .era-header {
+    display: flex; align-items: baseline; gap: 14px; margin-bottom: 4px;
+    flex-wrap: wrap;
+  }
+  .era-period {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px; color: var(--navy); font-weight: 700;
+    background: var(--navy-light); padding: 4px 10px; border-radius: 6px;
+  }
+  .era-name { font-size: 26px; color: var(--text); font-weight: 700; }
+  .era-kor { font-size: 15px; color: var(--gray); margin-bottom: 18px; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 20px; }
+  @media (max-width: 640px) { .grid2 { grid-template-columns: 1fr; } }
+
+  .callout {
+    background: var(--navy-light);
+    border-left: 4px solid var(--navy);
+    border-radius: 8px;
+    padding: 16px 18px;
+  }
+  .callout h4 {
+    font-size: 13px; color: var(--navy); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 8px; font-weight: 700;
+  }
+  .callout.limit { border-left-color: #b04a4a; background: #faf0f0; }
+  .callout.limit h4 { color: #b04a4a; }
+  .callout.bridge { border-left-color: #2d7d46; background: #eef7f0; }
+  .callout.bridge h4 { color: #2d7d46; }
+
+  .flow-diagram {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg); border-radius: 10px; padding: 20px;
+    margin: 18px 0; flex-wrap: wrap; justify-content: center;
+  }
+  .flow-box {
+    flex: none; background: white; border: 2px solid var(--navy);
+    border-radius: 8px; padding: 10px 12px; font-size: 12px; font-weight: 700;
+    color: var(--navy); text-align: center; min-width: 70px;
+  }
+  .flow-arrow { flex: none; color: var(--navy); font-size: 18px; font-weight: 700; }
+  @media (max-width: 640px) {
+    .flow-arrow { transform: rotate(90deg); }
+  }
+
+  ul.bullets { padding-left: 0; list-style: none; margin-top: 8px; }
+  ul.bullets li {
+    padding-left: 22px; position: relative; margin-bottom: 8px; font-size: 14px;
+  }
+  ul.bullets li::before {
+    content: '▸'; position: absolute; left: 0; color: var(--navy); font-weight: 700;
+  }
+
+  /* ===== AXIS / MECE SUMMARY ===== */
+  .axis-table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 13px; }
+  .axis-table th, .axis-table td {
+    border: 1px solid var(--border); padding: 10px 12px; text-align: left;
+  }
+  .axis-table th { background: var(--navy); color: white; font-weight: 700; font-size: 12px; }
+  .axis-table td.label { font-weight: 700; color: var(--navy); background: var(--navy-light); }
+
+  /* ===== QUIZ ===== */
+  .quiz-q { font-weight: 700; margin-bottom: 12px; font-size: 15px; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt {
+    border: 1.5px solid var(--border); border-radius: 8px;
+    padding: 12px 16px; cursor: pointer; font-size: 14px; transition: all .15s;
+    background: white;
+  }
+  .quiz-opt:hover { border-color: var(--navy); background: var(--navy-light); }
+  .quiz-opt.correct { border-color: #2d7d46; background: #eef7f0; font-weight: 700; }
+  .quiz-opt.wrong { border-color: #b04a4a; background: #faf0f0; }
+  .quiz-feedback { margin-top: 12px; font-size: 13px; color: var(--gray); display:none; }
+  .quiz-feedback.show { display: block; }
+
+  /* ===== MATCHING GAME ===== */
+  .match-game { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
+  @media (max-width: 640px) { .match-game { grid-template-columns: 1fr; } }
+  .match-col h4 { font-size: 12px; color: var(--gray); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .match-item {
+    border: 1.5px solid var(--border); border-radius: 8px; padding: 12px 14px;
+    margin-bottom: 8px; cursor: pointer; font-size: 13px; transition: all .15s; background: white;
+  }
+  .match-item.selected { border-color: var(--navy); background: var(--navy-light); }
+  .match-item.matched { border-color: #2d7d46; background: #eef7f0; opacity: .6; cursor: default; }
+  .match-item.shake { animation: shake .3s; border-color: #b04a4a; }
+  @keyframes shake { 0%,100% {transform: translateX(0);} 25% {transform: translateX(-4px);} 75% {transform: translateX(4px);} }
+  .match-status { margin-top: 12px; font-size: 13px; color: var(--gray); }
+
+  /* ===== SELF-DIAGNOSIS ===== */
+  .diag-card {
+    border: 1.5px solid var(--border); border-radius: 10px; padding: 18px;
+    margin-bottom: 12px; cursor: pointer; transition: all .15s;
+  }
+  .diag-card:hover { border-color: var(--navy); }
+  .diag-card.active { border-color: var(--navy); background: var(--navy-light); }
+  .diag-card h4 { font-size: 15px; color: var(--text); margin-bottom: 6px; }
+  .diag-card .stage-tag {
+    display: inline-block; font-size: 11px; font-weight: 700; color: white;
+    background: var(--navy); padding: 2px 8px; border-radius: 4px; margin-bottom: 8px;
+  }
+  .diag-result {
+    margin-top: 16px; padding: 16px; border-radius: 8px;
+    background: var(--navy-light); border-left: 4px solid var(--navy);
+    display: none; font-size: 14px;
+  }
+  .diag-result.show { display: block; }
+
+  /* ===== NAV BUTTONS ===== */
+  .module-nav {
+    display: flex; justify-content: space-between; margin-top: 28px;
+    padding-top: 20px; border-top: 1px solid var(--border);
+  }
+  .nbtn {
+    font-size: 13px; font-weight: 700; color: var(--navy);
+    background: var(--navy-light); border: none; border-radius: 8px;
+    padding: 10px 18px; cursor: pointer; transition: all .15s;
+  }
+  .nbtn:hover { background: var(--navy); color: white; }
+  .nbtn:disabled { opacity: .3; cursor: default; }
+  .nbtn:disabled:hover { background: var(--navy-light); color: var(--navy); }
+
+  .footer-note {
+    text-align: center; color: var(--gray); font-size: 12px; padding: 30px 24px;
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="eyebrow">SAC EDUCATION · PREREQUISITE MODULE</div>
+  <h1>경영정보시스템(MIS)의 역사</h1>
+  <p>TPS에서 AI Agent까지 — 정보시스템은 왜 단계적으로 진화했는가?<br>이 흐름 속에서 ERP와 SAC의 위치를 이해합니다.</p>
+</div>
+
+<div class="nav-bar">
+  <div class="nav-bar-inner" id="navBar">
+    <div class="nav-tab" data-target="intro">Intro</div>
+    <div class="nav-tab" data-target="timeline">진화 타임라인</div>
+    <div class="nav-tab" data-target="summary">종합 정리</div>
+    <div class="nav-tab" data-target="game">매칭 게임</div>
+    <div class="nav-tab" data-target="diagnosis">자가진단</div>
+    <div class="nav-tab" data-target="quiz">퀴즈</div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ============ INTRO ============ -->
+  <section class="module" id="intro">
+    <div class="module-tag">INTRO</div>
+    <h2 class="section-title">왜 MIS 역사를 알아야 하는가</h2>
+    <p class="subtitle">SAC를 배우기 전에, 이 도구가 "어디서 왔는가"를 이해합니다.</p>
+
+    <div class="flow-diagram">
+      <div class="flow-box">TPS</div><div class="flow-arrow">→</div>
+      <div class="flow-box">MIS</div><div class="flow-arrow">→</div>
+      <div class="flow-box">DSS</div><div class="flow-arrow">→</div>
+      <div class="flow-box">EIS</div><div class="flow-arrow">→</div>
+      <div class="flow-box" style="border-color:#b04a4a; color:#b04a4a;">ERP</div><div class="flow-arrow">→</div>
+      <div class="flow-box">BI / SAC</div><div class="flow-arrow">→</div>
+      <div class="flow-box">AI Agent</div>
+    </div>
+
+    <div class="grid2">
+      <div class="callout">
+        <h4>핵심 질문</h4>
+        <p>정보시스템은 왜 한 번에 완성되지 않고, 70년에 걸쳐 단계적으로 진화했을까요?</p>
+      </div>
+      <div class="callout bridge">
+        <h4>이 자료의 결론</h4>
+        <p>각 단계는 이전 단계의 <b>한계</b>를 보완하며 등장했습니다. SAC(BI+Planning)도 예외가 아니며, 이 진화 흐름의 한 지점일 뿐입니다.</p>
+      </div>
+    </div>
+
+    <ul class="bullets" style="margin-top:20px;">
+      <li><b>누적적 진화</b>: 새 단계가 등장해도 이전 단계는 사라지지 않고, 그 위에 새로운 레이어가 쌓입니다 (예: ERP는 TPS 기능을 포함하면서 통합을 추가).</li>
+      <li><b>3가지 축</b>: 데이터 범위, 의사결정 주체, 시간성이라는 축을 따라가며 각 단계의 위치를 파악합니다.</li>
+      <li><b>ERP는 전환점</b>: "데이터 통합"이라는 ERP의 가치가 있어야 그 이후의 BI·SAC·AI Agent가 의미를 가집니다.</li>
+    </ul>
+
+    <div class="module-nav">
+      <button class="nbtn" disabled>이전</button>
+      <button class="nbtn" onclick="goToSection('timeline')">다음: 진화 타임라인 →</button>
+    </div>
+  </section>
+
+  <!-- ============ TIMELINE ============ -->
+  <section class="module" id="timeline">
+    <div class="module-tag">TIMELINE</div>
+    <h2 class="section-title">진화 타임라인</h2>
+    <p class="subtitle">연도를 클릭하면 각 단계의 등장 배경 · 특징 · 한계를 확인할 수 있습니다.</p>
+
+    <div class="timeline-wrap">
+      <div class="timeline-track"><div class="timeline-fill" id="timelineFill"></div></div>
+      <div class="timeline-points" id="timelinePoints">
+        <div class="tpoint" data-era="0"><div class="dot"></div>TPS<br>1950s</div>
+        <div class="tpoint" data-era="1"><div class="dot"></div>MIS<br>1960s</div>
+        <div class="tpoint" data-era="2"><div class="dot"></div>DSS<br>1970s</div>
+        <div class="tpoint" data-era="3"><div class="dot"></div>EIS<br>1980s</div>
+        <div class="tpoint" data-era="4"><div class="dot"></div>ERP<br>1990s</div>
+        <div class="tpoint" data-era="5"><div class="dot"></div>BI<br>2000s</div>
+        <div class="tpoint" data-era="6"><div class="dot"></div>AI Agent<br>2020s</div>
+      </div>
+    </div>
+
+    <!-- ERA 0: TPS -->
+    <div class="era-card" data-era="0">
+      <div class="era-header">
+        <span class="era-period">1950s–1960s</span>
+        <span class="era-name">TPS</span>
+      </div>
+      <div class="era-kor">Transaction Processing System · 거래처리시스템</div>
+      <div class="grid2">
+        <div class="callout">
+          <h4>등장 배경</h4>
+          <p>급여 계산, 재고 입출고, 회계 전기처럼 반복적이고 대량인 거래를 사람이 일일이 처리할 수 없게 되면서 등장했습니다.</p>
+        </div>
+        <div class="callout">
+          <h4>특징</h4>
+          <ul class="bullets">
+            <li>정형화된 일상 업무 처리 (Operational Level)</li>
+            <li>거래 단위 기록 (1건의 입고, 1건의 출금)</li>
+            <li>정확성과 처리 속도가 핵심 가치</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout limit" style="margin-top:18px;">
+        <h4>한계 → 다음 단계로</h4>
+        <p>데이터는 시스템에 쌓이고 있지만, <b>경영진은 여전히 감(感)으로 의사결정</b>합니다. "쌓인 데이터를 누가, 어떻게 요약해서 보여줄 것인가?"라는 질문이 남습니다.</p>
+      </div>
+    </div>
+
+    <!-- ERA 1: MIS -->
+    <div class="era-card" data-era="1">
+      <div class="era-header">
+        <span class="era-period">1960s–1970s</span>
+        <span class="era-name">MIS</span>
+      </div>
+      <div class="era-kor">Management Information System · 경영정보시스템 (정기 보고의 시대)</div>
+      <div class="grid2">
+        <div class="callout">
+          <h4>등장 배경</h4>
+          <p>TPS에 쌓인 거래 데이터를 가공하여, 관리자에게 <b>정기적인 요약 보고서</b>(주간/월간 매출, 재고 현황 등)를 제공하기 시작했습니다.</p>
+        </div>
+        <div class="callout">
+          <h4>특징</h4>
+          <ul class="bullets">
+            <li>중간 관리자(Middle Management) 대상</li>
+            <li>정해진 양식의 정기 보고서(Scheduled Report)</li>
+            <li>"무엇이 일어났는가"를 사후적으로 요약</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout limit" style="margin-top:18px;">
+        <h4>한계 → 다음 단계로</h4>
+        <p>보고서는 <b>정해진 양식</b>으로만 나옵니다. "이번 달 매출이 왜 떨어졌지? 만약 가격을 10% 내리면 어떻게 될까?" 같은 <b>비정형 질문</b>에는 답할 수 없습니다.</p>
+      </div>
+    </div>
+
+    <!-- ERA 2: DSS -->
+    <div class="era-card" data-era="2">
+      <div class="era-header">
+        <span class="era-period">1970s–1980s</span>
+        <span class="era-name">DSS</span>
+      </div>
+      <div class="era-kor">Decision Support System · 의사결정지원시스템 (분석의 시대)</div>
+      <div class="grid2">
+        <div class="callout">
+          <h4>등장 배경</h4>
+          <p>MIS의 정형 보고서를 넘어, 관리자가 직접 변수를 바꿔보며 <b>모델 기반 분석</b>을 할 수 있는 도구가 필요해졌습니다.</p>
+        </div>
+        <div class="callout">
+          <h4>특징</h4>
+          <ul class="bullets">
+            <li>What-if 분석, 시뮬레이션 모델</li>
+            <li>비정형 / 반정형 의사결정 지원</li>
+            <li>"가격을 10% 내리면 수익은?" 같은 질문에 대응</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout limit" style="margin-top:18px;">
+        <h4>한계 → 다음 단계로</h4>
+        <p>분석은 가능해졌지만, <b>각 부서가 자기 데이터로 따로 모델을 만듭니다.</b> 경영진 입장에서는 전사 현황을 한눈에 보기 어렵고, 부서별 분석 결과가 서로 다른 전제를 사용해 일치하지 않습니다.</p>
+      </div>
+    </div>
+
+    <!-- ERA 3: EIS -->
+    <div class="era-card" data-era="3">
+      <div class="era-header">
+        <span class="era-period">1980s–1990s</span>
+        <span class="era-name">EIS</span>
+      </div>
+      <div class="era-kor">Executive Information System · 경영자정보시스템 (대시보드의 시대)</div>
+      <div class="grid2">
+        <div class="callout">
+          <h4>등장 배경</h4>
+          <p>최고경영진을 위해, 복잡한 분석 결과를 <b>요약된 화면(Dashboard)</b>으로 보여주고, 필요시 세부 내역을 파고들 수 있는(Drill-down) 시스템이 등장했습니다.</p>
+        </div>
+        <div class="callout">
+          <h4>특징</h4>
+          <ul class="bullets">
+            <li>경영진(Executive)을 위한 요약 화면</li>
+            <li>Drill-down 개념의 시작</li>
+            <li>그래픽 중심의 핵심 지표(KPI) 표시</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout limit" style="margin-top:18px;">
+        <h4>한계 → 다음 단계로</h4>
+        <p>화면은 멋지지만, <b>그 화면을 채우는 데이터 자체가 부서마다 따로 관리</b>되고 있습니다. 영업 부서의 "매출"과 회계 부서의 "매출"이 일치하지 않는 문제 — 즉 <b>데이터 신뢰성과 일관성</b>의 문제가 근본 원인으로 드러납니다.</p>
+      </div>
+    </div>
+
+    <!-- ERA 4: ERP -->
+    <div class="era-card" data-era="4">
+      <div class="era-header">
+        <span class="era-period">1990s–2000s</span>
+        <span class="era-name" style="color:#b04a4a;">ERP ★ 핵심 전환점</span>
+      </div>
+      <div class="era-kor">Enterprise Resource Planning · 전사적 자원관리 (통합의 시대)</div>
+      <div class="grid2">
+        <div class="callout">
+          <h4>등장 배경</h4>
+          <p>"EIS가 예쁜 화면을 만들어도, 그 뒤의 데이터가 제각각이면 의미가 없다." — 이 문제의식에서, 영업·생산·재무·인사를 <b>하나의 시스템, 하나의 데이터베이스</b>로 통합하는 ERP가 등장했습니다.</p>
+        </div>
+        <div class="callout">
+          <h4>핵심 가치</h4>
+          <ul class="bullets">
+            <li><b>Single Source of Truth</b>: 전사 데이터를 하나의 DB로 통합</li>
+            <li>모듈 간 실시간 연계 (판매 → 재고 → 생산 → 회계)</li>
+            <li>SAP가 대표 사례 — 이후 모든 분석(BI, SAC)의 데이터 기반</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout limit" style="margin-top:18px;">
+        <h4>한계 → 다음 단계로</h4>
+        <p>데이터는 통합됐지만, ERP 자체는 <b>"기록하고 처리하는" 시스템</b>입니다. 이 통합된 데이터를 가지고 자유롭게 분석하고, 미래를 계획(Planning)하려면 <b>별도의 도구</b>가 필요합니다.</p>
+      </div>
+      <div class="callout bridge" style="margin-top:12px;">
+        <h4>왜 이 단계가 중요한가</h4>
+        <p>ERP의 "통합된 데이터"가 없었다면, BI나 SAC가 분석할 신뢰할 수 있는 데이터 자체가 존재하지 않았을 것입니다. ERP는 이후 모든 단계의 <b>전제 조건</b>입니다.</p>
+      </div>
+    </div>
+
+    <!-- ERA 5: BI -->
+    <div class="era-card" data-era="5">
+      <div class="era-header">
+        <span class="era-period">2000s–2010s</span>
+        <span class="era-name">BI</span>
+      </div>
+      <div class="era-kor">Business Intelligence · 비즈니스 인텔리전스 (시각화와 셀프서비스의 시대)</div>
+      <div class="grid2">
+        <div class="callout">
+          <h4>등장 배경</h4>
+          <p>ERP에 통합된 데이터를 기반으로, IT부서를 거치지 않고 현업 사용자가 직접 리포트와 대시보드를 만들고, 계획(Planning)까지 수행할 수 있는 도구가 발전했습니다.</p>
+        </div>
+        <div class="callout">
+          <h4>특징</h4>
+          <ul class="bullets">
+            <li>ERP 데이터 기반 리포팅 / 대시보드 / 계획</li>
+            <li>셀프서비스 분석 — IT 의존도 감소</li>
+            <li>SAC(SAP Analytics Cloud)의 직접적 뿌리</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout bridge" style="margin-top:18px;">
+        <h4>SAC와의 연결</h4>
+        <p>SAC는 전통적 BI(분석·시각화)와 Planning(계획) 기능을 하나의 클라우드 플랫폼으로 통합한 차세대 도구입니다. ERP가 만든 통합 데이터를, BI 단계의 셀프서비스 철학으로 다루는 것이 SAC의 본질입니다.</p>
+      </div>
+    </div>
+
+    <!-- ERA 6: AI Agent -->
+    <div class="era-card" data-era="6">
+      <div class="era-header">
+        <span class="era-period">2020s–</span>
+        <span class="era-name">AI Agent</span>
+      </div>
+      <div class="era-kor">자동화와 능동적 의사결정의 시대</div>
+      <div class="grid2">
+        <div class="callout">
+          <h4>등장 배경</h4>
+          <p>BI는 "사람이 질문하면 시스템이 답을 주는" 단계였습니다. AI Agent는 한 단계 더 나아가, <b>사람이 묻기 전에 스스로 이상치를 탐지하고 원인과 대응안을 제안</b>합니다.</p>
+        </div>
+        <div class="callout">
+          <h4>특징</h4>
+          <ul class="bullets">
+            <li>이상치 탐지 및 자동 알림 (Predictive)</li>
+            <li>자연어 기반 질의 → 자동 분석 (Smart Insights)</li>
+            <li>SAC-P(Planning)의 예측 기능과 연결</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout" style="margin-top:18px;">
+        <h4>SAC와의 연결</h4>
+        <p>SAC의 Smart Insights, Predictive Planning 등 AI 기능은 이 흐름의 일부입니다. 다만 핵심 데이터 기반은 여전히 ERP의 통합 데이터(ACDOCA 등)이며, AI Agent는 그 위에 올라가는 마지막 레이어입니다.</p>
+      </div>
+    </div>
+
+    <div class="module-nav">
+      <button class="nbtn" onclick="goToSection('intro')">← 이전: Intro</button>
+      <button class="nbtn" onclick="goToSection('summary')">다음: 종합 정리 →</button>
+    </div>
+  </section>
+
+  <!-- ============ SUMMARY (MECE) ============ -->
+  <section class="module" id="summary">
+    <div class="module-tag">SUMMARY</div>
+    <h2 class="section-title">진화의 패턴 정리</h2>
+    <p class="subtitle">7단계의 변화를 3가지 축(MECE)으로 정리하면, SAC의 위치가 명확해집니다.</p>
+
+    <table class="axis-table">
+      <tr>
+        <th style="width:14%;">단계</th>
+        <th>① 데이터 범위</th>
+        <th>② 의사결정 주체</th>
+        <th>③ 시간성</th>
+      </tr>
+      <tr><td class="label">TPS</td><td>개별 거래</td><td>시스템이 처리</td><td>현재 (실시간 기록)</td></tr>
+      <tr><td class="label">MIS</td><td>부서 단위</td><td>시스템이 요약 → 사람이 확인</td><td>과거 (정기 보고)</td></tr>
+      <tr><td class="label">DSS</td><td>부서 단위 모델</td><td>사람이 분석</td><td>과거 + 가상의 미래(시뮬레이션)</td></tr>
+      <tr><td class="label">EIS</td><td>부서 데이터의 요약 화면</td><td>경영진이 확인</td><td>과거 요약</td></tr>
+      <tr style="background:#fdf3f3;"><td class="label" style="background:#b04a4a; color:white;">ERP</td><td><b>전사 통합</b></td><td>시스템이 처리 + 통합</td><td>현재 (실시간 통합 기록)</td></tr>
+      <tr><td class="label">BI / SAC</td><td>전사 통합 데이터</td><td>사람이 분석 + 계획</td><td>과거 분석 + 미래 계획</td></tr>
+      <tr><td class="label">AI Agent</td><td>전사 + 산업 데이터</td><td>AI가 보조 / 제안</td><td>과거 + 현재 + 미래 예측</td></tr>
+    </table>
+
+    <div class="callout bridge" style="margin-top:20px;">
+      <h4>핵심 결론</h4>
+      <p>SAC는 세 축이 모두 교차하는 지점에 위치합니다 — <b>① ERP가 통합한 전사 데이터</b>를 기반으로, <b>② 사람이 직접 분석·계획</b>하면서, <b>③ 과거 분석과 미래 계획을 한 플랫폼에서</b> 수행합니다. 이것이 SAC가 단순한 "리포팅 툴"이 아니라 ERP 이후 진화의 자연스러운 다음 단계인 이유입니다.</p>
+    </div>
+
+    <div class="module-nav">
+      <button class="nbtn" onclick="goToSection('timeline')">← 이전: 타임라인</button>
+      <button class="nbtn" onclick="goToSection('game')">다음: 매칭 게임 →</button>
+    </div>
+  </section>
+
+  <!-- ============ MATCHING GAME ============ -->
+  <section class="module" id="game">
+    <div class="module-tag">INTERACTIVE</div>
+    <h2 class="section-title">한계 → 해결 매칭 게임</h2>
+    <p class="subtitle">각 단계의 "한계"와, 그것을 해결한 "다음 단계"를 짝지어 보세요.</p>
+
+    <div class="match-game">
+      <div class="match-col">
+        <h4>한계 (Limitation)</h4>
+        <div class="match-item" data-pair="A">정해진 양식의 보고서만 제공되어, "왜?"라는 비정형 질문에 답할 수 없음</div>
+        <div class="match-item" data-pair="B">부서별로 따로 분석 모델을 만들어, 전사 차원의 일관된 그림이 없음</div>
+        <div class="match-item" data-pair="C">대시보드 화면은 좋지만, 그 뒤의 데이터가 부서마다 달라 신뢰할 수 없음</div>
+        <div class="match-item" data-pair="D">데이터는 통합되었지만, 자유로운 분석과 미래 계획은 별도 도구가 필요함</div>
+      </div>
+      <div class="match-col">
+        <h4>해결한 다음 단계</h4>
+        <div class="match-item" data-pair="C">ERP — 전사 데이터를 하나의 DB로 통합 (Single Source of Truth)</div>
+        <div class="match-item" data-pair="A">DSS — What-if 분석 및 시뮬레이션 모델 도입</div>
+        <div class="match-item" data-pair="D">BI / SAC — 통합 데이터 기반 셀프서비스 분석 + Planning</div>
+        <div class="match-item" data-pair="B">EIS — 경영진을 위한 요약 대시보드 (Drill-down)</div>
+      </div>
+    </div>
+    <div class="match-status" id="matchStatus">0 / 4 짝을 맞췄습니다.</div>
+
+    <div class="module-nav">
+      <button class="nbtn" onclick="goToSection('summary')">← 이전: 종합 정리</button>
+      <button class="nbtn" onclick="goToSection('diagnosis')">다음: 자가진단 →</button>
+    </div>
+  </section>
+
+  <!-- ============ SELF-DIAGNOSIS ============ -->
+  <section class="module" id="diagnosis">
+    <div class="module-tag">SELF-DIAGNOSIS</div>
+    <h2 class="section-title">우리 회사는 어느 단계일까?</h2>
+    <p class="subtitle">아래에서 가장 가까운 상황을 선택해 보세요.</p>
+
+    <div class="diag-card" data-stage="MIS / DSS 단계">
+      <span class="stage-tag">상황 A</span>
+      <h4>"매월 말 각 부서가 엑셀로 실적을 정리해서 메일로 보냅니다. 분석은 각자 알아서 합니다."</h4>
+    </div>
+    <div class="diag-card" data-stage="EIS 단계">
+      <span class="stage-tag">상황 B</span>
+      <h4>"경영진용 대시보드는 있지만, 부서별 숫자가 서로 안 맞아서 결국 회의에서 다시 맞춰봐야 합니다."</h4>
+    </div>
+    <div class="diag-card" data-stage="ERP 단계 (BI/SAC 도입 전)">
+      <span class="stage-tag">상황 C</span>
+      <h4>"ERP로 데이터는 통합되어 있지만, 분석이나 계획(Planning)은 여전히 엑셀로 다운로드해서 작업합니다."</h4>
+    </div>
+    <div class="diag-card" data-stage="BI/SAC 단계">
+      <span class="stage-tag">상황 D</span>
+      <h4>"ERP 데이터를 기반으로 셀프서비스 대시보드와 계획 시나리오를 직접 만들고 있습니다."</h4>
+    </div>
+
+    <div class="diag-result" id="diagResult"></div>
+
+    <div class="module-nav">
+      <button class="nbtn" onclick="goToSection('game')">← 이전: 매칭 게임</button>
+      <button class="nbtn" onclick="goToSection('quiz')">다음: 퀴즈 →</button>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="module" id="quiz">
+    <div class="module-tag">QUIZ</div>
+    <h2 class="section-title">확인 퀴즈</h2>
+    <p class="subtitle">학습한 내용을 점검해 봅니다.</p>
+
+    <div class="quiz-q">Q1. ERP가 MIS 역사에서 "핵심 전환점"으로 평가되는 가장 중요한 이유는?</div>
+    <div class="quiz-options" data-q="1">
+      <div class="quiz-opt" data-correct="false">화면 디자인이 가장 화려하기 때문</div>
+      <div class="quiz-opt" data-correct="true">전사 데이터를 하나의 DB로 통합하여, 이후 모든 분석(BI, SAC)의 데이터 기반을 제공했기 때문</div>
+      <div class="quiz-opt" data-correct="false">최초로 컴퓨터를 사용한 시스템이기 때문</div>
+      <div class="quiz-opt" data-correct="false">AI 기능을 최초로 탑재했기 때문</div>
+    </div>
+    <div class="quiz-feedback" data-q="1"></div>
+
+    <div class="quiz-q" style="margin-top:28px;">Q2. EIS 단계의 가장 근본적인 한계는 무엇이었나요?</div>
+    <div class="quiz-options" data-q="2">
+      <div class="quiz-opt" data-correct="false">화면을 만드는 비용이 너무 비쌌다</div>
+      <div class="quiz-opt" data-correct="false">경영진이 컴퓨터 사용을 거부했다</div>
+      <div class="quiz-opt" data-correct="true">대시보드 화면 자체보다, 그 화면이 참조하는 데이터가 부서마다 달라 신뢰성이 부족했다</div>
+      <div class="quiz-opt" data-correct="false">Drill-down 기능이 너무 복잡했다</div>
+    </div>
+    <div class="quiz-feedback" data-q="2"></div>
+
+    <div class="quiz-q" style="margin-top:28px;">Q3. SAC가 MIS 진화 흐름에서 차지하는 위치를 가장 정확히 설명한 것은?</div>
+    <div class="quiz-options" data-q="3">
+      <div class="quiz-opt" data-correct="false">ERP를 대체하는 새로운 전사 시스템</div>
+      <div class="quiz-opt" data-correct="false">TPS와 동일한 거래처리 시스템의 클라우드 버전</div>
+      <div class="quiz-opt" data-correct="true">ERP가 통합한 데이터를 기반으로, BI(분석)와 Planning(계획)을 하나로 통합한 단계</div>
+      <div class="quiz-opt" data-correct="false">AI Agent의 이전 단계로, 곧 사라질 과도기적 도구</div>
+    </div>
+    <div class="quiz-feedback" data-q="3"></div>
+
+    <div class="module-nav">
+      <button class="nbtn" onclick="goToSection('diagnosis')">← 이전: 자가진단</button>
+      <button class="nbtn" disabled>완료</button>
+    </div>
+  </section>
+
+</div>
+
+<div class="footer-note">BAC Education Portal · MIS 역사 · ERP/SAC 선수 학습 모듈</div>
+
+<script>
+  // ---- Sticky nav scroll-spy & click ----
+  const navTabs = document.querySelectorAll('.nav-tab');
+  const modules = document.querySelectorAll('section.module');
+
+  function goToSection(id) {
+    document.getElementById(id).scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  navTabs.forEach(tab => {
+    tab.addEventListener('click', () => goToSection(tab.dataset.target));
+  });
+
+  function updateActiveTab() {
+    let current = modules[0].id;
+    modules.forEach(m => {
+      const rect = m.getBoundingClientRect();
+      if (rect.top <= 120) current = m.id;
+    });
+    navTabs.forEach(t => t.classList.toggle('active', t.dataset.target === current));
+  }
+  window.addEventListener('scroll', updateActiveTab);
+  updateActiveTab();
+
+  // ---- Timeline ----
+  const eraCards = document.querySelectorAll('.era-card');
+  const tpoints = document.querySelectorAll('.tpoint');
+  const fill = document.getElementById('timelineFill');
+
+  function showEra(idx) {
+    eraCards.forEach(c => c.classList.toggle('show', c.dataset.era === String(idx)));
+    tpoints.forEach(t => t.classList.toggle('active', t.dataset.era === String(idx)));
+    fill.style.width = (idx / (tpoints.length - 1) * 100) + '%';
+  }
+  tpoints.forEach(t => t.addEventListener('click', () => showEra(t.dataset.era)));
+  showEra(0);
+
+  // ---- Matching Game ----
+  let selected = null;
+  let matchedCount = 0;
+  const matchItems = document.querySelectorAll('.match-item');
+  const matchStatus = document.getElementById('matchStatus');
+
+  matchItems.forEach(item => {
+    item.addEventListener('click', () => {
+      if (item.classList.contains('matched')) return;
+      if (!selected) {
+        selected = item;
+        item.classList.add('selected');
+        return;
+      }
+      if (selected === item) {
+        selected.classList.remove('selected');
+        selected = null;
+        return;
+      }
+      // compare
+      if (selected.dataset.pair === item.dataset.pair && selected !== item &&
+          selected.parentElement !== item.parentElement) {
+        selected.classList.remove('selected');
+        selected.classList.add('matched');
+        item.classList.add('matched');
+        matchedCount++;
+        matchStatus.textContent = matchedCount + ' / 4 짝을 맞췄습니다.';
+        if (matchedCount === 4) {
+          matchStatus.textContent = '🎉 모두 맞췄습니다! 각 단계는 이전 단계의 한계를 보완하며 등장했음을 확인했습니다.';
+        }
+        selected = null;
+      } else {
+        item.classList.add('shake');
+        setTimeout(() => item.classList.remove('shake'), 300);
+        selected.classList.remove('selected');
+        selected = null;
+      }
+    });
+  });
+
+  // ---- Self Diagnosis ----
+  const diagCards = document.querySelectorAll('.diag-card');
+  const diagResult = document.getElementById('diagResult');
+  const diagText = {
+    'MIS / DSS 단계': '현재 단계는 <b>MIS / DSS 단계</b>에 해당합니다. 데이터는 만들어지지만 부서별로 분산되어 있어, 다음 단계로 가기 위해서는 먼저 <b>데이터 통합(ERP)</b>이 선행되어야 합니다.',
+    'EIS 단계': '현재 단계는 <b>EIS 단계</b>에 해당합니다. 보여주는 화면은 있지만, 그 기반 데이터가 일관되지 않은 상태입니다. ERP를 통한 <b>Single Source of Truth</b> 확보가 우선 과제입니다.',
+    'ERP 단계 (BI/SAC 도입 전)': '현재 단계는 <b>ERP 단계</b>에 해당합니다. 데이터 통합은 완료되었으나, 분석과 계획이 시스템 밖(엑셀)에서 이루어지고 있습니다. <b>SAC(BI+Planning) 도입</b>이 자연스러운 다음 단계입니다.',
+    'BI/SAC 단계': '현재 단계는 <b>BI/SAC 단계</b>에 해당합니다. 셀프서비스 분석과 계획이 가능한 상태이며, 다음 단계는 <b>AI Agent 기반의 능동적 인사이트(Predictive, Smart Insights)</b> 활용입니다.'
+  };
+  diagCards.forEach(card => {
+    card.addEventListener('click', () => {
+      diagCards.forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      diagResult.innerHTML = diagText[card.dataset.stage];
+      diagResult.classList.add('show');
+    });
+  });
+
+  // ---- Quiz ----
+  document.querySelectorAll('.quiz-options').forEach(group => {
+    const feedback = document.querySelector('.quiz-feedback[data-q="' + group.dataset.q + '"]');
+    group.querySelectorAll('.quiz-opt').forEach(opt => {
+      opt.addEventListener('click', () => {
+        if (group.dataset.answered) return;
+        group.dataset.answered = 'true';
+        group.querySelectorAll('.quiz-opt').forEach(o => {
+          if (o.dataset.correct === 'true') o.classList.add('correct');
+          else if (o === opt) o.classList.add('wrong');
+        });
+        feedback.classList.add('show');
+        feedback.textContent = opt.dataset.correct === 'true'
+          ? '✓ 정답입니다.'
+          : '✗ 오답입니다. 정답은 녹색으로 표시된 항목입니다.';
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
