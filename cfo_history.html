@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CFO의 역사 — 경영진 관점에서 본 FI·CO·SAC·GR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=JetBrains+Mono:wght@400;600&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f0f3f8;
+    --navy:#003366;
+    --navy-10:#e6edf5;
+    --navy-05:#f3f6fa;
+    --text:#222;
+    --sub:#5a6472;
+    --line:#d7dee8;
+    --white:#ffffff;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Noto Sans KR','JetBrains Mono',monospace;
+    background:var(--bg);
+    color:var(--text);
+    font-size:15px;
+    line-height:1.75;
+    padding-bottom:80px;
+  }
+  h1,h2,h3,.serif{font-family:'DM Serif Display','Noto Sans KR',serif;}
+
+  /* ===== HERO ===== */
+  .hero{
+    background:var(--navy);
+    color:#fff;
+    padding:64px 24px 48px;
+    text-align:center;
+  }
+  .hero .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    letter-spacing:0.18em;
+    color:#9db6d6;
+    text-transform:uppercase;
+    margin-bottom:14px;
+  }
+  .hero h1{
+    font-size:42px;
+    line-height:1.3;
+    margin-bottom:16px;
+  }
+  .hero p{
+    font-size:16px;
+    color:#cfdcec;
+    max-width:640px;
+    margin:0 auto;
+  }
+
+  /* ===== STICKY NAV ===== */
+  .nav-wrap{
+    position:sticky;
+    top:0;
+    z-index:50;
+    background:var(--white);
+    border-bottom:1px solid var(--line);
+    box-shadow:0 2px 8px rgba(0,51,102,0.06);
+  }
+  .nav{
+    display:flex;
+    overflow-x:auto;
+    max-width:980px;
+    margin:0 auto;
+    scrollbar-width:thin;
+  }
+  .nav::-webkit-scrollbar{height:4px;}
+  .nav::-webkit-scrollbar-thumb{background:var(--navy-10);}
+  .nav a{
+    flex:0 0 auto;
+    padding:14px 18px;
+    font-size:13px;
+    font-weight:500;
+    color:var(--sub);
+    text-decoration:none;
+    white-space:nowrap;
+    border-bottom:3px solid transparent;
+    transition:all .15s ease;
+  }
+  .nav a:hover{color:var(--navy); background:var(--navy-05);}
+  .nav a.active{color:var(--navy); border-bottom-color:var(--navy); font-weight:700;}
+
+  /* ===== CONTAINER ===== */
+  .container{max-width:760px; margin:0 auto; padding:0 24px;}
+
+  /* ===== TIMELINE INTRO ===== */
+  .timeline{
+    display:flex;
+    overflow-x:auto;
+    gap:0;
+    margin:36px 0 8px;
+    padding-bottom:8px;
+  }
+  .timeline-item{
+    flex:0 0 130px;
+    text-align:center;
+    padding:0 6px;
+    position:relative;
+  }
+  .timeline-item .dot{
+    width:10px; height:10px; border-radius:50%;
+    background:var(--navy);
+    margin:0 auto 8px;
+    position:relative; z-index:2;
+  }
+  .timeline-item .line{
+    position:absolute; top:5px; left:0; right:0; height:2px;
+    background:var(--navy-10); z-index:1;
+  }
+  .timeline-item:first-child .line{left:50%;}
+  .timeline-item:last-child .line{right:50%;}
+  .timeline-item .era{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px; color:var(--navy); font-weight:700;
+  }
+  .timeline-item .label{
+    font-size:12px; color:var(--sub); margin-top:4px; line-height:1.4;
+  }
+
+  /* ===== CHAPTER ===== */
+  .chapter{
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:4px;
+    margin:28px 0;
+    padding:32px 28px;
+    scroll-margin-top:64px;
+  }
+  .chapter-num{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    color:#fff;
+    background:var(--navy);
+    display:inline-block;
+    padding:3px 10px;
+    border-radius:2px;
+    letter-spacing:0.06em;
+    margin-bottom:14px;
+  }
+  .chapter h2{
+    font-size:26px;
+    color:var(--navy);
+    line-height:1.4;
+    margin-bottom:6px;
+  }
+  .chapter .sub-h{
+    font-size:14px;
+    color:var(--sub);
+    margin-bottom:22px;
+  }
+  .chapter h3{
+    font-family:'Noto Sans KR';
+    font-weight:700;
+    font-size:16px;
+    color:var(--navy);
+    margin:24px 0 10px;
+    padding-left:10px;
+    border-left:4px solid var(--navy);
+  }
+  .chapter p{margin-bottom:12px; color:var(--text);}
+  .chapter p:last-child{margin-bottom:0;}
+
+  /* ===== QUESTION CARD ===== */
+  .key-question{
+    background:var(--navy);
+    color:#fff;
+    border-radius:4px;
+    padding:18px 20px;
+    margin:18px 0;
+    font-size:15px;
+    font-weight:700;
+    line-height:1.6;
+  }
+  .key-question .tag{
+    display:block;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    font-weight:400;
+    letter-spacing:0.12em;
+    color:#9db6d6;
+    margin-bottom:6px;
+    text-transform:uppercase;
+  }
+
+  /* ===== CASE CALLOUT ===== */
+  .case{
+    background:var(--navy-05);
+    border-left:4px solid var(--navy);
+    border-radius:0 4px 4px 0;
+    padding:16px 18px;
+    margin:18px 0;
+  }
+  .case .case-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    font-weight:700;
+    color:var(--navy);
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    margin-bottom:8px;
+  }
+  .case p{font-size:14px; color:var(--text);}
+
+  /* ===== SAP MAPPING ===== */
+  .sap-map{
+    border:1px solid var(--navy-10);
+    border-radius:4px;
+    padding:16px 18px;
+    margin:18px 0;
+    background:#fff;
+  }
+  .sap-map .sap-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    font-weight:700;
+    color:var(--navy);
+    letter-spacing:0.1em;
+    margin-bottom:8px;
+  }
+  .sap-map ul{padding-left:20px;}
+  .sap-map li{margin-bottom:6px; font-size:14px;}
+  .sap-map code{
+    font-family:'JetBrains Mono',monospace;
+    background:var(--navy-10);
+    color:var(--navy);
+    padding:1px 5px;
+    border-radius:3px;
+    font-size:12.5px;
+  }
+
+  /* ===== TABLE ===== */
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:18px 0;
+    font-size:13.5px;
+  }
+  th,td{
+    border:1px solid var(--line);
+    padding:10px 12px;
+    text-align:left;
+  }
+  th{
+    background:var(--navy);
+    color:#fff;
+    font-weight:700;
+    font-size:13px;
+  }
+  tr:nth-child(even) td{background:var(--navy-05);}
+
+  /* ===== DRILL TOGGLE ===== */
+  .drill{
+    border:1px solid var(--line);
+    border-radius:4px;
+    margin:12px 0;
+    overflow:hidden;
+  }
+  .drill summary{
+    cursor:pointer;
+    padding:14px 16px;
+    font-weight:700;
+    font-size:14.5px;
+    color:var(--navy);
+    background:var(--navy-05);
+    list-style:none;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .drill summary::after{
+    content:"+";
+    font-family:'JetBrains Mono',monospace;
+    font-size:18px;
+    color:var(--navy);
+    transition:transform .2s ease;
+  }
+  .drill[open] summary::after{transform:rotate(45deg);}
+  .drill summary::-webkit-details-marker{display:none;}
+  .drill-body{padding:14px 16px; font-size:14px; border-top:1px solid var(--line);}
+  .drill-body p{margin-bottom:8px;}
+  .drill-body p:last-child{margin-bottom:0;}
+  .drill-body .lens-tag{
+    display:inline-block;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    font-weight:700;
+    color:#fff;
+    background:var(--navy);
+    padding:2px 8px;
+    border-radius:2px;
+    margin-bottom:8px;
+  }
+
+  /* ===== QUIZ ===== */
+  .quiz{
+    border:1px solid var(--navy-10);
+    border-radius:4px;
+    padding:18px;
+    margin:24px 0;
+    background:var(--navy-05);
+  }
+  .quiz .q-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    font-weight:700;
+    color:var(--navy);
+    letter-spacing:0.1em;
+    margin-bottom:10px;
+  }
+  .quiz .q-text{font-weight:700; margin-bottom:12px; font-size:14.5px;}
+  .quiz-options{display:flex; flex-direction:column; gap:8px;}
+  .quiz-opt{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:10px 14px;
+    font-size:14px;
+    cursor:pointer;
+    text-align:left;
+    transition:all .15s ease;
+  }
+  .quiz-opt:hover{border-color:var(--navy);}
+  .quiz-opt.disabled{cursor:default; opacity:.7; pointer-events:none;}
+  .quiz-opt.correct{
+    border-color:var(--navy);
+    background:var(--navy);
+    color:#fff;
+    font-weight:700;
+  }
+  .quiz-opt.wrong{
+    border-color:#b00020;
+    color:#b00020;
+    text-decoration:line-through;
+  }
+  .quiz-feedback{
+    margin-top:12px;
+    font-size:13.5px;
+    color:var(--sub);
+    display:none;
+    padding-top:10px;
+    border-top:1px solid var(--line);
+  }
+  .quiz-feedback.show{display:block;}
+
+  /* ===== CHECKLIST (recap) ===== */
+  .recap{
+    background:var(--navy);
+    color:#fff;
+    border-radius:4px;
+    padding:24px 28px;
+    margin:36px 0 0;
+  }
+  .recap h2{font-size:22px; margin-bottom:16px; color:#fff;}
+  .recap ul{list-style:none;}
+  .recap li{
+    display:flex;
+    gap:10px;
+    margin-bottom:10px;
+    font-size:14px;
+    line-height:1.6;
+    color:#dbe6f3;
+  }
+  .recap li::before{
+    content:"✓";
+    font-family:'JetBrains Mono',monospace;
+    font-weight:700;
+    color:#7fb3e8;
+    flex:0 0 auto;
+  }
+
+  /* ===== CASE STUDY TXN TABLE ===== */
+  .txn-flow{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+    margin:18px 0 24px;
+    flex-wrap:wrap;
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+  }
+  .txn-box{
+    border:1.5px solid var(--navy);
+    border-radius:4px;
+    padding:10px 16px;
+    text-align:center;
+    color:var(--navy);
+    font-weight:700;
+    background:#fff;
+  }
+  .txn-arrow{color:var(--navy); font-size:18px;}
+
+  /* ===== FOOTER ===== */
+  .footer{
+    text-align:center;
+    color:var(--sub);
+    font-size:12.5px;
+    margin-top:48px;
+    font-family:'JetBrains Mono',monospace;
+    letter-spacing:0.05em;
+  }
+
+  @media (max-width:600px){
+    .hero h1{font-size:30px;}
+    .chapter{padding:24px 18px;}
+    .chapter h2{font-size:21px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<div class="hero">
+  <div class="eyebrow">EDU · 07 ERP Fundamentals · Prologue</div>
+  <h1>CFO의 역사</h1>
+  <p>회계팀이 아닌 경영진의 눈으로 본 100년의 흐름 — 재무회계의 탄생부터 그룹 경영까지,<br>
+  FI · CO · SAC · GR이 "왜" 존재하는지를 이해합니다.</p>
+</div>
+
+<!-- ===== STICKY NAV ===== -->
+<div class="nav-wrap">
+  <nav class="nav" id="nav">
+    <a href="#ch1">1. 재무회계의 탄생</a>
+    <a href="#ch2">2. 관리회계의 등장</a>
+    <a href="#ch3">3. 주주가치 경영</a>
+    <a href="#ch4">4. EVA</a>
+    <a href="#ch5">5. VBM</a>
+    <a href="#ch6">6. 그룹 경영</a>
+    <a href="#ch7">7. 종합</a>
+  </nav>
+</div>
+
+<div class="container">
+
+  <!-- ===== TIMELINE ===== -->
+  <div class="timeline">
+    <div class="timeline-item"><div class="line"></div><div class="dot"></div><div class="era">19C</div><div class="label">재무회계<br>탄생</div></div>
+    <div class="timeline-item"><div class="line"></div><div class="dot"></div><div class="era">1920s</div><div class="label">관리회계<br>등장</div></div>
+    <div class="timeline-item"><div class="line"></div><div class="dot"></div><div class="era">1980s</div><div class="label">주주가치<br>경영</div></div>
+    <div class="timeline-item"><div class="line"></div><div class="dot"></div><div class="era">1990s</div><div class="label">EVA</div></div>
+    <div class="timeline-item"><div class="line"></div><div class="dot"></div><div class="era">2000s</div><div class="label">VBM</div></div>
+    <div class="timeline-item"><div class="line"></div><div class="dot"></div><div class="era">2000s~</div><div class="label">그룹<br>경영</div></div>
+    <div class="timeline-item"><div class="line"></div><div class="dot"></div><div class="era">Now</div><div class="label">FI·CO·SAC·GR<br>통합</div></div>
+  </div>
+
+  <!-- ================= CHAPTER 1 ================= -->
+  <section class="chapter" id="ch1">
+    <div class="chapter-num">CHAPTER 1</div>
+    <h2>재무회계의 탄생</h2>
+    <div class="sub-h">"외부에 약속을 지키는 언어"</div>
+
+    <p>18~19세기 산업혁명을 거치며 기업의 자본조달 방식이 근본적으로 바뀝니다. 개인 사업주가 자기 돈으로 운영하던 시대에서, 불특정 다수의 투자자(주주, 채권자)로부터 자본을 모아 대규모 설비(철도, 공장)에 투자하는 시대로 전환됩니다.</p>
+    <p>이때부터 <strong>"소유"와 "경영"이 분리</strong>됩니다. 돈을 댄 사람은 회사 내부에서 무슨 일이 벌어지는지 직접 볼 수 없습니다. 경영자가 "사업이 잘 되고 있다"고 말해도, 이를 확인할 방법이 없다면 아무도 돈을 맡기지 않을 것입니다.</p>
+
+    <div class="key-question">
+      <span class="tag">Key Question</span>
+      경영자가 외부 투자자와의 약속을 지키고 있는가? 그리고 그것을 어떻게 증명할 것인가?
+    </div>
+
+    <p>19세기 철도회사들은 막대한 고정자산 투자, 복잡한 자금조달, 광범위한 주주 기반을 가진 최초의 "현대적 대기업"이었습니다. 이 과정에서 표준화된 재무제표, 외부감사, 공시 제도의 초기 형태가 자리잡습니다. 핵심은 "측정의 통일성"입니다 — 모든 투자자가 같은 규칙으로 작성된 숫자를 보고 비교할 수 있어야 신뢰가 형성됩니다.</p>
+
+    <h3>역설적 사례 — 신뢰가 무너지면 무슨 일이 벌어지는가</h3>
+    <div class="case">
+      <div class="case-label">Case</div>
+      <p>재무회계 시스템이 왜 필요한지는, 그것이 무너졌을 때 가장 선명하게 드러납니다. 1990년대 후반 외환위기 당시 일부 국내 대기업에서 발생한 대규모 회계부정 사태는, 재무제표가 실제 현금흐름·자산상태와 괴리되었을 때 자본시장 전체의 신뢰가 어떻게 붕괴되는지를 보여주는 사례로 자주 인용됩니다. 분식회계가 드러나는 순간, 해당 기업뿐 아니라 같은 시장에 있는 다른 기업들의 조달 비용까지 함께 상승하는 "신뢰의 외부효과"가 발생합니다.</p>
+    </div>
+    <p><strong>메시지</strong> — 재무회계는 "장부를 맞추는 일"이 아니라, 자본시장이 작동하기 위한 신뢰 인프라입니다. 이 인프라가 깨지면 개별 기업의 문제가 시장 전체의 자본조달 비용으로 전이됩니다.</p>
+
+    <h3>SAP 매핑 — FI / Universal Journal</h3>
+    <div class="sap-map">
+      <div class="sap-label">SAP MAPPING</div>
+      <ul>
+        <li><code>FI</code>와 Universal Journal(<code>ACDOCA</code>)은 바로 이 "외부에 대한 단일한 진실"을 만들기 위한 인프라입니다.</li>
+        <li>과거에는 재무(FI)와 관리(CO)가 서로 다른 테이블/원장에 기록되어, "재무상 숫자"와 "내부 관리상 숫자"가 일치하지 않는 문제가 빈번했습니다.</li>
+        <li><code>ACDOCA</code>는 모든 거래를 하나의 원장에 기록함으로써, "외부에 보고하는 숫자"와 "내부 의사결정에 쓰는 숫자"가 출발점부터 동일한 데이터에서 나오도록 만듭니다.</li>
+      </ul>
+    </div>
+
+    <div class="quiz" id="q1">
+      <div class="q-label">CHECK YOUR UNDERSTANDING</div>
+      <div class="q-text">Q1. 재무회계가 본질적으로 답하고자 하는 질문은?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="checkQuiz('q1', this, false)">우리 사업부는 얼마를 벌고 있는가?</button>
+        <button class="quiz-opt" onclick="checkQuiz('q1', this, true)">경영자가 외부 투자자와의 약속을 지키고 있는가?</button>
+        <button class="quiz-opt" onclick="checkQuiz('q1', this, false)">미래에 가치를 어떻게 만들어갈 것인가?</button>
+      </div>
+      <div class="quiz-feedback" id="q1-feedback"></div>
+    </div>
+  </section>
+
+  <!-- ================= CHAPTER 2 ================= -->
+  <section class="chapter" id="ch2">
+    <div class="chapter-num">CHAPTER 2</div>
+    <h2>관리회계의 등장</h2>
+    <div class="sub-h">"내부 의사결정을 위한 언어"</div>
+
+    <p>20세기 초, 미국의 General Motors(GM)는 여러 개의 자동차 브랜드(Chevrolet, Buick, Cadillac 등)를 인수하며 거대해졌습니다. 문제는, 회사 전체를 하나의 손익계산서로만 보면 "어느 브랜드가 돈을 벌고, 어느 브랜드가 돈을 잃고 있는지" 알 수 없다는 것이었습니다.</p>
+    <p>GM의 Alfred P. Sloan과 Donaldson Brown은 이 문제를 풀기 위해 <strong>사업부제(divisional structure)</strong>와 <strong>ROI(투자수익률) 기반 성과측정</strong> 체계를 도입합니다. 회사를 여러 개의 "책임 단위(사업부)"로 나누고, 각 단위가 투입한 자본 대비 얼마의 수익을 내는지를 측정하기 시작한 것입니다.</p>
+
+    <div class="key-question">
+      <span class="tag">Key Question</span>
+      회사 전체가 아니라, 각 부문/제품/사업이 개별적으로 얼마를 벌고 있는가?
+    </div>
+
+    <h3>사례 — GM의 사업부제와 ROI 트리</h3>
+    <div class="case">
+      <div class="case-label">Case</div>
+      <p>GM의 사업부제 도입은 경영학·관리회계 역사에서 가장 빈번하게 인용되는 사례입니다. 핵심은 단순히 "조직을 나눈 것"이 아니라, 나눈 조직 각각에 "투하자본 대비 수익률(ROI)"이라는 공통의 측정 언어를 부여했다는 점입니다. 이를 통해 본사는 여러 사업부를 동일한 기준으로 비교하고, 자본을 어디에 더 배분할지를 결정할 수 있게 되었습니다.</p>
+    </div>
+    <p><strong>메시지</strong> — 관리회계는 "회사를 잘라서 보기 위한" 도구입니다. 잘라야 비교할 수 있고, 비교해야 자본을 더 잘 배분할 수 있습니다.</p>
+
+    <h3>재무회계 vs 관리회계 — 근본적 차이</h3>
+    <table>
+      <tr><th></th><th>재무회계 (FI)</th><th>관리회계 (CO)</th></tr>
+      <tr><td>보는 단위</td><td>법적 실체 (회사, 법인)</td><td>의사결정 단위 (사업부·제품·프로젝트)</td></tr>
+      <tr><td>목적</td><td>외부 신뢰 확보</td><td>내부 자원배분 의사결정</td></tr>
+      <tr><td>규칙</td><td>회계기준 (K-IFRS 등)</td><td>회사가 자율적으로 설계</td></tr>
+      <tr><td>타임프레임</td><td>확정된 과거 (월·분기·연간 마감)</td><td>과거+현재+계획 (실시간 의사결정)</td></tr>
+    </table>
+
+    <h3>SAP 매핑 — CO</h3>
+    <div class="sap-map">
+      <div class="sap-label">SAP MAPPING</div>
+      <ul>
+        <li><code>Cost Center</code> — 비용이 발생하는 책임 단위 (부서, 공정)</li>
+        <li><code>Profit Center</code> — 손익을 책임지는 단위 (사업부)</li>
+        <li><code>CO-PA</code> — 제품·고객·시장 등 다양한 기준으로 수익성을 분석하는 단위</li>
+      </ul>
+      <p style="margin-top:10px; font-size:14px;">같은 거래(예: 원재료 구매, 인건비 지급)가 FI에서는 "법인 전체의 비용"으로 한 번 기록되지만, CO에서는 동시에 "어느 사업부·제품·코스트센터의 비용인지"가 추가로 태깅됩니다. 이 태깅이 바로 GM이 100여 년 전에 풀고자 했던 문제의 현대적 구현입니다.</p>
+    </div>
+  </section>
+
+  <!-- ================= CHAPTER 3 ================= -->
+  <section class="chapter" id="ch3">
+    <div class="chapter-num">CHAPTER 3</div>
+    <h2>주주가치 경영</h2>
+    <div class="sub-h">"회계적 이익이 아니라 가치를 봐라"</div>
+
+    <p>1980년대 미국에서는 적대적 인수합병(M&A) 붐과 함께, 기관투자자의 영향력이 크게 커집니다. "회사는 누구를 위해 존재하는가"라는 질문이 본격적으로 제기되고, <strong>주주가치(Shareholder Value)</strong>가 경영의 최우선 목표로 부상합니다.</p>
+
+    <div class="key-question">
+      <span class="tag">Key Question</span>
+      회계적으로는 이익이 나고 있는데, 왜 주가는 오르지 않는가?
+    </div>
+
+    <p>답은 회계적 이익(Net Income)이 "자본을 사용한 대가(자본비용)"를 전혀 반영하지 않는다는 데 있었습니다. 100억원을 투자해서 10억원의 이익을 냈다면, 회계상으로는 "흑자"입니다. 그러나 그 100억원을 은행에 넣어두기만 해도 8억원의 이자가 나왔다면, 실질적으로 회사는 단 2억원의 "추가 가치"만 만든 것입니다. 회계적 이익은 이 차이를 보여주지 못합니다.</p>
+
+    <h3>사례 — GE의 사업 포트폴리오 재편</h3>
+    <div class="case">
+      <div class="case-label">Case</div>
+      <p>1980~90년대 General Electric(GE)의 잭 웰치(Jack Welch) 체제는 "주주가치 경영"이 실제 경영 의사결정에 어떻게 반영되었는지를 보여주는 대표적 사례로 자주 언급됩니다. 핵심 원칙은 "각 사업 영역에서 1위 또는 2위가 아니면 매각하거나 정리한다"는 포트폴리오 전략이었습니다. 이는 "회사 전체의 이익 합계"가 아니라, "각 사업이 자본을 효율적으로 쓰고 있는가"를 기준으로 사업 포트폴리오 자체를 재편한다는 사고방식의 전환을 의미합니다.</p>
+    </div>
+    <p><strong>메시지</strong> — 주주가치 경영의 등장으로, 경영의 질문은 "이번 분기 이익이 얼마인가"에서 "우리가 가진 자본을 가장 가치 있는 곳에 배분하고 있는가"로 이동했습니다.</p>
+
+    <h3>다음 챕터로의 연결</h3>
+    <p>"주주가치"는 방향(direction)을 제시했지만, 이를 측정할 구체적인 "숫자"는 아직 없었습니다. <strong>"자본비용을 반영한 이익을 어떻게 계산할 것인가?"</strong>라는 질문에 대한 답이 다음 챕터의 EVA입니다.</p>
+  </section>
+
+  <!-- ================= CHAPTER 4 ================= -->
+  <section class="chapter" id="ch4">
+    <div class="chapter-num">CHAPTER 4</div>
+    <h2>EVA (Economic Value Added)</h2>
+    <div class="sub-h">"자본비용을 빼고 남는 게 진짜 이익"</div>
+
+    <p>EVA는 컨설팅사 Stern Stewart & Co.가 체계화한 지표로, 다음과 같이 정의됩니다.</p>
+
+    <div class="key-question">
+      <span class="tag">Formula</span>
+      EVA = NOPAT(세후영업이익) − (투하자본 × WACC)
+    </div>
+
+    <p>핵심은 "이익에서 자본비용을 빼고도 남는 것이 진짜 가치 창출"이라는 사고입니다. 회계적으로는 이익이 나더라도, 그 이익이 자본비용보다 작다면 EVA는 마이너스이고, 이는 "이 사업이 가치를 파괴하고 있다"는 신호입니다.</p>
+
+    <h3>EVA가 경영에 던진 질문</h3>
+    <div class="key-question">
+      <span class="tag">Key Question</span>
+      이 사업부는 회계상 흑자지만, 투하자본을 고려하면 정말 돈을 벌고 있는 것인가?
+    </div>
+
+    <div class="case">
+      <div class="case-label">Case</div>
+      <p>이는 1990년대 후반부터 2000년대 초, 글로벌 기업뿐 아니라 다수의 한국 대기업에서도 사업부별 성과평가 체계에 EVA 또는 이와 유사한 "자본비용 반영 지표"를 도입하는 흐름으로 이어집니다. 이 흐름의 공통된 배경은, 외환위기 이후 "외형 성장(매출·이익 규모)"보다 "자본의 질적 효율성"이 기업 평가의 중요한 축으로 부상했다는 점입니다.</p>
+    </div>
+
+    <h3>실무적 난제</h3>
+    <p>EVA를 실제로 적용하려면 다음을 결정해야 합니다.</p>
+    <ol style="padding-left:20px; margin-bottom:14px;">
+      <li style="margin-bottom:6px;">각 사업부에 얼마의 "투하자본"을 배분할 것인가? (공유 자산, 본사 자산은 어떻게 나누나?)</li>
+      <li style="margin-bottom:6px;">WACC을 사업부별로 다르게 적용할 것인가, 전사 단일 WACC을 쓸 것인가?</li>
+      <li style="margin-bottom:6px;">이 계산을 매월·매분기 반복적으로, 신뢰성 있게 산출할 시스템적 기반이 있는가?</li>
+    </ol>
+    <p><strong>메시지</strong> — EVA는 "개념"으로는 단순하지만, "운영"하려면 사업부별 자본배분과 데이터 인프라가 필요합니다. 바로 이 지점에서 시스템(SAP)의 역할이 중요해집니다.</p>
+
+    <h3>SAP 매핑</h3>
+    <div class="sap-map">
+      <div class="sap-label">SAP MAPPING</div>
+      <ul>
+        <li><code>CO-PA</code> / <code>Profit Center Accounting</code> — 사업부별 손익뿐 아니라, 배분된 자산(투하자본)까지 추적해야 EVA 계산이 가능합니다.</li>
+        <li><code>ACDOCA</code> 환경에서는 자산(Asset)과 손익(P&L)이 같은 원장에서 관리되므로, 사업부별 투하자본 산정의 데이터 정합성이 과거보다 크게 개선됩니다.</li>
+        <li>다만 "투하자본을 어떻게 배분할 것인가"는 여전히 회사의 정책적 판단 영역이며, 시스템은 그 판단을 일관되게 "운영"할 수 있게 해주는 역할입니다.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= CHAPTER 5 ================= -->
+  <section class="chapter" id="ch5">
+    <div class="chapter-num">CHAPTER 5</div>
+    <h2>Value Based Management (VBM)</h2>
+    <div class="sub-h">"가치 창출을 경영 시스템 전체에 내재화"</div>
+
+    <p>EVA는 훌륭한 "측정 지표"였지만, 한 가지 한계가 있었습니다: <strong>측정은 항상 "과거"에 대한 것</strong>입니다. 지난달, 지난 분기의 EVA가 마이너스였다는 것을 안다고 해서, 그것이 곧바로 미래의 의사결정을 바꾸지는 않습니다.</p>
+    <p>VBM은 이 측정 지표를 경영 프로세스 전체 — 목표설정 → 계획 → 실행 → 성과평가/보상 — 에 내재화하는 접근입니다. 즉, "가치"라는 개념이 연말 평가 때 한 번 계산되는 숫자가 아니라, 매일의 의사결정 기준이 되도록 만드는 것입니다.</p>
+
+    <h3>계획(Planning)의 중요성 증가</h3>
+    <div class="key-question">
+      <span class="tag">Key Question</span>
+      환경이 바뀔 때마다, 그 변화가 우리의 미래 가치에 어떤 영향을 미치는지 빠르게 시뮬레이션할 수 있는가?
+    </div>
+
+    <p>전통적인 연간 예산(Annual Budget)은 한 번 수립하면 1년간 거의 변경되지 않는 "고정된 계획"이었습니다. 그러나 VBM적 사고에서는 계획이 "환경 변화에 따라 지속적으로 갱신되는 살아있는 시뮬레이션"이어야 합니다 — 이것이 롤링포캐스트(Rolling Forecast)와 드라이버 기반 계획(Driver-based Planning)의 등장 배경입니다.</p>
+
+    <table>
+      <tr><th>전통적 예산</th><th>드라이버 기반 계획</th></tr>
+      <tr><td>"내년 매출 100억, 비용 80억" — 고정된 숫자를 1년간 유지</td><td>"판매량 × 단가 = 매출", "생산량 × 단위원가 = 비용"처럼 변수와 관계식으로 구성 → 가정이 바뀌면 전체 계획이 자동 재계산</td></tr>
+    </table>
+
+    <h3>SAP 매핑 — SAC Planning</h3>
+    <div class="sap-map">
+      <div class="sap-label">SAP MAPPING</div>
+      <ul>
+        <li>계획을 단일 숫자가 아니라 "수식과 가정(driver)의 조합"으로 구성 → 가정이 바뀌면 전체 계획이 즉시 재계산</li>
+        <li>What-if 시뮬레이션: "원자재 가격이 10% 오르면 EVA는 어떻게 변하는가?"를 즉시 확인 가능</li>
+        <li><code>ACDOCA</code>(실적)와 <code>SAC-P</code>(계획)가 직접 연계되면, "계획 대비 실적" 비교가 시스템적으로 일관되게 이루어짐</li>
+      </ul>
+    </div>
+    <p><strong>메시지</strong> — EVA가 "가치를 어떻게 측정할 것인가"에 대한 답이라면, VBM/SAC-P는 "그 측정을 의사결정 프로세스에 실시간으로 연결할 것인가"에 대한 답입니다.</p>
+  </section>
+
+  <!-- ================= CHAPTER 6 ================= -->
+  <section class="chapter" id="ch6">
+    <div class="chapter-num">CHAPTER 6</div>
+    <h2>글로벌화와 그룹 경영</h2>
+    <div class="sub-h">"이제는 그룹 전체가 하나의 가치 단위"</div>
+
+    <p>기업이 성장하면서 여러 개의 법인(자회사, 해외법인)으로 구성된 "그룹"이 됩니다. 각 법인은 각자의 국가에서 각자의 회계기준에 따라 재무제표를 작성합니다 — 이는 Chapter 1의 "재무회계" 논리가 법인 단위로 반복되는 것입니다.</p>
+    <p>그러나 투자자는 개별 법인이 아니라 "그룹 전체"에 투자합니다.</p>
+
+    <div class="key-question">
+      <span class="tag">Key Question</span>
+      법적으로는 여러 개의 회사지만, 투자자 입장에서는 하나의 사업이다. 그룹 전체의 재무상태와 성과를 어떻게 하나의 숫자로 보여줄 것인가?
+    </div>
+
+    <p>이것이 <strong>연결재무제표(Consolidated Financial Statements)</strong>의 본질입니다. 연결은 단순히 "각 법인의 숫자를 더하는 것"이 아닙니다 — 그룹 내부의 거래(IC Transaction)는 제거되어야 하고, 자회사 지분에 대한 평가(영업권, 비지배지분 등)가 반영되어야 합니다. 즉, "여러 개의 법적 실체"를 "하나의 경제적 실체"로 재구성하는 작업입니다.</p>
+
+    <h3>경영적 의미</h3>
+    <p>연결재무제표는 단순한 법적 의무를 넘어, 다음과 같은 경영적 질문에 답합니다.</p>
+    <ul style="padding-left:20px; margin-bottom:14px;">
+      <li style="margin-bottom:6px;">그룹 전체로 봤을 때, 우리는 정말 가치를 창출하고 있는가? (Chapter 4의 EVA를 그룹 단위로)</li>
+      <li style="margin-bottom:6px;">어느 자회사·사업부가 그룹 전체 가치에 기여하고 있고, 어느 곳이 그룹의 자원을 소모하고 있는가?</li>
+      <li style="margin-bottom:6px;">그룹 내부거래(예: 한국 법인이 유럽 법인에 제품을 판매)는 그룹 관점에서는 "매출"이 아니라 "내부 이동"일 뿐인데, 각 법인의 개별 재무제표에는 매출로 기록되어 있다 — 이 차이를 어떻게 관리할 것인가?</li>
+    </ul>
+
+    <h3>SAP 매핑 — GR (Group Reporting)</h3>
+    <div class="sap-map">
+      <div class="sap-label">SAP MAPPING</div>
+      <ul>
+        <li><code>IC Elimination</code> — 그룹 내부거래(매출-매입, 대여금-차입금 등)를 자동으로 식별하고 제거</li>
+        <li><code>Investment Consolidation</code> — 자회사 지분 취득·처분 시 영업권, 비지배지분(NCI) 등을 계산</li>
+        <li><code>Reporting Structure</code> — 여러 법인의 재무제표를 하나의 그룹 구조(Consolidation Unit, Group Structure)로 재구성</li>
+      </ul>
+      <p style="margin-top:10px; font-size:14px;">연결 이후의 데이터는 단순히 "법적 보고용"이 아니라, Chapter 4~5에서 다룬 EVA/VBM 분석을 그룹 전체 또는 사업부(Profit Center) 단위로 다시 수행할 수 있는 출발점이 됩니다 — 이것이 다음 챕터의 "연결 후 재구성"입니다.</p>
+    </div>
+  </section>
+
+  <!-- ================= CHAPTER 7 ================= -->
+  <section class="chapter" id="ch7">
+    <div class="chapter-num">CHAPTER 7</div>
+    <h2>종합 — 왜 FI, CO, SAC, GR은 따로 존재하면서도 연결되어 있는가</h2>
+    <div class="sub-h">하나의 거래, 네 개의 렌즈</div>
+
+    <h3>4개 모듈을 4개의 경영 질문으로</h3>
+    <table>
+      <tr><th>모듈</th><th>경영 질문</th><th>보는 단위</th><th>시간 축</th></tr>
+      <tr><td><strong>FI</strong></td><td>외부에 약속을 지켰는가?</td><td>법적 실체 (법인)</td><td>확정된 과거</td></tr>
+      <tr><td><strong>CO</strong></td><td>내부적으로 어디서 벌고 어디서 잃었는가?</td><td>의사결정 단위 (사업부/제품)</td><td>과거~현재</td></tr>
+      <tr><td><strong>SAC-P</strong></td><td>미래에 가치를 어떻게 만들어갈 것인가?</td><td>의사결정 단위 + 시나리오</td><td>미래 (계획/시뮬레이션)</td></tr>
+      <tr><td><strong>GR</strong></td><td>그룹 전체로 보면 우리는 어떤 가치를 갖고 있는가?</td><td>그룹 (다수 법인의 재구성)</td><td>확정된 과거 (그룹 관점)</td></tr>
+    </table>
+
+    <p>네 모듈은 "같은 거래"를 각자의 질문에 맞게 다르게 "읽습니다". 이 차이를 하나의 거래로 살펴보겠습니다.</p>
+
+    <h3>케이스 스터디 — ASPN Group의 내부거래 하나</h3>
+    <div class="case">
+      <div class="case-label">Transaction</div>
+      <p>ASPN Korea가 자체 생산한 부품을 ASPN Europe에 판매 (이전가격 적용)</p>
+    </div>
+
+    <div class="txn-flow">
+      <div class="txn-box">ASPN Korea<br><span style="font-weight:400; font-size:12px;">생산 사업부</span></div>
+      <div class="txn-arrow">→</div>
+      <div class="txn-box">부품 판매<br><span style="font-weight:400; font-size:12px;">(이전가격)</span></div>
+      <div class="txn-arrow">→</div>
+      <div class="txn-box">ASPN Europe<br><span style="font-weight:400; font-size:12px;">조립 사업부</span></div>
+    </div>
+
+    <p style="margin-bottom:14px;">이 하나의 거래가 4개 모듈에서 각각 어떻게 "보이는지" 클릭해서 확인해보세요.</p>
+
+    <details class="drill">
+      <summary>① FI — 법인 관점에서는 어떻게 보이는가?</summary>
+      <div class="drill-body">
+        <span class="lens-tag">FI · 법적 실체</span>
+        <p>ASPN Korea의 개별 재무제표에는 "매출"로 기록됩니다. ASPN Europe의 개별 재무제표에는 "매입(원재료)"으로 기록됩니다.</p>
+        <p>각 법인은 자신의 회계기준(K-IFRS 등)에 따라 이 거래를 독립적으로 보고합니다 — Chapter 1의 "각 법인이 외부에 약속을 지키는가"가 여기서 작동합니다.</p>
+      </div>
+    </details>
+
+    <details class="drill">
+      <summary>② CO — 사업부 관점에서는 어떻게 보이는가?</summary>
+      <div class="drill-body">
+        <span class="lens-tag">CO · 의사결정 단위</span>
+        <p>ASPN Korea의 생산 사업부 입장에서는 "내부 고객(Europe)에게 판매한 매출"로, 이 사업부의 CO-PA 수익성에 반영됩니다.</p>
+        <p>ASPN Europe의 조립 사업부 입장에서는 "원가(매입원가)"로 반영됩니다 — Chapter 2의 "사업부별로 잘라서 본 손익"입니다.</p>
+      </div>
+    </details>
+
+    <details class="drill">
+      <summary>③ SAC-P — 계획 관점에서는 어떻게 보이는가?</summary>
+      <div class="drill-body">
+        <span class="lens-tag">SAC-P · 미래 시뮬레이션</span>
+        <p>향후 이전가격 정책이 바뀌거나(예: 세법 변경), 환율이 변동하면, 이 내부거래의 단가·물량 가정을 조정하여 양쪽 법인의 미래 손익이 어떻게 변하는지 시뮬레이션할 수 있습니다 — Chapter 5의 "드라이버 기반 계획"입니다.</p>
+      </div>
+    </details>
+
+    <details class="drill">
+      <summary>④ GR — 그룹 관점에서는 어떻게 보이는가?</summary>
+      <div class="drill-body">
+        <span class="lens-tag">GR · 그룹 재구성</span>
+        <p>그룹 전체로 보면, 이 거래는 "그룹 내부에서 부품이 이동한 것"일 뿐, 그룹 외부 고객에게 발생한 매출이 아닙니다.</p>
+        <p><code>IC Elimination</code>을 통해 ASPN Korea의 매출과 ASPN Europe의 매입이 서로 상계되어 제거됩니다.</p>
+        <p>만약 해당 부품에 미실현이익(아직 외부 판매되지 않은 재고에 포함된 마진)이 있다면, 이 또한 그룹 관점에서 제거됩니다 — Chapter 6의 "여러 법인을 하나의 경제적 실체로"입니다.</p>
+      </div>
+    </details>
+
+    <div class="quiz" id="q2">
+      <div class="q-label">CHECK YOUR UNDERSTANDING</div>
+      <div class="q-text">Q2. ASPN Korea → ASPN Europe 내부거래에서, "그룹 관점"에서 이 거래가 갖는 의미는?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="checkQuiz('q2', this, false)">외부 고객에게 발생한 정상적인 매출</button>
+        <button class="quiz-opt" onclick="checkQuiz('q2', this, true)">그룹 내부에서 부품이 이동한 것 — 외부 매출이 아니므로 제거 대상</button>
+        <button class="quiz-opt" onclick="checkQuiz('q2', this, false)">두 법인 모두에게 이익이 되는 신규 거래</button>
+      </div>
+      <div class="quiz-feedback" id="q2-feedback"></div>
+    </div>
+  </section>
+
+  <!-- ================= RECAP ================= -->
+  <div class="recap">
+    <h2>종합 정리</h2>
+    <ul>
+      <li><strong>FI</strong>는 "소유와 경영의 분리"에서 시작된, 외부 신뢰를 위한 언어입니다.</li>
+      <li><strong>CO</strong>는 회사를 사업부 단위로 "잘라서" 비교하고 자본을 배분하기 위한 언어입니다.</li>
+      <li><strong>주주가치 경영</strong>은 "이익"이 아니라 "자본비용을 넘어선 가치"를 경영의 목표로 제시했습니다.</li>
+      <li><strong>EVA</strong>는 그 가치를 측정하는 구체적 공식(NOPAT − 투하자본×WACC)을 제공했습니다.</li>
+      <li><strong>VBM / SAC-P</strong>는 그 측정을 "계획-실행-보상"이라는 경영 프로세스 전체에 실시간으로 연결합니다.</li>
+      <li><strong>GR</strong>은 여러 법인을 "하나의 그룹"으로 재구성하여, 그룹 단위의 가치를 보여줍니다.</li>
+      <li>네 모듈은 같은 거래를 서로 다른 렌즈로 읽지만, <strong>ACDOCA</strong>라는 동일한 원천 데이터를 공유함으로써 서로 모순되지 않습니다.</li>
+    </ul>
+  </div>
+
+</div>
+
+<div class="footer">EDU · ASPN BAC · CFO의 역사 — Section 07 Prologue</div>
+
+<script>
+  // Sticky nav active state on scroll
+  const sections = document.querySelectorAll('.chapter');
+  const navLinks = document.querySelectorAll('.nav a');
+  function onScroll(){
+    let current = '';
+    sections.forEach(sec=>{
+      const rect = sec.getBoundingClientRect();
+      if(rect.top <= 120) current = sec.id;
+    });
+    navLinks.forEach(link=>{
+      link.classList.toggle('active', link.getAttribute('href') === '#'+current);
+    });
+  }
+  window.addEventListener('scroll', onScroll);
+  onScroll();
+
+  // Quiz
+  function checkQuiz(id, el, isCorrect){
+    const container = document.getElementById(id);
+    if(container.querySelector('.quiz-opt.correct, .quiz-opt.wrong')) return;
+    container.querySelectorAll('.quiz-opt').forEach(o=>o.classList.add('disabled'));
+    el.classList.add(isCorrect ? 'correct' : 'wrong');
+    const fb = document.getElementById(id + '-feedback');
+    fb.classList.add('show');
+    if(id === 'q1'){
+      fb.textContent = isCorrect
+        ? '✓ 정답입니다. 재무회계는 "소유와 경영의 분리"에서 출발한, 외부 신뢰를 위한 언어입니다.'
+        : '✗ 오답입니다. 정답은 "경영자가 외부 투자자와의 약속을 지키고 있는가?"입니다. 사업부 손익은 CO, 미래 가치는 SAC-P의 영역입니다.';
+    } else if(id === 'q2'){
+      fb.textContent = isCorrect
+        ? '✓ 정답입니다. GR의 IC Elimination은 이러한 내부거래를 식별하여 그룹 재무제표에서 상계·제거합니다.'
+        : '✗ 오답입니다. 그룹 관점에서는 ASPN Korea→Europe 거래가 "내부 이동"일 뿐이며, IC Elimination을 통해 매출·매입이 상계 제거됩니다.';
+    }
+  }
+
+</script>
+
+</body>
+</html>

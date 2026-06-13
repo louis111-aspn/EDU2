@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>숫자는 왜 거짓말을 하는가 — 데이터 리터러시와 의사결정</title>
+<style>
+  :root{
+    --navy:#003366;
+    --navy-light:#e8eef5;
+    --bg:#f0f3f8;
+    --card:#ffffff;
+    --text:#222831;
+    --sub:#5a6678;
+    --border:#d8e0ec;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:'Noto Sans KR','JetBrains Mono',monospace;
+    background:var(--bg);
+    color:var(--text);
+    font-size:15px;
+    line-height:1.7;
+    padding-bottom:80px;
+  }
+  h1,h2,h3,.serif{
+    font-family:'DM Serif Display','Noto Sans KR',serif;
+  }
+  /* ===== HEADER ===== */
+  header{
+    background:var(--navy);
+    color:#fff;
+    padding:48px 24px 36px;
+    text-align:center;
+  }
+  header .eyebrow{
+    font-size:13px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:#9fb6d3;
+    margin-bottom:12px;
+  }
+  header h1{
+    font-size:42px;
+    font-weight:400;
+    margin-bottom:14px;
+  }
+  header p{
+    font-size:16px;
+    color:#cdd9ec;
+    max-width:640px;
+    margin:0 auto;
+  }
+  /* ===== STICKY NAV ===== */
+  nav{
+    position:sticky;
+    top:0;
+    z-index:100;
+    background:#fff;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    overflow-x:auto;
+    box-shadow:0 2px 8px rgba(0,0,0,0.04);
+  }
+  nav a{
+    flex:1 0 auto;
+    text-align:center;
+    padding:14px 10px;
+    font-size:13px;
+    font-weight:700;
+    color:var(--sub);
+    text-decoration:none;
+    white-space:nowrap;
+    border-bottom:3px solid transparent;
+    transition:.15s;
+  }
+  nav a:hover, nav a.active{
+    color:var(--navy);
+    border-bottom-color:var(--navy);
+    background:var(--navy-light);
+  }
+  /* ===== LAYOUT ===== */
+  main{
+    max-width:760px;
+    margin:0 auto;
+    padding:0 20px;
+  }
+  section{
+    padding:48px 0 16px;
+    border-bottom:1px solid var(--border);
+  }
+  section:last-child{ border-bottom:none; }
+  .section-num{
+    display:inline-block;
+    background:var(--navy);
+    color:#fff;
+    font-size:13px;
+    font-weight:700;
+    padding:4px 12px;
+    border-radius:3px;
+    margin-bottom:14px;
+    letter-spacing:1px;
+  }
+  section h2{
+    font-size:30px;
+    font-weight:400;
+    color:var(--navy);
+    margin-bottom:8px;
+  }
+  .section-sub{
+    font-size:14px;
+    color:var(--sub);
+    margin-bottom:24px;
+  }
+  p{ margin-bottom:14px; }
+  strong{ color:var(--navy); }
+  /* ===== CARD ===== */
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:22px 24px;
+    margin:18px 0;
+  }
+  .card h3{
+    font-size:17px;
+    font-weight:700;
+    font-family:'Noto Sans KR',sans-serif;
+    color:var(--navy);
+    margin-bottom:10px;
+  }
+  /* ===== CALLOUT ===== */
+  .callout{
+    border-left:4px solid var(--navy);
+    background:var(--navy-light);
+    padding:16px 20px;
+    margin:18px 0;
+    border-radius:0 6px 6px 0;
+    font-size:14px;
+  }
+  .callout .label{
+    font-weight:700;
+    color:var(--navy);
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin-bottom:6px;
+    display:block;
+  }
+  /* ===== FLOW DIAGRAM ===== */
+  .flow{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:0;
+    margin:22px 0;
+  }
+  .flow-step{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:12px 16px;
+    font-size:13px;
+    text-align:center;
+    flex:1;
+    min-width:100px;
+  }
+  .flow-step.highlight{
+    background:var(--navy);
+    color:#fff;
+    border-color:var(--navy);
+    font-weight:700;
+  }
+  .flow-arrow{
+    padding:0 8px;
+    color:var(--navy);
+    font-size:18px;
+    font-weight:700;
+  }
+  @media (max-width:600px){
+    .flow{ flex-direction:column; }
+    .flow-arrow{ transform:rotate(90deg); padding:4px 0; }
+  }
+  /* ===== TABLE ===== */
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:18px 0;
+    font-size:14px;
+    background:#fff;
+  }
+  th,td{
+    border:1px solid var(--border);
+    padding:10px 12px;
+    text-align:left;
+  }
+  th{
+    background:var(--navy);
+    color:#fff;
+    font-weight:700;
+    font-size:13px;
+  }
+  tr:nth-child(even) td{ background:#f7f9fc; }
+  /* ===== CHART (CSS bar) ===== */
+  .chart-box{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:20px;
+    margin:18px 0;
+  }
+  .chart-title{
+    font-size:13px;
+    font-weight:700;
+    color:var(--sub);
+    margin-bottom:14px;
+    text-align:center;
+  }
+  .bar-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+    font-size:12px;
+  }
+  .bar-label{ width:70px; text-align:right; flex-shrink:0; color:var(--sub);}
+  .bar-track{
+    flex:1;
+    background:#eef2f8;
+    border-radius:3px;
+    overflow:hidden;
+    height:22px;
+    position:relative;
+  }
+  .bar-fill{
+    height:100%;
+    background:var(--navy);
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    color:#fff;
+    font-size:11px;
+    font-weight:700;
+    padding-right:6px;
+    border-radius:3px;
+  }
+  .chart-caption{
+    text-align:center;
+    font-size:12px;
+    color:var(--sub);
+    margin-top:8px;
+  }
+  /* axis-cut visualization */
+  .axis-demo{
+    display:flex;
+    gap:16px;
+    margin:18px 0;
+  }
+  .axis-col{
+    flex:1;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:16px;
+  }
+  .axis-col .chart-title{ margin-bottom:10px; }
+  .axis-bars{
+    display:flex;
+    align-items:flex-end;
+    gap:10px;
+    height:120px;
+    border-left:2px solid var(--text);
+    border-bottom:2px solid var(--text);
+    padding-left:8px;
+  }
+  .axis-bar{
+    flex:1;
+    background:var(--navy);
+    border-radius:2px 2px 0 0;
+    position:relative;
+  }
+  .axis-bar span{
+    position:absolute;
+    top:-18px;
+    left:0; right:0;
+    text-align:center;
+    font-size:11px;
+    color:var(--sub);
+  }
+  @media (max-width:600px){ .axis-demo{ flex-direction:column; } }
+  /* ===== QUIZ ===== */
+  .quiz{
+    background:#fff;
+    border:2px solid var(--navy);
+    border-radius:8px;
+    padding:22px;
+    margin:22px 0;
+  }
+  .quiz .q-label{
+    font-size:12px;
+    font-weight:700;
+    color:var(--navy);
+    letter-spacing:1px;
+    text-transform:uppercase;
+    margin-bottom:8px;
+  }
+  .quiz .q-text{
+    font-weight:700;
+    margin-bottom:14px;
+    font-size:15px;
+  }
+  .quiz-option{
+    display:block;
+    width:100%;
+    text-align:left;
+    background:var(--navy-light);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:10px 14px;
+    margin-bottom:8px;
+    font-size:14px;
+    cursor:pointer;
+    font-family:inherit;
+    color:var(--text);
+    transition:.15s;
+  }
+  .quiz-option:hover{ background:#dbe6f3; }
+  .quiz-option.correct{
+    background:var(--navy);
+    color:#fff;
+    border-color:var(--navy);
+    font-weight:700;
+  }
+  .quiz-option.wrong{
+    background:#f6dede;
+    border-color:#d99;
+    color:#a33;
+  }
+  .quiz-feedback{
+    display:none;
+    margin-top:12px;
+    padding:12px 14px;
+    border-radius:6px;
+    font-size:13px;
+    background:#f7f9fc;
+    border-left:3px solid var(--navy);
+  }
+  .quiz-feedback.show{ display:block; }
+  /* ===== CHECKLIST ===== */
+  .checklist{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:22px;
+    margin:18px 0;
+  }
+  .checklist h3{
+    font-size:16px;
+    color:var(--navy);
+    margin-bottom:14px;
+    font-family:'Noto Sans KR',sans-serif;
+    font-weight:700;
+  }
+  .check-item{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    margin-bottom:12px;
+    cursor:pointer;
+    font-size:14px;
+  }
+  .check-box{
+    width:18px; height:18px;
+    border:2px solid var(--navy);
+    border-radius:3px;
+    flex-shrink:0;
+    margin-top:1px;
+    position:relative;
+    transition:.15s;
+  }
+  .check-item.checked .check-box{
+    background:var(--navy);
+  }
+  .check-item.checked .check-box::after{
+    content:'✓';
+    color:#fff;
+    position:absolute;
+    top:-2px; left:2px;
+    font-size:13px;
+    font-weight:700;
+  }
+  .check-item.checked .check-text{
+    color:var(--sub);
+    text-decoration:line-through;
+  }
+  /* ===== DRILL TOGGLE ===== */
+  .drill{
+    border:1px solid var(--border);
+    border-radius:8px;
+    margin:14px 0;
+    overflow:hidden;
+  }
+  .drill-head{
+    background:var(--navy-light);
+    padding:14px 18px;
+    font-weight:700;
+    font-size:14px;
+    color:var(--navy);
+    cursor:pointer;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .drill-head .arrow{ transition:.2s; font-size:13px; }
+  .drill.open .drill-head .arrow{ transform:rotate(90deg); }
+  .drill-body{
+    display:none;
+    padding:18px;
+    font-size:14px;
+    background:#fff;
+    border-top:1px solid var(--border);
+  }
+  .drill.open .drill-body{ display:block; }
+  /* ===== KEY TAKEAWAY ===== */
+  .takeaway{
+    background:var(--navy);
+    color:#fff;
+    border-radius:8px;
+    padding:24px 26px;
+    margin:24px 0;
+  }
+  .takeaway .label{
+    font-size:12px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:#9fb6d3;
+    margin-bottom:8px;
+  }
+  .takeaway p{ margin:0; font-size:15px; }
+  .takeaway strong{ color:#fff; }
+  /* ===== FOOTER NAV ===== */
+  .next-prev{
+    display:flex;
+    justify-content:space-between;
+    margin-top:24px;
+  }
+  .next-prev a{
+    font-size:13px;
+    font-weight:700;
+    color:var(--navy);
+    text-decoration:none;
+  }
+  /* simpson paradox table highlight */
+  .hl-red{ color:#a33; font-weight:700; }
+  .hl-navy{ color:var(--navy); font-weight:700; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">EDU · 데이터 리터러시 시리즈</div>
+  <h1>숫자는 왜 거짓말을 하는가</h1>
+  <p>데이터는 객관적이라는 믿음, 그 믿음이 가장 위험한 순간에 대하여 — KPI, 평균, 시각화, 그리고 의사결정의 함정을 다룹니다.</p>
+</header>
+
+<nav id="topnav">
+  <a href="#s1" class="active">1. 인트로</a>
+  <a href="#s2">2. Goodhart's Law</a>
+  <a href="#s3">3. 평균의 함정</a>
+  <a href="#s4">4. 시각화 왜곡</a>
+  <a href="#s5">5. 의사결정 체크리스트</a>
+</nav>
+
+<main>
+
+<!-- ================= SECTION 1 ================= -->
+<section id="s1">
+  <span class="section-num">SECTION 1</span>
+  <h2>왜 숫자를 믿으면 안 되는가</h2>
+  <div class="section-sub">측정의 순간부터 시작되는 왜곡</div>
+
+  <p>"숫자는 거짓말을 하지 않는다"는 말은 절반만 맞다. 숫자 자체는 거짓말을 하지 않지만, <strong>숫자가 만들어지는 과정 — 무엇을 측정할지, 어떻게 집계할지, 어떻게 보여줄지</strong> — 의 모든 단계에는 사람의 선택이 개입된다.</p>
+
+  <div class="flow">
+    <div class="flow-step">현실 (Reality)</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step highlight">측정 설계<br><span style="font-size:11px;font-weight:400;">무엇을, 어떻게</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step highlight">집계 방식<br><span style="font-size:11px;font-weight:400;">평균? 합계? 레벨?</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step highlight">표현 방식<br><span style="font-size:11px;font-weight:400;">차트, 축, 색상</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">의사결정</div>
+  </div>
+
+  <p>강조된 세 단계 각각이 결론을 바꿀 수 있는 지점이다. 동일한 현실에서 출발해도, 이 세 단계의 선택이 달라지면 완전히 다른 — 때로는 정반대의 — 결론에 도달할 수 있다.</p>
+
+  <div class="callout">
+    <span class="label">컨설턴트의 역할</span>
+    클라이언트는 보통 "숫자"를 결과물로 받아들인다. 하지만 컨설턴트는 그 숫자가 만들어진 <strong>설계 단계</strong>를 다루는 사람이다. KPI를 설계하고, 집계 로직을 설계하고, 보고서 양식을 설계하는 것 자체가 — 의사결정을 설계하는 일이다.
+  </div>
+
+  <div class="card">
+    <h3>이 모듈에서 다루는 4가지 함정</h3>
+    <table>
+      <tr><th>함정</th><th>핵심 질문</th><th>대표 사례</th></tr>
+      <tr><td><strong>Goodhart's Law</strong></td><td>측정하는 순간 무엇이 왜곡되는가?</td><td>KPI 달성 → 본질 훼손</td></tr>
+      <tr><td><strong>평균의 함정</strong></td><td>대표값이 무엇을 숨기는가?</td><td>심슨의 역설</td></tr>
+      <tr><td><strong>시각화 왜곡</strong></td><td>같은 데이터, 다른 그림이 가능한가?</td><td>Y축 절단, 이중 축</td></tr>
+      <tr><td><strong>의사결정 오류</strong></td><td>위 함정들이 결합되면 무슨 일이 생기는가?</td><td>잘못된 전략적 결론</td></tr>
+    </table>
+  </div>
+
+  <div class="takeaway">
+    <div class="label">Key Takeaway</div>
+    <p>숫자는 현실을 그대로 비추는 거울이 아니라, <strong>설계자의 선택을 통과한 렌즈</strong>다. 좋은 컨설턴트는 그 렌즈를 다루는 사람이며, 동시에 그 렌즈의 왜곡을 식별할 수 있는 사람이어야 한다.</p>
+  </div>
+
+  <div class="next-prev">
+    <span></span>
+    <a href="#s2">다음: Goodhart's Law →</a>
+  </div>
+</section>
+
+<!-- ================= SECTION 2 ================= -->
+<section id="s2">
+  <span class="section-num">SECTION 2</span>
+  <h2>Goodhart's Law — 측정하는 순간 게임이 된다</h2>
+  <div class="section-sub">"측정 대상이 되는 지표는, 더 이상 좋은 지표가 아니다"</div>
+
+  <p>영국 경제학자 Charles Goodhart의 이름에서 따온 이 법칙은 단순하지만 강력하다. <strong>어떤 지표를 목표로 설정하고 보상/평가와 연결하는 순간, 사람들은 그 지표 자체를 최적화하기 시작하며, 그 지표가 원래 대표하려던 본질은 뒤로 밀려난다.</strong></p>
+
+  <div class="card">
+    <h3>고전적 사례: CS 응답시간 KPI</h3>
+    <div class="flow">
+      <div class="flow-step">목표: 고객 만족도 향상</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step highlight">측정 가능한 KPI:<br>"평균 응답시간 5분 이내"</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">실제 행동 변화</div>
+    </div>
+    <p style="margin-top:14px;">상담원은 5분 내 "응답"하기 위해 — 문제 해결 여부와 무관하게 — 형식적인 첫 답변("확인 중입니다")을 빠르게 발송한다. <span class="hl-navy">KPI는 100% 달성</span>되지만, <span class="hl-red">실제 고객 만족도는 오히려 하락</span>할 수 있다.</p>
+  </div>
+
+  <div class="chart-box">
+    <div class="chart-title">동일 기간 KPI vs 실제 만족도 추이 (지수, 도입 시점=100)</div>
+    <div class="bar-row">
+      <div class="bar-label">KPI 달성률</div>
+      <div class="bar-track"><div class="bar-fill" style="width:96%;">96%</div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">고객 만족도</div>
+      <div class="bar-track"><div class="bar-fill" style="width:68%; background:#a33;">68 (▼32)</div></div>
+    </div>
+    <div class="chart-caption">측정 가능한 지표(응답시간)는 개선되었으나, 측정의 본래 목적(만족도)은 악화 — Goodhart's Law의 전형적 패턴</div>
+  </div>
+
+  <div class="drill">
+    <div class="drill-head" onclick="toggleDrill(this)">
+      <span>더 알아보기 — 다른 산업의 Goodhart's Law 사례</span>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="drill-body">
+      <table>
+        <tr><th>산업/영역</th><th>설정된 KPI</th><th>왜곡된 행동</th></tr>
+        <tr><td>제조 — 생산성</td><td>시간당 생산량</td><td>품질 검사 생략, 불량률 증가</td></tr>
+        <tr><td>영업 — 매출</td><td>월말 매출 목표</td><td>월말 밀어내기(channel stuffing), 익월 매출 선반영</td></tr>
+        <tr><td>의료 — 대기시간</td><td>응급실 대기 4시간 이내</td><td>"대기실 외부"에 환자 대기시켜 시간 미산입</td></tr>
+        <tr><td>교육 — 시험 점수</td><td>표준화 시험 평균</td><td>시험 위주 교육, 비측정 역량(창의성 등) 소외</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="quiz">
+    <div class="q-label">Quick Check</div>
+    <div class="q-text">Q. SAC Planning에서 부서별 "예산 소진율"을 핵심 평가 KPI로 설정했을 때, Goodhart's Law 관점에서 가장 우려되는 행동은?</div>
+    <button class="quiz-option" onclick="answerQuiz(this, false)">예산을 더 정밀하게 분석하려는 노력이 증가한다</button>
+    <button class="quiz-option" onclick="answerQuiz(this, true)">연말에 필요 없는 지출을 늘려서라도 예산을 소진하려 한다</button>
+    <button class="quiz-option" onclick="answerQuiz(this, false)">예산 수립 프로세스에 더 많은 부서가 참여하게 된다</button>
+    <div class="quiz-feedback">
+      <strong>정답: 2번.</strong> "소진율"이 평가 지표가 되면, 부서는 익년도 예산 삭감을 피하기 위해 불필요한 지출로 소진율을 맞추는 행동을 한다. 이는 "예산 효율성"이라는 본래 목적과 정반대 방향이다. KPI 설계 시 "이 지표를 100% 달성하기 위한 최악의 행동은 무엇인가?"를 항상 역으로 검증해야 한다.
+    </div>
+  </div>
+
+  <div class="callout">
+    <span class="label">GR/SAC 설계 철학과의 연결</span>
+    GR(Group Reporting)에서 IC 거래 미일치분을 임시 계정에 그대로 노출시키는 설계는, "숫자를 매끄럽게 만드는 것"이 목적이 아니라 <strong>"무엇이 측정되고 있는지를 왜곡 없이 드러내는 것"</strong>이 목적이라는 점에서 Goodhart's Law에 대한 구조적 방어와 같은 철학을 공유한다.
+  </div>
+
+  <div class="takeaway">
+    <div class="label">Key Takeaway</div>
+    <p>KPI를 설계할 때는 "이 숫자가 좋아지면 정말 좋은 일이 일어나는가?"뿐 아니라, <strong>"이 숫자만 좋아지고 본질은 나빠지는 경로가 존재하는가?"</strong>를 반드시 검증해야 한다.</p>
+  </div>
+
+  <div class="next-prev">
+    <a href="#s1">← 이전</a>
+    <a href="#s3">다음: 평균의 함정 →</a>
+  </div>
+</section>
+
+<!-- ================= SECTION 3 ================= -->
+<section id="s3">
+  <span class="section-num">SECTION 3</span>
+  <h2>평균의 함정 — 대표값이 숨기는 것</h2>
+  <div class="section-sub">하나의 숫자로 요약하는 순간, 무언가는 사라진다</div>
+
+  <p>"평균"은 가장 널리 쓰이는 요약 통계지만, 동시에 가장 오해를 부르는 숫자이기도 하다. 평균은 분포의 <strong>형태, 분산, 극단값의 존재</strong>를 모두 지운 채 하나의 숫자만 남긴다.</p>
+
+  <div class="card">
+    <h3>"평균 연봉"의 함정</h3>
+    <div class="chart-box" style="margin-top:0;">
+      <div class="chart-title">A팀 연봉 분포 (단위: 백만원)</div>
+      <div class="bar-row"><div class="bar-label">팀원 1~9</div><div class="bar-track"><div class="bar-fill" style="width:40%;">각 45</div></div></div>
+      <div class="bar-row"><div class="bar-label">팀장</div><div class="bar-track"><div class="bar-fill" style="width:95%; background:#a33;">450</div></div></div>
+      <div class="chart-caption">9명은 4,500만원, 1명은 4억 5천만원 → <strong>평균 = 8,550만원</strong> (10명 중 9명의 실제 연봉보다 훨씬 높음)</div>
+    </div>
+    <p style="margin-top:14px;">"A팀 평균 연봉 8,550만원"이라는 보고는 사실이지만, 팀원 90%의 현실을 전혀 대표하지 못한다. 이 경우 <strong>중앙값(Median, 4,500만원)</strong>이 훨씬 더 대표성 있는 지표다.</p>
+  </div>
+
+  <div class="card">
+    <h3>심슨의 역설(Simpson's Paradox) — 부분과 전체가 뒤집히는 사례</h3>
+    <p>두 개의 영업팀(A, B)의 성과를 비교한다. <strong>각 제품군별로는 B팀이 A팀보다 전환율이 높지만, 전체 합산에서는 A팀이 더 높게 나타난다.</strong></p>
+    <table>
+      <tr><th>제품군</th><th>A팀 전환율</th><th>B팀 전환율</th><th>우위</th></tr>
+      <tr><td>프리미엄 제품</td><td>50건 중 20건 (40%)</td><td>400건 중 180건 (45%)</td><td class="hl-navy">B팀</td></tr>
+      <tr><td>일반 제품</td><td>400건 중 100건 (25%)</td><td>50건 중 15건 (30%)</td><td class="hl-navy">B팀</td></tr>
+      <tr style="background:#fef6f6;"><td><strong>전체 합산</strong></td><td><strong>450건 중 120건 (26.7%)</strong></td><td><strong>450건 중 195건 (43.3%)</strong></td><td class="hl-navy">B팀</td></tr>
+    </table>
+    <p style="margin-top:10px; font-size:13px; color:var(--sub);">※ 위 표는 B팀이 두 영역 모두에서 우위인 "정상" 케이스를 보여준다. 역설이 발생하는 실제 조건은 두 그룹의 <strong>표본 비중(mix)</strong>이 크게 다를 때다 — 아래 드릴다운에서 역설이 실제로 발생하는 수치 예시를 확인하라.</p>
+  </div>
+
+  <div class="drill">
+    <div class="drill-head" onclick="toggleDrill(this)">
+      <span>드릴다운 — 심슨의 역설이 실제로 "역전"되는 수치 예시</span>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="drill-body">
+      <table>
+        <tr><th>제품군</th><th>A팀</th><th>B팀</th></tr>
+        <tr><td>프리미엄 제품 (전환율 높음)</td><td>10건 중 6건 (60%)</td><td>300건 중 150건 (50%)</td></tr>
+        <tr><td>일반 제품 (전환율 낮음)</td><td>300건 중 60건 (20%)</td><td>10건 중 1건 (10%)</td></tr>
+        <tr style="background:#fef6f6;"><td><strong>전체 합산</strong></td><td><strong>310건 중 66건 = 21.3%</strong></td><td><strong>310건 중 151건 = 48.7%</strong></td></tr>
+      </table>
+      <p style="margin-top:10px;">제품군별로는 <strong>A팀이 두 영역 모두에서 B팀보다 전환율이 높다</strong> (60%>50%, 20%>10%). 그러나 A팀은 "어려운" 일반 제품에 영업력의 97%를 투입했고, B팀은 "쉬운" 프리미엄 제품에 97%를 투입했다. 그 결과 <strong>전체 합산에서는 B팀이 압도적으로 높게 나타난다</strong> — 부분에서의 결론과 전체에서의 결론이 정반대가 되는 경우다.</p>
+      <div class="callout" style="margin-top:14px;">
+        <span class="label">왜 중요한가</span>
+        "전체 전환율"만 보고 B팀에 인센티브를 주는 결정은, 각 영역에서의 실제 역량(A팀이 더 우수)을 완전히 거꾸로 평가하게 만든다. <strong>집계 레벨(Level of Aggregation)을 바꾸면 결론이 뒤집힐 수 있다</strong>는 것이 핵심이다.
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <span class="label">SAC Planning 연결</span>
+    SAC Planning 모델에서 동일한 계획 데이터라도 <strong>어떤 계층(Dimension Hierarchy) 레벨에서 집계해 보여주는가</strong>에 따라 의사결정자가 받는 인상이 완전히 달라질 수 있다. 보고서 설계자는 "어느 레벨에서 봐야 진짜 그림이 보이는가"를 항상 함께 고민해야 한다.
+  </div>
+
+  <div class="quiz">
+    <div class="q-label">Quick Check</div>
+    <div class="q-text">Q. 전사 평균 매출 성장률이 +5%로 보고되었다. 이 숫자만으로 "모든 사업부가 양호하다"고 결론 내리는 것의 가장 큰 위험은?</div>
+    <button class="quiz-option" onclick="answerQuiz(this, false)">+5%는 너무 낮은 숫자라서 신뢰할 수 없다</button>
+    <button class="quiz-option" onclick="answerQuiz(this, true)">일부 사업부의 큰 성장이 다른 사업부의 부진을 가려, 전체 분포(분산)가 보이지 않는다</button>
+    <button class="quiz-option" onclick="answerQuiz(this, false)">성장률은 항상 전년 대비로만 계산해야 한다</button>
+    <div class="quiz-feedback">
+      <strong>정답: 2번.</strong> 평균은 분산을 지운다. 전사 +5%라는 숫자 뒤에는 +20% 성장 사업부와 -10% 역성장 사업부가 동시에 존재할 수 있다. 의사결정자가 "전사 +5%"만 보고 안심한다면, 위기에 처한 사업부에 대한 대응이 한 분기 이상 늦어질 수 있다.
+    </div>
+  </div>
+
+  <div class="takeaway">
+    <div class="label">Key Takeaway</div>
+    <p>평균(또는 모든 단일 대표값)을 보고할 때는 항상 <strong>"이 숫자가 숨기고 있는 분산은 무엇인가?"</strong>를 함께 질문해야 한다. 가능하다면 평균과 함께 최소·최대·중앙값, 또는 분포를 함께 제시하라.</p>
+  </div>
+
+  <div class="next-prev">
+    <a href="#s2">← 이전</a>
+    <a href="#s4">다음: 시각화 왜곡 →</a>
+  </div>
+</section>
+
+<!-- ================= SECTION 4 ================= -->
+<section id="s4">
+  <span class="section-num">SECTION 4</span>
+  <h2>시각화의 왜곡 — 차트는 어떻게 거짓말하는가</h2>
+  <div class="section-sub">같은 데이터, 다른 그림, 다른 결론</div>
+
+  <p>데이터가 정확하고 집계 방식도 합리적이라 해도, <strong>시각화 방식 하나만으로 받는 사람의 인상을 완전히 바꿀 수 있다.</strong> 가장 흔한 두 가지 기법: Y축 절단(Truncated Axis)과 이중 축(Dual Axis)이다.</p>
+
+  <div class="card">
+    <h3>기법 1 — Y축 절단 (Truncated Axis)</h3>
+    <p>아래 두 차트는 <strong>완전히 동일한 데이터</strong> (100 → 103, 3% 성장)를 보여준다.</p>
+    <div class="axis-demo">
+      <div class="axis-col">
+        <div class="chart-title">A. Y축 0부터 시작</div>
+        <div class="axis-bars">
+          <div class="axis-bar" style="height:72%;"><span>100</span></div>
+          <div class="axis-bar" style="height:74%;"><span>103</span></div>
+        </div>
+        <div class="chart-caption">"거의 변화 없음"으로 보임</div>
+      </div>
+      <div class="axis-col">
+        <div class="chart-title">B. Y축 95부터 시작</div>
+        <div class="axis-bars">
+          <div class="axis-bar" style="height:30%;"><span>100</span></div>
+          <div class="axis-bar" style="height:90%;"><span>103</span></div>
+        </div>
+        <div class="chart-caption">"극적인 급증"으로 보임</div>
+      </div>
+    </div>
+    <p>두 차트 모두 "틀린" 숫자를 쓰지 않았다. 그러나 B는 3%의 변화를 시각적으로 3배 이상 부풀려 보여준다. <strong>축의 시작점을 선택하는 것 자체가 메시지를 선택하는 행위</strong>다.</p>
+  </div>
+
+  <div class="card">
+    <h3>기법 2 — 이중 축 (Dual Axis)의 함정</h3>
+    <p>두 개의 서로 다른 지표(예: 매출과 광고비)를 하나의 차트에 각각 다른 축으로 표시하면, <strong>두 축의 스케일을 조정하는 것만으로 "상관관계가 있는 것처럼" 또는 "상관관계가 없는 것처럼" 보이게 만들 수 있다.</strong></p>
+    <div class="chart-box" style="margin-top:0;">
+      <div class="chart-title">매출(좌측 축) vs 광고비(우측 축) — 두 축의 스케일이 임의로 설정됨</div>
+      <div class="bar-row"><div class="bar-label">매출 (좌축)</div><div class="bar-track"><div class="bar-fill" style="width:88%;">스케일 A: 90~110</div></div></div>
+      <div class="bar-row"><div class="bar-label">광고비 (우축)</div><div class="bar-track"><div class="bar-fill" style="width:85%; background:#5a7ba6;">스케일 B: 0~50</div></div></div>
+      <div class="chart-caption">두 선이 "겹쳐 보이도록" 우측 축의 범위를 조정하면, 실제로는 약한 상관관계도 강한 인과관계처럼 보일 수 있다</div>
+    </div>
+  </div>
+
+  <div class="drill">
+    <div class="drill-head" onclick="toggleDrill(this)">
+      <span>더 알아보기 — 그 외 흔한 왜곡 기법</span>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="drill-body">
+      <table>
+        <tr><th>기법</th><th>방식</th><th>효과</th></tr>
+        <tr><td>3D 효과 / 원근</td><td>파이차트를 기울여 표시</td><td>가까운 조각이 실제보다 커 보임</td></tr>
+        <tr><td>색상 강조</td><td>비교 대상 중 하나만 강렬한 색</td><td>해당 항목에 시선·중요도 집중</td></tr>
+        <tr><td>면적 vs 길이</td><td>버블차트에서 반지름으로 값 표현</td><td>면적은 반지름의 제곱 → 차이 과장</td></tr>
+        <tr><td>역순 축</td><td>Y축을 위→아래로 감소하게 배치</td><td>"증가"가 시각적으로 "하락"처럼 보임</td></tr>
+        <tr><td>선택적 기간</td><td>유리한 구간만 잘라서 표시</td><td>장기 추세와 반대되는 단기 추세 강조</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="callout">
+    <span class="label">IBCS와의 연결</span>
+    IBCS(International Business Communication Standards)가 <strong>Y축 절단 금지, 0 기준선 의무화, 색상의 의미 고정(예: Actual=실선/검정, Plan=점선)</strong> 등을 표준 규칙으로 명문화한 이유가 바로 여기에 있다. 표준화는 "디자인 통일"이 아니라 <strong>해석의 왜곡 가능성을 시스템적으로 제거</strong>하는 작업이다. SAC의 디자인 철학 역시 — 차트가 아니라 "통제된 보고 구조"를 만드는 것이 본질이라는 점에서 같은 방향을 향한다.
+  </div>
+
+  <div class="quiz">
+    <div class="q-label">Quick Check</div>
+    <div class="q-text">Q. IBCS가 Y축을 항상 0부터 시작하도록 규정하는 가장 근본적인 이유는?</div>
+    <button class="quiz-option" onclick="answerQuiz(this, false)">차트를 더 보기 좋게 만들기 위해서</button>
+    <button class="quiz-option" onclick="answerQuiz(this, false)">데이터 용량을 줄이기 위해서</button>
+    <button class="quiz-option" onclick="answerQuiz(this, true)">막대(면적)의 비율이 실제 값의 비율과 일치해야, 시각적 인상이 데이터를 왜곡하지 않기 때문이다</button>
+    <div class="quiz-feedback">
+      <strong>정답: 3번.</strong> 막대 차트는 면적/길이로 값을 직관적으로 비교하게 만드는 도구다. 축이 0에서 시작하지 않으면 "면적의 비율"과 "실제 값의 비율"이 어긋나면서, 보는 사람은 무의식적으로 잘못된 비율을 인지하게 된다. 0 기준선은 미적 규칙이 아니라 <strong>정합성(integrity) 규칙</strong>이다.
+    </div>
+  </div>
+
+  <div class="takeaway">
+    <div class="label">Key Takeaway</div>
+    <p>차트를 검토할 때는 항상 <strong>"이 축은 0에서 시작하는가? 두 개의 축이 있다면 누가 그 스케일을 정했는가? 보여주는 기간은 어떤 기준으로 선택되었는가?"</strong>를 확인해야 한다.</p>
+  </div>
+
+  <div class="next-prev">
+    <a href="#s3">← 이전</a>
+    <a href="#s5">다음: 의사결정 체크리스트 →</a>
+  </div>
+</section>
+
+<!-- ================= SECTION 5 ================= -->
+<section id="s5">
+  <span class="section-num">SECTION 5</span>
+  <h2>의사결정으로 가는 다리</h2>
+  <div class="section-sub">숫자를 다루는 컨설턴트의 자세</div>
+
+  <p>지금까지 다룬 4가지 함정 — KPI 왜곡, 평균의 함정, 시각화 왜곡 — 은 독립적으로 발생하기보다 <strong>결합되어 의사결정 오류로 이어지는 경우가 많다.</strong> 마지막 섹션은 이를 점검하기 위한 실전 체크리스트다.</p>
+
+  <div class="checklist">
+    <h3>숫자를 마주할 때의 5단계 점검</h3>
+    <div class="check-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div class="check-text"><strong>① 정의 확인</strong> — 이 숫자는 정확히 무엇을 측정하는가? (분자/분모, 기간, 포함/제외 범위)</div>
+    </div>
+    <div class="check-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div class="check-text"><strong>② 누락 확인</strong> — 이 지표 때문에 의도적으로 또는 비의도적으로 무시되는 행동/영역은 없는가? (Goodhart's Law)</div>
+    </div>
+    <div class="check-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div class="check-text"><strong>③ 분산 확인</strong> — 이 대표값(평균/합계) 뒤에 어떤 분포가 숨어 있는가? 집계 레벨을 바꾸면 결론이 달라지는가? (심슨의 역설)</div>
+    </div>
+    <div class="check-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div class="check-text"><strong>④ 표현 확인</strong> — 차트의 축, 색상, 기간 선택이 메시지를 과장하거나 축소하고 있지 않은가?</div>
+    </div>
+    <div class="check-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div class="check-text"><strong>⑤ 비교 기준 확인</strong> — 이 숫자는 무엇과 비교되고 있는가? 그 비교 대상은 적절한가? (전년 동기? 계획? 동종업계?)</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>종합 사례 — 4가지 함정이 결합된 보고서</h3>
+    <p>한 사업부가 분기 보고에서 다음과 같이 주장한다:</p>
+    <div class="callout">
+      "이번 분기 <strong>신규 고객 전환율 KPI 95% 달성</strong>(목표 90%)했으며, 전사 평균 매출은 <strong>+5% 성장</strong>했습니다. 아래 차트와 같이 광고비 투입 대비 매출이 뚜렷한 상관관계를 보이고 있어, 광고 예산 확대를 제안합니다."
+    </div>
+    <p style="margin-top:14px;">위 한 문단에는 4가지 함정이 모두 숨어 있을 수 있다:</p>
+    <table>
+      <tr><th>점검 항목</th><th>의심해야 할 지점</th></tr>
+      <tr><td>① 정의</td><td>"전환율 95%"의 "전환"은 무엇으로 정의되는가? (결제완료? 장바구니 추가?)</td></tr>
+      <tr><td>② 누락</td><td>전환율 KPI를 맞추기 위해 "전환 인정 기준"을 완화하지 않았는가?</td></tr>
+      <tr><td>③ 분산</td><td>전사 +5% 뒤에 특정 사업부의 역성장이 가려져 있지 않은가?</td></tr>
+      <tr><td>④ 표현 / ⑤ 비교</td><td>"광고비-매출 상관관계" 차트는 이중 축인가? 축 스케일은 누가 정했는가? 비교 기간은 임의로 선택되었는가?</td></tr>
+    </table>
+  </div>
+
+  <div class="drill">
+    <div class="drill-head" onclick="toggleDrill(this)">
+      <span>더 알아보기 — 이 체크리스트를 보고서 작성 단계에 적용하는 법</span>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="drill-body">
+      <p>이 체크리스트는 "받은 보고서를 검증"할 때뿐 아니라, <strong>본인이 보고서를 작성할 때 거꾸로 적용</strong>하는 것이 더 중요하다. 보고서를 완성한 뒤 5단계를 스스로에게 적용해보면, "이 숫자가 의도와 다르게 해석될 여지"를 사전에 제거할 수 있다.</p>
+      <p style="margin-top:10px;">특히 ④ 표현 단계에서는 — 차트를 그리기 전에 먼저 <strong>"이 차트를 본 사람이 어떤 결론을 내려야 하는가"</strong>를 먼저 정의하고, 그 결론과 데이터가 실제로 일치하는지를 역으로 검증하는 습관이 유용하다. 결론이 데이터보다 먼저 정해져 있다면, 그것이야말로 가장 위험한 신호다.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <span class="label">GR / SAC 설계 철학으로의 연결</span>
+    SAP GR이 IC 미일치를 숨기지 않고 노출시키는 것, ICMR이 조정 분개를 유형별로 추적 가능하게 만드는 것, IBCS가 차트 표현 규칙을 표준화하는 것 — 이 모든 설계의 공통된 철학은 <strong>"숫자가 만들어지는 과정을 투명하게 만들어, 해석의 자유도를 줄이는 것"</strong>이다. 좋은 시스템 설계와 좋은 보고서 작성은 같은 원칙을 공유한다: <strong>왜곡의 여지를 구조적으로 차단하라.</strong>
+  </div>
+
+  <div class="takeaway">
+    <div class="label">Module Summary</div>
+    <p>숫자는 거짓말을 하지 않는다 — 그러나 숫자를 <strong>고르고, 집계하고, 보여주는 사람</strong>은 의도적이든 아니든 거짓말을 할 수 있다. 컨설턴트의 가치는 정답을 빨리 찾는 데 있는 것이 아니라, <strong>"이 숫자가 어떻게 만들어졌는가"를 끝까지 추적하는 태도</strong>에 있다.</p>
+  </div>
+
+  <div class="next-prev">
+    <a href="#s4">← 이전</a>
+    <span></span>
+  </div>
+</section>
+
+</main>
+
+<script>
+  // sticky nav active state on scroll
+  const sections = document.querySelectorAll('section');
+  const navLinks = document.querySelectorAll('#topnav a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(sec => {
+      const rect = sec.getBoundingClientRect();
+      if (rect.top <= 120) current = sec.id;
+    });
+    navLinks.forEach(link => {
+      link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+    });
+  });
+
+  // quiz logic
+  function answerQuiz(btn, isCorrect){
+    const quiz = btn.closest('.quiz');
+    const options = quiz.querySelectorAll('.quiz-option');
+    options.forEach(o => o.disabled = true);
+    if(isCorrect){
+      btn.classList.add('correct');
+    } else {
+      btn.classList.add('wrong');
+    }
+    quiz.querySelector('.quiz-feedback').classList.add('show');
+  }
+
+  // checklist toggle
+  function toggleCheck(el){
+    el.classList.toggle('checked');
+  }
+
+  // drill toggle
+  function toggleDrill(el){
+    el.closest('.drill').classList.toggle('open');
+  }
+</script>
+
+</body>
+</html>
