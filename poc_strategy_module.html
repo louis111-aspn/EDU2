@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PoC 전략 — BAC 컨설턴트 교육 모듈</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #003366;
+  --navy-light: #e8eef5;
+  --navy-mid: #c2d0e0;
+  --bg: #f0f3f8;
+  --white: #ffffff;
+  --text: #1a2330;
+  --muted: #6b7a8d;
+  --border: #d0d8e4;
+  --warn-bg: #fff8e6;
+  --warn-border: #d4a017;
+  --correct-bg: #e8f5ee;
+  --correct-border: #2e7d52;
+  --wrong-bg: #fdecea;
+  --wrong-border: #b5321a;
+  --gap: 20px;
+  --pad: 40px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 15px;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.75;
+}
+
+/* ── NAV ── */
+#top-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--navy);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--pad);
+  height: 52px;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+#top-nav::-webkit-scrollbar { display: none; }
+.nav-brand {
+  font-family: 'DM Serif Display', serif;
+  color: var(--white);
+  font-size: 14px;
+  white-space: nowrap;
+  margin-right: 20px;
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+.nav-tab {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.65);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  padding: 6px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+.nav-tab:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.nav-tab.active { background: rgba(255,255,255,0.18); color: #fff; font-weight: 500; }
+
+/* ── HERO ── */
+.hero {
+  background: var(--navy);
+  color: white;
+  padding: 64px var(--pad) 56px;
+}
+.hero-eyebrow {
+  font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 16px;
+}
+.hero h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 42px;
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+.hero-sub {
+  font-size: 16px;
+  color: rgba(255,255,255,0.7);
+  max-width: 620px;
+  margin-bottom: 32px;
+}
+.hero-meta {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.hero-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.hero-meta-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+}
+.hero-meta-value {
+  font-size: 13px;
+  color: rgba(255,255,255,0.85);
+  font-weight: 500;
+}
+
+/* ── SECTIONS ── */
+.section {
+  display: none;
+  padding: 56px var(--pad);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.section.visible { display: block; }
+
+.section-header {
+  margin-bottom: 40px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid var(--navy);
+}
+.section-badge {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--navy);
+  border: 1px solid var(--navy);
+  padding: 3px 10px;
+  border-radius: 2px;
+  margin-bottom: 12px;
+}
+.section-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 30px;
+  color: var(--navy);
+  line-height: 1.25;
+  margin-bottom: 8px;
+}
+.section-desc {
+  font-size: 15px;
+  color: var(--muted);
+}
+
+/* ── CARDS ── */
+.card-grid {
+  display: grid;
+  gap: var(--gap);
+}
+.card-grid-2 { grid-template-columns: 1fr 1fr; }
+.card-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+.card-grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 28px;
+}
+.card-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.card-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+.card p {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+.card ul {
+  margin-top: 10px;
+  padding-left: 16px;
+}
+.card ul li {
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 6px;
+  line-height: 1.6;
+}
+
+/* ── CALLOUT ── */
+.callout {
+  border-radius: 4px;
+  padding: 20px 24px;
+  margin: var(--gap) 0;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.callout.navy { background: var(--navy-light); border-left: 3px solid var(--navy); }
+.callout.warn { background: var(--warn-bg); border-left: 3px solid var(--warn-border); }
+.callout.correct { background: var(--correct-bg); border-left: 3px solid var(--correct-border); }
+.callout.wrong { background: var(--wrong-bg); border-left: 3px solid var(--wrong-border); }
+.callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.callout-body { font-size: 14px; line-height: 1.7; }
+.callout-body strong { display: block; font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+
+/* ── FLOW DIAGRAM ── */
+.flow {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin: var(--gap) 0;
+  flex-wrap: wrap;
+}
+.flow-step {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 16px 20px;
+  min-width: 130px;
+  text-align: center;
+  flex: 1;
+}
+.flow-step-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.flow-step-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--navy);
+  line-height: 1.4;
+}
+.flow-step.highlight {
+  background: var(--navy);
+  border-color: var(--navy);
+}
+.flow-step.highlight .flow-step-num { color: rgba(255,255,255,0.5); }
+.flow-step.highlight .flow-step-label { color: white; }
+.flow-arrow {
+  font-size: 18px;
+  color: var(--navy-mid);
+  padding: 0 6px;
+  flex-shrink: 0;
+}
+
+/* ── COMPARE TABLE ── */
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  margin: var(--gap) 0;
+}
+.compare-table th {
+  background: var(--navy);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 14px 18px;
+  text-align: left;
+  letter-spacing: 0.3px;
+}
+.compare-table td {
+  font-size: 14px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  vertical-align: top;
+}
+.compare-table tr:last-child td { border-bottom: none; }
+.compare-table tr:nth-child(even) td { background: var(--bg); }
+.compare-table td:first-child { font-weight: 600; color: var(--navy); }
+
+/* ── DRILL TOGGLE ── */
+.drill-wrap { margin: 10px 0; }
+.drill-btn {
+  width: 100%;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 14px 18px;
+  text-align: left;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--navy);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.15s;
+}
+.drill-btn:hover { background: var(--navy-light); }
+.drill-btn .arrow { font-size: 11px; transition: transform 0.2s; }
+.drill-btn.open .arrow { transform: rotate(90deg); }
+.drill-content {
+  display: none;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  padding: 18px 20px;
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--text);
+}
+.drill-content.open { display: block; }
+.drill-content ul { padding-left: 18px; margin-top: 6px; }
+.drill-content ul li { margin-bottom: 6px; }
+
+/* ── QUIZ ── */
+.quiz-block {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 28px;
+  margin: var(--gap) 0;
+}
+.quiz-q {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 18px;
+  line-height: 1.5;
+}
+.quiz-options { display: flex; flex-direction: column; gap: 10px; }
+.quiz-opt {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 12px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  text-align: left;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: var(--text);
+}
+.quiz-opt:hover:not(:disabled) { border-color: var(--navy); background: var(--navy-light); }
+.quiz-opt.correct { background: var(--correct-bg); border-color: var(--correct-border); color: #1a4a2e; font-weight: 600; }
+.quiz-opt.wrong { background: var(--wrong-bg); border-color: var(--wrong-border); color: #7a1a0e; }
+.quiz-feedback {
+  margin-top: 14px;
+  font-size: 14px;
+  line-height: 1.65;
+  display: none;
+  padding: 12px 16px;
+  border-radius: 4px;
+}
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct { background: var(--correct-bg); color: #1a4a2e; }
+.quiz-feedback.wrong { background: var(--wrong-bg); color: #7a1a0e; }
+.quiz-retry {
+  margin-top: 12px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-family: 'Noto Sans KR', sans-serif;
+  cursor: pointer;
+  color: var(--muted);
+}
+.quiz-retry:hover { border-color: var(--navy); color: var(--navy); }
+
+/* ── CHECKLIST ── */
+.checklist-block {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 24px 28px;
+  margin: var(--gap) 0;
+}
+.checklist-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 16px;
+}
+.progress-bar-wrap {
+  background: var(--bg);
+  border-radius: 99px;
+  height: 6px;
+  margin-bottom: 18px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: var(--navy);
+  border-radius: 99px;
+  transition: width 0.3s;
+  width: 0%;
+}
+.checklist-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+}
+.checklist-item:last-child { border-bottom: none; }
+.check-box {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border);
+  border-radius: 3px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.checklist-item.checked .check-box {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: white;
+  font-size: 11px;
+}
+.checklist-item span {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text);
+}
+.checklist-item.checked span { color: var(--muted); text-decoration: line-through; }
+
+/* ── HIGHLIGHT BOX ── */
+.highlight-box {
+  background: var(--navy);
+  color: white;
+  border-radius: 6px;
+  padding: 28px 32px;
+  margin: var(--gap) 0;
+}
+.highlight-box h3 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px;
+  margin-bottom: 12px;
+}
+.highlight-box p { font-size: 14px; color: rgba(255,255,255,0.8); line-height: 1.75; }
+
+/* ── STEP LIST ── */
+.step-list { display: flex; flex-direction: column; gap: 12px; margin: var(--gap) 0; }
+.step-item {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 18px 22px;
+}
+.step-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  background: var(--navy);
+  border-radius: 3px;
+  padding: 3px 9px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.step-body h4 { font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+.step-body p { font-size: 14px; color: var(--muted); line-height: 1.65; }
+
+/* ── SPACER ── */
+.mt { margin-top: var(--gap); }
+.mt2 { margin-top: calc(var(--gap) * 2); }
+.section-sub-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 36px 0 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  :root { --pad: 20px; }
+  .hero h1 { font-size: 28px; }
+  .card-grid-2, .card-grid-3, .card-grid-4 { grid-template-columns: 1fr; }
+  .flow { flex-direction: column; }
+  .flow-arrow { transform: rotate(90deg); }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="top-nav">
+  <span class="nav-brand">BAC · PoC 전략</span>
+  <button class="nav-tab active" onclick="showSection(0, this)">개요</button>
+  <button class="nav-tab" onclick="showSection(1, this)">S1 · 개념</button>
+  <button class="nav-tab" onclick="showSection(2, this)">S2 · 전략적 의미</button>
+  <button class="nav-tab" onclick="showSection(3, this)">S3 · 설계 전략</button>
+  <button class="nav-tab" onclick="showSection(4, this)">S4 · 수행 방법론</button>
+  <button class="nav-tab" onclick="showSection(5, this)">S5 · 수주 전환</button>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">BAC Business Advisory Consulting · Consultant Education</div>
+  <h1>PoC 전략:<br>수주로 이어지는<br>컨설팅 실전 가이드</h1>
+  <p class="hero-sub">PoC(Proof of Concept)는 단순한 기술 검증이 아닙니다. 설계 방식에 따라 수주의 관문이 되기도, 무료 노동의 함정이 되기도 합니다.</p>
+  <div class="hero-meta">
+    <div class="hero-meta-item"><span class="hero-meta-label">대상</span><span class="hero-meta-value">전 레벨 통합 (주니어~시니어)</span></div>
+    <div class="hero-meta-item"><span class="hero-meta-label">구성</span><span class="hero-meta-value">5개 섹션 · 퀴즈 · 체크리스트</span></div>
+    <div class="hero-meta-item"><span class="hero-meta-label">범위</span><span class="hero-meta-value">컨설팅 일반론</span></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ SECTION 0: 개요 ════════════════════════════════ -->
+<div class="section visible" id="sec-0">
+
+  <div class="section-header">
+    <span class="section-badge">Overview</span>
+    <h2 class="section-title">이 모듈에서 배우는 것</h2>
+    <p class="section-desc">PoC의 개념부터 수주 전환까지, 컨설턴트가 알아야 할 전 과정을 다섯 섹션으로 구성했습니다.</p>
+  </div>
+
+  <div class="card-grid card-grid-3">
+    <div class="card">
+      <div class="card-label">Section 1</div>
+      <div class="card-title">PoC란 무엇인가</div>
+      <p>PoC의 정의와 목적, PoC·Pilot·MVP 비교, 발생 맥락과 유형 분류</p>
+    </div>
+    <div class="card">
+      <div class="card-label">Section 2</div>
+      <div class="card-title">컨설팅 조직에서의 전략적 의미</div>
+      <p>PoC를 바라보는 올바른 관점, 3가지 함정, 수주 실패의 구조적 원인</p>
+    </div>
+    <div class="card">
+      <div class="card-label">Section 3</div>
+      <div class="card-title">수주 연결을 위한 설계 전략</div>
+      <p>Success Criteria 선합의, 범위 통제, 챔피언 확보, 출구 설계</p>
+    </div>
+    <div class="card">
+      <div class="card-label">Section 4</div>
+      <div class="card-title">PoC 수행 실전 방법론</div>
+      <p>킥오프 5대 항목, 가시성 관리, 스토리텔링, 최종 보고서 구조</p>
+    </div>
+    <div class="card">
+      <div class="card-label">Section 5</div>
+      <div class="card-title">수주 전환 실행</div>
+      <p>전환 타이밍·시그널, 경쟁 상황 포지셔닝, PoC 경험 자산화</p>
+    </div>
+    <div class="card" style="background:var(--navy); border-color:var(--navy);">
+      <div class="card-label" style="color:rgba(255,255,255,0.5);">핵심 원칙</div>
+      <div class="card-title" style="color:white;">PoC는 수주의 관문이다</div>
+      <p style="color:rgba(255,255,255,0.75);">설계 없이 착수한 PoC는 고객에게 무료 컨설팅을, 우리에게 기회 비용만 남긴다.</p>
+    </div>
+  </div>
+
+  <div class="callout navy mt2">
+    <span class="callout-icon">💡</span>
+    <div class="callout-body">
+      <strong>학습 방법</strong>
+      상단 탭으로 섹션을 이동하세요. 각 섹션 내 드릴다운 버튼으로 심화 내용을 펼칠 수 있으며, 섹션 말미의 퀴즈로 이해도를 점검할 수 있습니다.
+    </div>
+  </div>
+
+</div>
+
+<!-- ════════════════════════════════ SECTION 1: 개념 ════════════════════════════════ -->
+<div class="section" id="sec-1">
+
+  <div class="section-header">
+    <span class="section-badge">Section 1</span>
+    <h2 class="section-title">PoC란 무엇인가</h2>
+    <p class="section-desc">개념의 정확한 이해 없이는 전략도 없다. 정의, 맥락, 유형 세 가지를 짚는다.</p>
+  </div>
+
+  <!-- 1-1 -->
+  <div class="section-sub-title">1-1. 정의와 목적 — PoC, Pilot, MVP 비교</div>
+
+  <div class="highlight-box">
+    <h3>PoC (Proof of Concept)</h3>
+    <p>특정 아이디어나 솔루션이 기술적·비즈니스적으로 실현 가능한지를 <strong style="color:white;">제한된 범위와 시간 내에</strong> 검증하는 활동. 전면 도입 의사결정 전, 리스크를 최소화하면서 핵심 가설을 확인하는 것이 목적이다.</p>
+  </div>
+
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th>구분</th>
+        <th>PoC</th>
+        <th>Pilot</th>
+        <th>MVP</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>목적</td>
+        <td>가능성 검증</td>
+        <td>실제 환경 적용성 검증</td>
+        <td>시장 반응 검증</td>
+      </tr>
+      <tr>
+        <td>범위</td>
+        <td>제한적 · 실험적</td>
+        <td>제한적 · 실제적</td>
+        <td>최소 기능 배포</td>
+      </tr>
+      <tr>
+        <td>대상</td>
+        <td>의사결정자 · 내부</td>
+        <td>선정된 실제 사용자</td>
+        <td>초기 시장 사용자</td>
+      </tr>
+      <tr>
+        <td>결과물</td>
+        <td>검증 보고서 · 데모</td>
+        <td>운영 결과 보고서</td>
+        <td>실제 작동 제품</td>
+      </tr>
+      <tr>
+        <td>컨설팅 맥락</td>
+        <td>제안 직전 단계</td>
+        <td>1차 수주 후 단계</td>
+        <td>제품화 프로젝트</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout warn">
+    <span class="callout-icon">⚠️</span>
+    <div class="callout-body">
+      <strong>흔한 혼용 주의</strong>
+      "Pilot 해보자"는 고객 요청이 실제로는 PoC 수준의 작업을 의미하는 경우가 많다. 범위와 기대 결과물을 명확히 재정의하지 않으면 작업 부하가 비례적으로 증가한다.
+    </div>
+  </div>
+
+  <!-- 1-2 -->
+  <div class="section-sub-title">1-2. PoC가 발생하는 맥락: 고객 의사결정 구조</div>
+
+  <p style="font-size:14px; color:var(--muted); margin-bottom:16px;">고객이 PoC를 요청하는 이면에는 항상 의사결정상의 불확실성이 있다. 그 불확실성의 성격을 파악하는 것이 PoC 설계의 출발점이다.</p>
+
+  <div class="card-grid card-grid-3">
+    <div class="card">
+      <div class="card-label">동인 A</div>
+      <div class="card-title">기술적 불확실성</div>
+      <p>"이 솔루션이 우리 환경에서 기술적으로 작동하는가?" 내부 IT 또는 아키텍처 팀의 승인이 필요한 상황.</p>
+    </div>
+    <div class="card">
+      <div class="card-label">동인 B</div>
+      <div class="card-title">예산 정당화 필요</div>
+      <p>"CFO/경영진에게 투자 근거를 보여줘야 한다." 내부 예산 심의 전 가시적 결과물이 필요한 상황.</p>
+    </div>
+    <div class="card">
+      <div class="card-label">동인 C</div>
+      <div class="card-title">경쟁사 비교</div>
+      <p>"A사와 B사 중 누가 더 적합한지 직접 보고 싶다." 복수 벤더를 동시에 PoC에 참여시키는 상황.</p>
+    </div>
+  </div>
+
+  <div class="flow mt">
+    <div class="flow-step"><div class="flow-step-num">고객 내부</div><div class="flow-step-label">문제 인식</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-step-num">내부 검토</div><div class="flow-step-label">솔루션 탐색</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step highlight"><div class="flow-step-num">PoC 요청</div><div class="flow-step-label">불확실성 해소</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-step-num">의사결정</div><div class="flow-step-label">발주 or 보류</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-step-num">수주</div><div class="flow-step-label">본 프로젝트</div></div>
+  </div>
+
+  <!-- 1-3 -->
+  <div class="section-sub-title">1-3. PoC 유형 분류</div>
+
+  <div class="card-grid card-grid-3">
+    <div class="card">
+      <div class="card-label">Type 1</div>
+      <div class="card-title">기술 검증형</div>
+      <ul>
+        <li>통합 가능성, 성능, 보안 등 기술 스펙 확인</li>
+        <li>평가 주체: IT팀, 아키텍처위원회</li>
+        <li>핵심 산출물: 기술 검증 보고서, 아키텍처 다이어그램</li>
+        <li>함정: 비즈니스 임팩트 논의 배제 → 수주 전환율 ↓</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-label">Type 2</div>
+      <div class="card-title">비즈니스 가치 검증형</div>
+      <ul>
+        <li>비용 절감, 생산성 향상 등 정량적 효과 입증</li>
+        <li>평가 주체: CFO, 사업부장, 경영진</li>
+        <li>핵심 산출물: ROI 분석, 비즈니스 케이스</li>
+        <li>함정: 효과 측정 기준 미합의 → 결과 해석 충돌</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-label">Type 3</div>
+      <div class="card-title">경쟁사 비교형</div>
+      <ul>
+        <li>동일 과제를 복수 벤더가 동시 수행, 비교 평가</li>
+        <li>평가 주체: 구매팀, 선정위원회</li>
+        <li>핵심 산출물: 비교 평가표, 최종 프레젠테이션</li>
+        <li>함정: 평가 기준이 경쟁사 유리하게 설정될 위험</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- QUIZ 1 -->
+  <div class="quiz-block mt2">
+    <div class="quiz-q">Q. 고객이 "CFO 보고를 위한 ROI 근거가 필요하다"며 PoC를 요청했다. 이는 어떤 유형에 해당하는가?</div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answerQuiz(this, false, 'quiz1')">① 기술 검증형 — 아키텍처 검증이 핵심</button>
+      <button class="quiz-opt" onclick="answerQuiz(this, true, 'quiz1')">② 비즈니스 가치 검증형 — 정량적 효과 입증이 목적</button>
+      <button class="quiz-opt" onclick="answerQuiz(this, false, 'quiz1')">③ 경쟁사 비교형 — 타사와의 비교가 핵심</button>
+    </div>
+    <div class="quiz-feedback correct" id="quiz1-correct">✅ 정답입니다. CFO 보고용 ROI 근거 확보는 비즈니스 가치 검증형의 전형적 맥락입니다. 이 경우 기술 데모보다 정량 지표와 비즈니스 케이스 설계가 훨씬 중요합니다.</div>
+    <div class="quiz-feedback wrong" id="quiz1-wrong">❌ 다시 생각해보세요. 고객의 최종 목적이 무엇인지에 집중하세요. "CFO 보고"와 "ROI"라는 키워드가 힌트입니다.</div>
+    <button class="quiz-retry" onclick="resetQuiz('quiz1')" style="display:none" id="quiz1-retry">↺ 다시 풀기</button>
+  </div>
+
+</div>
+
+<!-- ════════════════════════════════ SECTION 2: 전략적 의미 ════════════════════════════════ -->
+<div class="section" id="sec-2">
+
+  <div class="section-header">
+    <span class="section-badge">Section 2</span>
+    <h2 class="section-title">컨설팅 조직에서 PoC의 전략적 의미</h2>
+    <p class="section-desc">PoC를 어떤 관점으로 바라보느냐가 수주 결과를 결정한다.</p>
+  </div>
+
+  <!-- 2-1 -->
+  <div class="section-sub-title">2-1. PoC는 "무료 서비스"가 아닌 "유료 수주의 첫 관문"</div>
+
+  <div class="card-grid card-grid-2">
+    <div class="card" style="border-left: 3px solid var(--wrong-border);">
+      <div class="card-label" style="color:var(--wrong-border);">❌ 잘못된 관점</div>
+      <div class="card-title">PoC = 무료 서비스</div>
+      <ul>
+        <li>고객 요청이니 일단 보여주자</li>
+        <li>잘 하면 수주되겠지</li>
+        <li>범위·기간은 나중에 협의</li>
+        <li>결과는 고객이 평가</li>
+      </ul>
+    </div>
+    <div class="card" style="border-left: 3px solid var(--correct-border);">
+      <div class="card-label" style="color:var(--correct-border);">✅ 올바른 관점</div>
+      <div class="card-title">PoC = 영업 활동의 일환</div>
+      <ul>
+        <li>PoC도 투자: 시간·인력·기회비용 발생</li>
+        <li>기대 수주액 대비 투자 ROI 판단 필요</li>
+        <li>범위·기간·평가기준 선합의가 필수</li>
+        <li>우리가 평가 프레임을 주도해야 한다</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout navy mt">
+    <span class="callout-icon">📌</span>
+    <div class="callout-body">
+      <strong>시니어 관점</strong>
+      PoC 착수 전 반드시 물어야 할 질문: <em>"이 PoC에서 우리가 원하는 결과를 도출했을 때, 고객이 발주하지 않을 이유는 무엇인가?"</em> 이 질문에 답을 못 한다면 PoC 설계가 불완전한 것이다.
+    </div>
+  </div>
+
+  <!-- 2-2 -->
+  <div class="section-sub-title">2-2. PoC에서 발생하는 3가지 함정</div>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">함정 1</div>
+      <div class="step-body">
+        <h4>범위 무한 확장 (Scope Creep)</h4>
+        <p>초기 합의 범위를 넘는 추가 요청이 PoC 진행 중 계속 유입된다. 고객 입장에서는 "무료니까" 더 많이 요청하는 유인이 생긴다. 범위 통제 없이는 PoC가 사실상 무료 컨설팅이 된다.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">함정 2</div>
+      <div class="step-body">
+        <h4>결과 귀속 불명확</h4>
+        <p>PoC 결과물(분석 보고서, 데모 코드, 방법론)의 지적재산권과 활용 범위가 불명확하다. 수주 없이 고객이 결과물만 취하는 상황이 발생할 수 있다. 착수 전 소유권 조항을 명시해야 한다.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">함정 3</div>
+      <div class="step-body">
+        <h4>평가 기준 부재</h4>
+        <p>무엇을 달성하면 "성공"인지 사전 합의가 없다. PoC 종료 후 고객이 "기대에 못 미쳤다"는 주관적 판단으로 수주를 보류한다. 성공 기준은 착수 전 문서로 합의해야 한다.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2-3 -->
+  <div class="section-sub-title">2-3. PoC가 수주로 이어지지 않는 구조적 원인</div>
+
+  <div class="card-grid card-grid-2">
+    <div class="card">
+      <div class="card-label">원인 A · 우리 측</div>
+      <div class="card-title">기술에만 집중, 의사결정자를 설득하지 못함</div>
+      <p>IT팀을 만족시키는 데모를 만들었지만, 실제 발주 권한자인 경영진이 "왜 우리 회사에 필요한가"를 납득하지 못한 상태로 PoC가 종료된다.</p>
+    </div>
+    <div class="card">
+      <div class="card-label">원인 B · 고객 측</div>
+      <div class="card-title">내부 챔피언 부재</div>
+      <p>PoC를 요청한 실무자가 내부 의사결정을 움직일 영향력이 없다. 우리의 결과물이 아무리 좋아도 내부 정치적 장벽을 넘지 못한다.</p>
+    </div>
+    <div class="card">
+      <div class="card-label">원인 C · 구조적</div>
+      <div class="card-title">출구 설계 없이 PoC 종료</div>
+      <p>PoC 결과 보고 후 "다음 단계"가 명확하지 않다. 고객이 결과를 수령했지만 우리가 제안서를 내야 한다는 인식이 없고, 모멘텀이 식는다.</p>
+    </div>
+    <div class="card">
+      <div class="card-label">원인 D · 경쟁</div>
+      <div class="card-title">경쟁사 대비 차별화 포인트 전달 실패</div>
+      <p>비교형 PoC에서 기능 시연은 비슷하지만, 우리만의 강점(업종 전문성, 방법론, 지원체계)을 명확히 전달하지 못해 가격 경쟁으로만 귀결된다.</p>
+    </div>
+  </div>
+
+  <!-- QUIZ 2 -->
+  <div class="quiz-block mt2">
+    <div class="quiz-q">Q. PoC 진행 중 고객 실무자가 "처음 논의한 것 외에 이 기능도 한번 보여줄 수 있나요?"라고 요청했다. 가장 적절한 대응은?</div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answerQuiz(this, false, 'quiz2')">① 수주를 위해 요청을 수용하고 추가 작업을 진행한다</button>
+      <button class="quiz-opt" onclick="answerQuiz(this, false, 'quiz2')">② 무조건 거절하고 초기 합의 범위만 진행한다</button>
+      <button class="quiz-opt" onclick="answerQuiz(this, true, 'quiz2')">③ 요청 내용을 기록하고, 현 PoC 범위 외임을 확인한 뒤 별도 협의를 제안한다</button>
+    </div>
+    <div class="quiz-feedback correct" id="quiz2-correct">✅ 정답입니다. 요청을 무시하면 관계가 손상되고, 무조건 수용하면 범위가 확장됩니다. "요청 내용은 충분히 의미 있으나 별도 협의가 필요하다"는 응답이 범위 통제와 관계 유지를 동시에 달성합니다.</div>
+    <div class="quiz-feedback wrong" id="quiz2-wrong">❌ 다시 생각해보세요. 범위 통제와 고객 관계 유지, 두 가지를 동시에 달성하는 방법은 무엇일까요?</div>
+    <button class="quiz-retry" onclick="resetQuiz('quiz2')" style="display:none" id="quiz2-retry">↺ 다시 풀기</button>
+  </div>
+
+</div>
+
+<!-- ════════════════════════════════ SECTION 3: 설계 전략 ════════════════════════════════ -->
+<div class="section" id="sec-3">
+
+  <div class="section-header">
+    <span class="section-badge">Section 3</span>
+    <h2 class="section-title">수주 연결을 위한 PoC 설계 전략</h2>
+    <p class="section-desc">PoC의 성패는 착수 전에 결정된다. 설계 단계에서 수주 경로를 만들어야 한다.</p>
+  </div>
+
+  <!-- 3-1 -->
+  <div class="section-sub-title">3-1. 평가 기준(Success Criteria) 선합의</div>
+
+  <div class="callout warn">
+    <span class="callout-icon">⚠️</span>
+    <div class="callout-body">
+      <strong>핵심 원칙</strong>
+      "무엇을 달성하면 PoC가 성공인가"를 고객과 문서로 합의하지 않으면, 고객은 언제든 판단 기준을 바꿀 수 있다. 평가 기준 합의는 PoC 착수의 선결 조건이다.
+    </div>
+  </div>
+
+  <div class="card-grid card-grid-2 mt">
+    <div class="card">
+      <div class="card-label">정량 기준 예시</div>
+      <div class="card-title">측정 가능한 수치로 정의</div>
+      <ul>
+        <li>처리 시간 X초 이내</li>
+        <li>데이터 정합성 Y% 이상</li>
+        <li>연결 성공률 Z% 이상</li>
+        <li>비용 절감 추정치 W억 원 이상</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-label">정성 기준 예시</div>
+      <div class="card-title">주관적 판단을 최소화하는 방식</div>
+      <ul>
+        <li>담당자 3인 이상 "활용 가능" 판단</li>
+        <li>경영진 발표 후 Q&A 통과</li>
+        <li>내부 IT 아키텍처 위원회 승인</li>
+        <li>현행 프로세스 대비 개선 사항 문서화</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="drill-wrap mt">
+    <button class="drill-btn" onclick="toggleDrill(this)">
+      <span>Success Criteria 합의서 구성 항목 보기</span>
+      <span class="arrow">▶</span>
+    </button>
+    <div class="drill-content">
+      <ul>
+        <li><strong>PoC 목적:</strong> 이 PoC를 통해 검증하려는 핵심 가설 1~2문장</li>
+        <li><strong>범위:</strong> 수행 항목 명시 (In-scope) + 비수행 항목 명시 (Out-of-scope)</li>
+        <li><strong>성공 기준:</strong> 정량/정성 기준, 측정 방법, 합격 기준선</li>
+        <li><strong>평가 주체:</strong> 누가, 어떤 기준으로, 언제 최종 판정하는가</li>
+        <li><strong>기간 및 마일스톤:</strong> 착수일, 중간 보고일, 최종 보고일</li>
+        <li><strong>산출물:</strong> 최종적으로 어떤 결과물을 제출하는가</li>
+        <li><strong>지적재산권:</strong> 결과물의 소유권과 활용 범위</li>
+        <li><strong>다음 단계:</strong> PoC 성공 시 예상 발주 일정 및 프로세스</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 3-2 -->
+  <div class="section-sub-title">3-2. 범위 통제: Scope 명문화 원칙</div>
+
+  <div class="card-grid card-grid-2">
+    <div class="card">
+      <div class="card-label">In-Scope</div>
+      <div class="card-title">이것을 수행한다</div>
+      <ul>
+        <li>구체적 기능 시나리오 명시</li>
+        <li>데이터 범위 (샘플 데이터, 특정 기간)</li>
+        <li>참여 인원·역할 명시</li>
+        <li>산출물 형태 명시</li>
+      </ul>
+    </div>
+    <div class="card" style="border-left: 3px solid var(--warn-border);">
+      <div class="card-label" style="color:var(--warn-border);">Out-of-Scope (중요)</div>
+      <div class="card-title">이것은 수행하지 않는다</div>
+      <ul>
+        <li>전체 시스템 연동 구현</li>
+        <li>운영 환경 배포</li>
+        <li>교육 및 변경관리</li>
+        <li>추가 기능 개발 (범위 외 요청 시 별도 협의)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout correct mt">
+    <span class="callout-icon">✅</span>
+    <div class="callout-body">
+      <strong>실전 팁</strong>
+      Out-of-Scope를 명시하는 것이 오히려 신뢰를 높인다. "우리가 무엇을 하지 않는지"를 명확히 하는 컨설턴트는 "무엇이든 합니다"는 컨설턴트보다 전문적으로 인식된다.
+    </div>
+  </div>
+
+  <!-- 3-3 -->
+  <div class="section-sub-title">3-3. 고객 내부 챔피언 확보 전략</div>
+
+  <p style="font-size:14px;color:var(--muted);margin-bottom:16px;">챔피언(Champion)이란 고객 내부에서 우리의 수주를 지지하고, 내부 의사결정을 움직여 줄 수 있는 인물이다.</p>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">Step 1</div>
+      <div class="step-body">
+        <h4>챔피언 후보 파악</h4>
+        <p>PoC 요청자가 곧 챔피언인 경우는 드물다. 실제 발주 권한에 영향을 미치는 인물(사업부장, 혁신팀장, CFO 측근 등)을 파악해야 한다.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">Step 2</div>
+      <div class="step-body">
+        <h4>챔피언에게 무엇이 필요한지 파악</h4>
+        <p>챔피언도 내부적으로 설득해야 할 상대가 있다. 그들에게 필요한 근거 자료, 언어, 프레임을 우리가 제공해야 한다. PoC 결과물은 챔피언의 내부 발표 자료로 활용 가능하게 설계한다.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">Step 3</div>
+      <div class="step-body">
+        <h4>챔피언과의 정기 접점 유지</h4>
+        <p>PoC 진행 중 챔피언과 비공식 접점을 유지한다. 중간 결과, 이슈, 기대 관리를 공유해 내부 분위기를 실시간으로 파악한다.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3-4 -->
+  <div class="section-sub-title">3-4. 출구 설계: 결과물을 제안으로 자연스럽게 연결하는 구조</div>
+
+  <div class="highlight-box">
+    <h3>출구 설계(Exit Design)란?</h3>
+    <p>PoC 결과 보고 직후, 자연스럽게 "다음 단계"로 이어지도록 사전에 설계해 두는 전략. PoC를 마무리하는 것이 아니라 제안의 시작점으로 전환하는 구조를 만드는 것이다.</p>
+  </div>
+
+  <div class="card-grid card-grid-3 mt">
+    <div class="card">
+      <div class="card-label">출구 설계 요소 1</div>
+      <div class="card-title">미해결 과제 남기기</div>
+      <p>PoC에서 모든 것을 해결하지 않는다. "본 프로젝트에서 다뤄야 할 추가 과제"를 보고서에 포함시켜 다음 단계의 필요성을 자연스럽게 제시한다.</p>
+    </div>
+    <div class="card">
+      <div class="card-label">출구 설계 요소 2</div>
+      <div class="card-title">ROI 추정치 제시</div>
+      <p>PoC 결과 기반으로 본 프로젝트를 수행했을 때의 기대 효과를 수치로 추정해 제시한다. "이 결과를 전사 확대하면 연간 X억 원 절감"이 발주 근거가 된다.</p>
+    </div>
+    <div class="card">
+      <div class="card-label">출구 설계 요소 3</div>
+      <div class="card-title">Next Step 슬라이드</div>
+      <p>최종 보고서 마지막에 "제안 일정, 범위, 팀 구성"을 담은 Next Step을 포함한다. 고객이 이 슬라이드에 대해 반응하는 순간 제안 협의가 시작된다.</p>
+    </div>
+  </div>
+
+  <!-- QUIZ 3 -->
+  <div class="quiz-block mt2">
+    <div class="quiz-q">Q. PoC 최종 보고서에 반드시 포함해야 할 "출구 설계" 요소가 아닌 것은?</div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answerQuiz(this, false, 'quiz3')">① PoC 결과 기반 ROI 추정치</button>
+      <button class="quiz-opt" onclick="answerQuiz(this, false, 'quiz3')">② 본 프로젝트에서 다뤄야 할 미해결 과제</button>
+      <button class="quiz-opt" onclick="answerQuiz(this, false, 'quiz3')">③ 다음 단계 제안 일정 및 팀 구성</button>
+      <button class="quiz-opt" onclick="answerQuiz(this, true, 'quiz3')">④ 경쟁사 PoC 수행 결과 비교 분석</button>
+    </div>
+    <div class="quiz-feedback correct" id="quiz3-correct">✅ 정답입니다. 경쟁사 PoC 결과 비교는 출구 설계 요소가 아니며, 자칫 우리의 결과를 상대화시킬 위험이 있습니다. 출구 설계는 "우리가 제시하는 다음 단계"에 집중해야 합니다.</div>
+    <div class="quiz-feedback wrong" id="quiz3-wrong">❌ 다시 생각해보세요. 출구 설계의 목적은 "고객이 다음 단계로 자연스럽게 이동하도록 유도"하는 것입니다. 어떤 요소가 그 목적과 거리가 있을까요?</div>
+    <button class="quiz-retry" onclick="resetQuiz('quiz3')" style="display:none" id="quiz3-retry">↺ 다시 풀기</button>
+  </div>
+
+</div>
+
+<!-- ════════════════════════════════ SECTION 4: 수행 방법론 ════════════════════════════════ -->
+<div class="section" id="sec-4">
+
+  <div class="section-header">
+    <span class="section-badge">Section 4</span>
+    <h2 class="section-title">PoC 수행 실전 방법론</h2>
+    <p class="section-desc">착수부터 최종 보고까지, 단계별로 무엇을 어떻게 해야 하는가.</p>
+  </div>
+
+  <!-- 4-1 -->
+  <div class="section-sub-title">4-1. 킥오프에서 반드시 다뤄야 할 5가지 항목</div>
+
+  <div class="callout navy">
+    <span class="callout-icon">📌</span>
+    <div class="callout-body">
+      <strong>킥오프는 PoC의 계약이다</strong>
+      킥오프 미팅에서 합의된 내용은 이후 모든 이슈의 기준점이 된다. 구두 합의로 끝내지 말고 킥오프 회의록을 작성해 고객의 서명 또는 이메일 확인을 받아야 한다.
+    </div>
+  </div>
+
+  <div class="step-list mt">
+    <div class="step-item">
+      <div class="step-num">항목 1</div>
+      <div class="step-body"><h4>PoC의 목적과 기대 결과 재확인</h4><p>착수 전 논의한 내용을 다시 한번 공개적으로 확인한다. 참석자 간 목적 인식이 다를 수 있다.</p></div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">항목 2</div>
+      <div class="step-body"><h4>Success Criteria 문서 공유 및 합의 확인</h4><p>사전에 작성한 Success Criteria 문서를 배포하고, 참석자 전원의 이해와 동의를 확인한다.</p></div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">항목 3</div>
+      <div class="step-body"><h4>역할 및 책임(R&R) 정의</h4><p>우리 팀과 고객 측 각자의 담당 영역, 의사결정 경로, 에스컬레이션 채널을 명확히 한다.</p></div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">항목 4</div>
+      <div class="step-body"><h4>마일스톤 및 커뮤니케이션 계획</h4><p>중간 보고 일정, 보고 대상, 보고 형식을 합의한다. 정기 접점 없이 종료 보고만 하면 인식 관리 기회를 잃는다.</p></div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">항목 5</div>
+      <div class="step-body"><h4>데이터·환경 접근 권한 확인</h4><p>PoC 수행에 필요한 데이터, 시스템 접근 권한이 준비되었는지 확인한다. 착수 후 권한 문제로 지연되면 우리가 책임을 지게 된다.</p></div>
+    </div>
+  </div>
+
+  <!-- 4-2 -->
+  <div class="section-sub-title">4-2. 진행 중 가시성 관리</div>
+
+  <div class="card-grid card-grid-2">
+    <div class="card">
+      <div class="card-label">중간 보고 원칙</div>
+      <div class="card-title">최소 1회 이상 중간 보고</div>
+      <ul>
+        <li>PoC 기간 1/2 시점에 중간 현황 공유</li>
+        <li>현재까지의 결과와 남은 작업 설명</li>
+        <li>이슈 및 변경 사항 조기 공유</li>
+        <li>고객 피드백 수렴 → 방향 조정 기회</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-label">인식 관리 전략</div>
+      <div class="card-title">기대를 관리하라</div>
+      <ul>
+        <li>좋은 결과는 미리 노출, 최종 보고 때 재확인</li>
+        <li>나쁜 결과는 숨기지 말고 맥락과 함께 공유</li>
+        <li>챔피언에게 비공식 사전 브리핑</li>
+        <li>"놀라운 최종 보고"는 위험: 고객이 반응을 못 준비함</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 4-3 -->
+  <div class="section-sub-title">4-3. 기술 데모 vs. 비즈니스 임팩트 스토리텔링</div>
+
+  <div class="callout warn">
+    <span class="callout-icon">⚠️</span>
+    <div class="callout-body">
+      <strong>가장 흔한 실수</strong>
+      기술 팀은 "우리가 만든 것"에 집중하고, 고객 경영진은 "우리 회사에 어떤 변화가 오는지"에만 관심이 있다. 이 간극을 메우지 못하면 기술적으로 완벽한 PoC도 수주로 이어지지 않는다.
+    </div>
+  </div>
+
+  <table class="compare-table mt">
+    <thead>
+      <tr><th>구분</th><th>기술 데모 (Technical Demo)</th><th>비즈니스 임팩트 스토리텔링</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>청중</td><td>IT팀, 아키텍트</td><td>사업부장, CFO, 경영진</td></tr>
+      <tr><td>언어</td><td>API, 성능 지표, 아키텍처</td><td>비용 절감, 생산성, 리스크 감소</td></tr>
+      <tr><td>형식</td><td>라이브 데모, 기술 문서</td><td>Before/After, 스토리, 숫자</td></tr>
+      <tr><td>목표</td><td>"작동한다"는 확신</td><td>"우리에게 필요하다"는 확신</td></tr>
+      <tr><td>PoC에서</td><td>필요조건</td><td>충분조건 (수주 결정 요인)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="drill-wrap mt">
+    <button class="drill-btn" onclick="toggleDrill(this)">
+      <span>비즈니스 임팩트 스토리 구성 공식 보기</span>
+      <span class="arrow">▶</span>
+    </button>
+    <div class="drill-content">
+      <p><strong>현재 문제 상황 (As-Is)</strong> → 구체적 고통 수치화 ("현재 월 X시간 소요, 오류율 Y%")</p>
+      <p style="margin-top:10px;"><strong>PoC에서 검증한 개선 (Evidence)</strong> → "PoC 결과 처리 시간 A% 단축, 오류 B건 제거"</p>
+      <p style="margin-top:10px;"><strong>전사 확대 시 기대 효과 (To-Be)</strong> → "전사 적용 시 연간 C억 원 절감 추정"</p>
+      <p style="margin-top:10px;"><strong>다음 단계 제안 (Call to Action)</strong> → "3개월 본 프로젝트를 통해 전사 배포 가능"</p>
+    </div>
+  </div>
+
+  <!-- 4-4 -->
+  <div class="section-sub-title">4-4. PoC 최종 보고서 구성 원칙</div>
+
+  <div class="card-grid card-grid-2">
+    <div class="card">
+      <div class="card-label">보고서 구조 (권장)</div>
+      <div class="card-title">7개 파트 구성</div>
+      <ul>
+        <li>① Executive Summary (1페이지)</li>
+        <li>② PoC 개요: 목적·범위·기간</li>
+        <li>③ 수행 결과: Success Criteria 대비 달성 현황</li>
+        <li>④ 핵심 발견사항 (Findings)</li>
+        <li>⑤ 비즈니스 임팩트 분석</li>
+        <li>⑥ 잔여 과제 및 리스크</li>
+        <li>⑦ Next Step 제안</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-label">작성 원칙</div>
+      <div class="card-title">Action Title + Evidence 구조</div>
+      <ul>
+        <li>각 페이지 제목은 결론 문장으로 (Action Title)</li>
+        <li>데이터는 표나 차트로, 해석은 본문에</li>
+        <li>전문 용어는 비즈니스 언어로 번역</li>
+        <li>분량: 청중이 읽을 만한 범위 (10~15p)</li>
+        <li>Executive Summary는 경영진이 이것만 읽어도 판단 가능하게</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════════════════════════════════ SECTION 5: 수주 전환 ════════════════════════════════ -->
+<div class="section" id="sec-5">
+
+  <div class="section-header">
+    <span class="section-badge">Section 5</span>
+    <h2 class="section-title">PoC 이후: 수주 전환 실행</h2>
+    <p class="section-desc">PoC가 끝난 후가 진짜 영업의 시작이다. 모멘텀을 잃지 않고 수주로 전환하는 방법.</p>
+  </div>
+
+  <!-- 5-1 -->
+  <div class="section-sub-title">5-1. 전환 타이밍과 시그널 포착</div>
+
+  <div class="callout navy">
+    <span class="callout-icon">📌</span>
+    <div class="callout-body">
+      <strong>황금 타이밍 법칙</strong>
+      제안서는 PoC 최종 보고 당일 또는 익일 제출하는 것이 가장 효과적이다. 고객의 관심과 기억이 최고조일 때 다음 행동을 촉발해야 한다. 1~2주 이상 지연되면 모멘텀이 급격히 식는다.
+    </div>
+  </div>
+
+  <div class="card-grid card-grid-2 mt">
+    <div class="card">
+      <div class="card-label">긍정 시그널</div>
+      <div class="card-title">이때 빠르게 제안서를 제출하라</div>
+      <ul>
+        <li>보고 자리에서 경영진이 직접 질문</li>
+        <li>"다음 단계 어떻게 진행하나요?" 고객이 먼저 질문</li>
+        <li>챔피언이 "내부 보고 자료 공유해달라" 요청</li>
+        <li>관련 예산 확인 또는 발주 프로세스 문의</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-label">주의 시그널</div>
+      <div class="card-title">원인 파악 후 대응 전략 수정</div>
+      <ul>
+        <li>보고 후 내부 검토 필요하다며 연락 두절</li>
+        <li>담당자가 "예산이 아직..."이라는 표현</li>
+        <li>챔피언이 다른 프로젝트로 이동</li>
+        <li>경쟁사 재검토 언급</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 5-2 -->
+  <div class="section-sub-title">5-2. 경쟁 상황에서의 포지셔닝</div>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">전략 1</div>
+      <div class="step-body">
+        <h4>평가 기준 프레임을 우리에게 유리하게 설정</h4>
+        <p>PoC 시작 전부터 "무엇이 중요한가"의 프레임을 우리의 강점에 맞게 제시한다. 기능 수가 아닌 "업종 적합성", 가격이 아닌 "총소유비용(TCO)" 등.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">전략 2</div>
+      <div class="step-body">
+        <h4>구현 역량이 아닌 "파트너십"을 차별화 포인트로</h4>
+        <p>기능 시연은 경쟁사도 할 수 있다. 우리가 차별화할 수 있는 것은 방법론, 경험, 사후 지원체계, 업종 전문성이다. 이를 PoC 보고서와 최종 제안에 명시적으로 포함한다.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">전략 3</div>
+      <div class="step-body">
+        <h4>가격 경쟁을 피하는 구조 만들기</h4>
+        <p>ROI 분석을 통해 "가격 대비 가치"로 논의를 이동시킨다. "A사가 X억이면 우리는 Y억인데, 우리가 제시하는 가치는 Z억입니다"의 논리 구조를 만들어야 한다.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5-3 -->
+  <div class="section-sub-title">5-3. PoC 경험의 자산화</div>
+
+  <p style="font-size:14px;color:var(--muted);margin-bottom:16px;">수주 여부와 무관하게, PoC는 조직의 지식 자산이 되어야 한다.</p>
+
+  <div class="card-grid card-grid-3">
+    <div class="card">
+      <div class="card-label">자산화 방법 1</div>
+      <div class="card-title">사례 문서화</div>
+      <p>고객명 비공개 처리 후 업종·규모·과제 유형·접근 방식·결과를 정리. 다음 유사 PoC의 템플릿으로 활용.</p>
+    </div>
+    <div class="card">
+      <div class="card-label">자산화 방법 2</div>
+      <div class="card-title">방법론 재사용 프레임워크화</div>
+      <p>킥오프 체크리스트, Success Criteria 템플릿, 보고서 양식을 표준화. 신규 컨설턴트도 바로 활용 가능하게.</p>
+    </div>
+    <div class="card">
+      <div class="card-label">자산화 방법 3</div>
+      <div class="card-title">수주 실패 원인 분석</div>
+      <p>수주로 이어지지 않은 PoC는 원인을 반드시 분석한다. 구조적 패턴이 보이면 PoC 전략 자체를 수정해야 한다.</p>
+    </div>
+  </div>
+
+  <!-- 최종 체크리스트 -->
+  <div class="section-sub-title">PoC 전 과정 체크리스트</div>
+
+  <div class="checklist-block">
+    <div class="checklist-title">PoC 마스터 체크리스트</div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="main-progress"></div></div>
+    <div id="checklist-items">
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>[착수 전] PoC 유형과 고객 동인 파악 완료</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>[착수 전] Success Criteria 문서 작성 및 고객 합의 완료</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>[착수 전] In-Scope / Out-of-Scope 명문화 완료</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>[착수 전] 고객 내부 챔피언 파악 및 접촉 완료</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>[착수 전] 지적재산권 조항 확인 완료</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>[킥오프] 5대 항목 커버 및 회의록 서면 확인 완료</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>[진행 중] 중간 보고 1회 이상 실시</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>[진행 중] 챔피언 비공식 사전 브리핑 완료</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>[최종 보고] 비즈니스 임팩트 스토리 포함 여부 확인</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>[최종 보고] Next Step 슬라이드 포함 및 제안 방향 제시</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>[보고 후] 제안서 보고 당일~익일 제출</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>[보고 후] PoC 사례 문서화 및 내부 공유 완료</span></div>
+    </div>
+  </div>
+
+  <!-- QUIZ 5 -->
+  <div class="quiz-block mt2">
+    <div class="quiz-q">Q. PoC 최종 보고 후 고객이 연락 없이 2주가 지났다. 가장 적절한 대응은?</div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answerQuiz(this, false, 'quiz5')">① 고객이 검토 중일 것이므로 연락을 기다린다</button>
+      <button class="quiz-opt" onclick="answerQuiz(this, false, 'quiz5')">② 제안 가격을 낮춰 새로운 제안서를 발송한다</button>
+      <button class="quiz-opt" onclick="answerQuiz(this, true, 'quiz5')">③ 챔피언에게 비공식 접촉해 내부 상황과 장벽을 파악한다</button>
+      <button class="quiz-opt" onclick="answerQuiz(this, false, 'quiz5')">④ PoC 결과를 보완해 재보고를 요청한다</button>
+    </div>
+    <div class="quiz-feedback correct" id="quiz5-correct">✅ 정답입니다. 2주간의 침묵은 "주의 시그널"입니다. 먼저 챔피언을 통해 내부 상황(예산 이슈, 의사결정 지연, 경쟁 상황 등)을 파악해야 합니다. 원인도 모른 채 가격을 낮추거나 재보고를 요청하는 것은 협상력만 약화시킵니다.</div>
+    <div class="quiz-feedback wrong" id="quiz5-wrong">❌ 다시 생각해보세요. 2주간 연락 없음은 수동적으로 기다릴 상황이 아닙니다. 어떤 정보를 먼저 파악해야 올바른 대응이 가능할까요?</div>
+    <button class="quiz-retry" onclick="resetQuiz('quiz5')" style="display:none" id="quiz5-retry">↺ 다시 풀기</button>
+  </div>
+
+  <div class="highlight-box mt2">
+    <h3>핵심 요약: PoC를 수주로 만드는 3가지 원칙</h3>
+    <p>① <strong style="color:white;">설계가 전부다</strong> — 착수 전 Success Criteria, 범위, 챔피언, 출구를 모두 설계해야 한다.<br>
+    ② <strong style="color:white;">기술이 아닌 비즈니스 언어로 말하라</strong> — 발주 결정은 경영진이 한다.<br>
+    ③ <strong style="color:white;">모멘텀을 놓치지 마라</strong> — 보고 당일이 최고의 제안 타이밍이다.</p>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div style="background:var(--navy); color:rgba(255,255,255,0.45); text-align:center; padding:28px; font-size:12px; font-family:'JetBrains Mono',monospace; letter-spacing:1px;">
+  BAC BUSINESS ADVISORY CONSULTING · POC STRATEGY MODULE · INTERNAL EDUCATION PORTAL
+</div>
+
+<script>
+// Section navigation
+function showSection(idx, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sec-' + idx).classList.add('visible');
+  btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Drill toggle
+function toggleDrill(btn) {
+  btn.classList.toggle('open');
+  const content = btn.nextElementSibling;
+  content.classList.toggle('open');
+}
+
+// Quiz
+function answerQuiz(btn, isCorrect, quizId) {
+  const block = btn.closest('.quiz-block');
+  block.querySelectorAll('.quiz-opt').forEach(b => {
+    b.disabled = true;
+    b.style.cursor = 'default';
+  });
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+  const fb = document.getElementById(quizId + (isCorrect ? '-correct' : '-wrong'));
+  fb.classList.add('show');
+  document.getElementById(quizId + '-retry').style.display = 'inline-block';
+}
+
+function resetQuiz(quizId) {
+  const retry = document.getElementById(quizId + '-retry');
+  const block = retry.closest('.quiz-block');
+  block.querySelectorAll('.quiz-opt').forEach(b => {
+    b.disabled = false;
+    b.classList.remove('correct', 'wrong');
+    b.style.cursor = 'pointer';
+  });
+  block.querySelectorAll('.quiz-feedback').forEach(f => f.classList.remove('show'));
+  retry.style.display = 'none';
+}
+
+// Checklist
+function toggleCheck(item) {
+  item.classList.toggle('checked');
+  if (item.classList.contains('checked')) {
+    item.querySelector('.check-box').textContent = '✓';
+  } else {
+    item.querySelector('.check-box').textContent = '';
+  }
+  updateProgress();
+}
+
+function updateProgress() {
+  const items = document.querySelectorAll('#checklist-items .checklist-item');
+  const checked = document.querySelectorAll('#checklist-items .checklist-item.checked').length;
+  const pct = Math.round((checked / items.length) * 100);
+  document.getElementById('main-progress').style.width = pct + '%';
+}
+</script>
+</body>
+</html>
