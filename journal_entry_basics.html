@@ -1,0 +1,1767 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAP 컨설턴트를 위한 회계 입문 | ASPN BAC Education Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #003366;
+  --navy-mid: #004488;
+  --navy-pale: #e8f0f9;
+  --navy-pale2: #d4e3f5;
+  --white: #ffffff;
+  --bg: #f0f3f8;
+  --border: #d0d8e4;
+  --gray-100: #f5f7fa;
+  --gray-300: #d0d8e4;
+  --gray-500: #6b7a8d;
+  --gray-700: #3d4f63;
+  --gray-900: #1a2533;
+  --green: #1a6b3c;
+  --green-bg: #e8f5ee;
+  --red: #b91c1c;
+  --red-bg: #fef2f2;
+  --amber: #92400e;
+  --amber-bg: #fffbeb;
+  --mono: 'JetBrains Mono', 'Noto Sans KR', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 15px;
+  color: var(--gray-900);
+  background: var(--bg);
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  line-height: 1.7;
+}
+
+/* ── HEADER ── */
+.portal-header {
+  background: var(--navy);
+  color: #fff;
+  padding: 28px 48px 24px;
+}
+.portal-header-eyebrow {
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+  font-family: var(--mono);
+  margin-bottom: 8px;
+}
+.portal-header h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 30px;
+  font-weight: 400;
+  color: #fff;
+  line-height: 1.25;
+  margin-bottom: 10px;
+}
+.portal-header-sub {
+  font-size: 14px;
+  color: rgba(255,255,255,0.65);
+}
+.portal-header-meta {
+  display: flex;
+  gap: 20px;
+  margin-top: 16px;
+}
+.meta-chip {
+  font-size: 12px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.8);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-family: var(--mono);
+}
+
+/* ── STICKY NAV ── */
+.tab-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--white);
+  border-bottom: 2px solid var(--border);
+  display: flex;
+  overflow-x: auto;
+  padding: 0 48px;
+  scrollbar-width: none;
+}
+.tab-nav::-webkit-scrollbar { display: none; }
+.tab-btn {
+  padding: 14px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-500);
+  border: none;
+  border-bottom: 3px solid transparent;
+  background: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+  font-family: 'Noto Sans KR', sans-serif;
+  margin-bottom: -2px;
+}
+.tab-btn:hover { color: var(--navy); }
+.tab-btn.active {
+  color: var(--navy);
+  border-bottom-color: var(--navy);
+  font-weight: 700;
+}
+
+/* ── CONTENT WRAPPER ── */
+.content-area {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── SECTION HEADER ── */
+.section-eyebrow {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--navy);
+  margin-bottom: 8px;
+}
+.section-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 30px;
+  font-weight: 400;
+  color: var(--navy);
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+.section-lead {
+  font-size: 15px;
+  color: var(--gray-700);
+  border-left: 3px solid var(--navy);
+  padding-left: 16px;
+  margin-bottom: 32px;
+  line-height: 1.7;
+}
+
+/* ── CARD ── */
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-title::before {
+  content: '';
+  display: block;
+  width: 3px;
+  height: 16px;
+  background: var(--navy);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ── CALLOUT ── */
+.callout {
+  border-radius: 6px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.callout-navy {
+  background: var(--navy-pale);
+  border-left: 4px solid var(--navy);
+  color: var(--gray-900);
+}
+.callout-warn {
+  background: var(--amber-bg);
+  border-left: 4px solid #d97706;
+  color: var(--amber);
+}
+.callout-correct {
+  background: var(--green-bg);
+  border-left: 4px solid #16a34a;
+  color: var(--green);
+}
+.callout-wrong {
+  background: var(--red-bg);
+  border-left: 4px solid #dc2626;
+  color: var(--red);
+}
+.callout-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  font-family: var(--mono);
+}
+
+/* ── CODE BLOCK ── */
+.code-block {
+  background: #1a2533;
+  color: #e2e8f0;
+  border-radius: 6px;
+  padding: 18px 20px;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.8;
+  margin-bottom: 16px;
+  overflow-x: auto;
+}
+.code-block .kw { color: #7dd3fc; }
+.code-block .str { color: #86efac; }
+.code-block .cmt { color: #64748b; }
+.code-block .num { color: #fcd34d; }
+.code-block .fn { color: #f9a8d4; }
+
+/* ── TABLE ── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+.data-table th {
+  background: var(--navy);
+  color: #fff;
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+.data-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:nth-child(even) td { background: var(--gray-100); }
+.data-table td.debit { color: var(--navy); font-weight: 600; }
+.data-table td.credit { color: var(--gray-700); padding-left: 28px; }
+.data-table td.amt { font-family: var(--mono); text-align: right; }
+
+/* ── GRID ── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+
+@media (max-width: 640px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .portal-header { padding: 20px 20px 18px; }
+  .tab-nav { padding: 0 12px; }
+  .content-area { padding: 28px 16px 60px; }
+}
+
+/* ── ACCORDION ── */
+.accordion { margin-bottom: 12px; }
+.accordion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--gray-900);
+  transition: background 0.15s;
+}
+.accordion-header:hover { background: var(--navy-pale); }
+.accordion-header.open {
+  background: var(--navy);
+  color: #fff;
+  border-color: var(--navy);
+  border-radius: 6px 6px 0 0;
+}
+.accordion-arrow { font-size: 12px; transition: transform 0.2s; }
+.accordion-header.open .accordion-arrow { transform: rotate(180deg); }
+.accordion-body {
+  display: none;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  padding: 20px;
+}
+.accordion-body.open { display: block; }
+
+/* ── FLOW DIAGRAM ── */
+.flow-wrap {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0;
+  margin-bottom: 20px;
+}
+.flow-node {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--navy);
+  text-align: center;
+  min-width: 80px;
+}
+.flow-node.active {
+  background: var(--navy);
+  color: #fff;
+  border-color: var(--navy);
+}
+.flow-arrow {
+  font-size: 18px;
+  color: var(--gray-300);
+  padding: 0 8px;
+}
+
+/* ── T-ACCOUNT ── */
+.t-account-wrap { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px; }
+.t-account {
+  flex: 1;
+  min-width: 200px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--white);
+}
+.t-account-title {
+  background: var(--navy);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 14px;
+  text-align: center;
+  font-family: var(--mono);
+}
+.t-account-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.t-col { padding: 12px 14px; min-height: 80px; }
+.t-col:first-child { border-right: 2px solid var(--navy); }
+.t-col-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--gray-500);
+  margin-bottom: 8px;
+  font-family: var(--mono);
+}
+.t-entry {
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 3px 0;
+  display: flex;
+  justify-content: space-between;
+}
+.t-entry .t-label { color: var(--gray-700); font-size: 12px; }
+.t-entry .t-amt { font-weight: 600; color: var(--navy); }
+.t-balance-row {
+  grid-column: 1 / -1;
+  background: var(--navy-pale);
+  padding: 8px 14px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--navy);
+  font-family: var(--mono);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ── JOURNAL ENTRY ── */
+.je-box {
+  background: var(--gray-100);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 16px 20px;
+  font-family: var(--mono);
+  font-size: 13.5px;
+  line-height: 1.9;
+  margin-bottom: 16px;
+}
+.je-row { display: flex; align-items: baseline; gap: 8px; }
+.je-row.dr .je-acct { color: var(--navy); font-weight: 600; }
+.je-row.cr .je-acct { color: var(--gray-700); padding-left: 24px; }
+.je-amt { margin-left: auto; font-weight: 600; }
+.je-divider { border: none; border-top: 1px dashed var(--border); margin: 10px 0; }
+
+/* ── QUIZ ── */
+.quiz-box { background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 24px; margin-bottom: 20px; }
+.quiz-q { font-size: 15px; font-weight: 700; color: var(--gray-900); margin-bottom: 16px; line-height: 1.5; }
+.quiz-options { display: flex; flex-direction: column; gap: 10px; }
+.quiz-option {
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  background: var(--white);
+  text-align: left;
+  transition: all 0.15s;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+.quiz-option:hover:not(:disabled) { border-color: var(--navy); background: var(--navy-pale); }
+.quiz-option.correct { background: var(--green-bg); border-color: #16a34a; color: var(--green); pointer-events: none; }
+.quiz-option.wrong { background: var(--red-bg); border-color: #dc2626; color: var(--red); pointer-events: none; }
+.quiz-option.disabled { pointer-events: none; opacity: 0.5; }
+.quiz-feedback { margin-top: 14px; font-size: 14px; display: none; padding: 12px 16px; border-radius: 6px; }
+.quiz-feedback.show { display: block; }
+.quiz-feedback.ok { background: var(--green-bg); color: var(--green); }
+.quiz-feedback.ng { background: var(--red-bg); color: var(--red); }
+
+/* ── NUMBER BADGE ── */
+.num-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: var(--navy);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 50%;
+  flex-shrink: 0;
+  font-family: var(--mono);
+}
+
+/* ── HIGHLIGHT ── */
+.hl-navy { color: var(--navy); font-weight: 700; }
+.hl-box {
+  display: inline-block;
+  background: var(--navy);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-family: var(--mono);
+}
+
+/* ── SAP SCREEN MOCK ── */
+.sap-screen {
+  background: #1e3a5f;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  border: 1px solid #0d2644;
+}
+.sap-screen-bar {
+  background: #0d2644;
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sap-tcode {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: #fcd34d;
+  background: rgba(255,255,255,0.08);
+  padding: 3px 10px;
+  border-radius: 3px;
+  letter-spacing: 1px;
+}
+.sap-title {
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
+  font-family: var(--mono);
+}
+.sap-body {
+  padding: 16px;
+}
+.sap-field-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.sap-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.sap-field-label {
+  font-size: 10px;
+  color: rgba(255,255,255,0.45);
+  font-family: var(--mono);
+  letter-spacing: 0.5px;
+}
+.sap-field-value {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: #e2e8f0;
+  background: rgba(0,0,0,0.25);
+  padding: 4px 10px;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0.1);
+  min-width: 80px;
+}
+.sap-line-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+.sap-line-table th {
+  background: rgba(0,0,0,0.3);
+  color: rgba(255,255,255,0.5);
+  font-size: 10px;
+  font-family: var(--mono);
+  padding: 6px 10px;
+  text-align: left;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.sap-line-table td {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: #cbd5e1;
+  padding: 7px 10px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+.sap-line-table tr:nth-child(even) td { background: rgba(255,255,255,0.03); }
+.sap-line-table td.dr-cell { color: #7dd3fc; }
+.sap-line-table td.cr-cell { color: #86efac; }
+
+/* ── PROCESS STEP ── */
+.process-steps { counter-reset: step; margin-bottom: 20px; }
+.process-step {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  align-items: flex-start;
+}
+.step-num {
+  width: 32px;
+  height: 32px;
+  background: var(--navy);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+  font-family: var(--mono);
+}
+.step-content { flex: 1; }
+.step-title { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+.step-desc { font-size: 14px; color: var(--gray-700); }
+
+/* ── DIVIDER ── */
+.section-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 28px 0;
+}
+
+/* ── EQUATION ── */
+.eq-box {
+  background: var(--navy);
+  color: #fff;
+  border-radius: 8px;
+  padding: 20px 28px;
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px;
+  text-align: center;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+}
+.eq-box .eq-label {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 12px;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  font-style: normal;
+}
+
+/* ── COMPARISON TABLE ── */
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+.compare-table th {
+  padding: 10px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+.compare-table th:first-child {
+  background: var(--gray-700);
+  color: #fff;
+  text-align: left;
+}
+.compare-table th.concept-col { background: var(--navy); color: #fff; }
+.compare-table th.sap-col { background: #1e5c3a; color: #fff; }
+.compare-table td { padding: 10px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.compare-table td:nth-child(2) { background: var(--navy-pale); color: var(--navy); font-weight: 500; }
+.compare-table td:nth-child(3) { background: #e8f5ee; color: var(--green); font-weight: 500; }
+.compare-table tr:last-child td { border-bottom: none; }
+
+/* ── FS TREE ── */
+.fs-tree { font-family: var(--mono); font-size: 13px; line-height: 2; color: var(--gray-900); background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 18px 20px; margin-bottom: 16px; }
+.fs-tree .fs-root { font-weight: 700; color: var(--navy); }
+.fs-tree .fs-child { padding-left: 20px; color: var(--gray-700); }
+.fs-tree .fs-grandchild { padding-left: 40px; color: var(--gray-500); font-size: 12px; }
+.fs-tree .fs-section { margin-bottom: 8px; }
+
+/* ── PROGRESS INDICATOR ── */
+.tab-progress {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--gray-500);
+  padding: 10px 48px;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.prog-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--border); display: inline-block; cursor: pointer;
+  transition: background 0.2s;
+}
+.prog-dot.done { background: var(--navy); }
+
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="portal-header">
+  <div class="portal-header-eyebrow">ASPN BAC Education Portal · Section 07</div>
+  <h1>SAP 컨설턴트를 위한<br>회계 입문</h1>
+  <div class="portal-header-sub">거래에서 전표까지 — IT 컨설턴트가 반드시 알아야 할 회계의 기초</div>
+  <div class="portal-header-meta">
+    <span class="meta-chip">Junior Consultant</span>
+    <span class="meta-chip">7 Sections</span>
+    <span class="meta-chip">FI / CO 기초</span>
+  </div>
+</div>
+
+<!-- TAB NAV -->
+<nav class="tab-nav" id="tabNav">
+  <button class="tab-btn active" onclick="switchTab(0)">01 · 왜 알아야 하는가</button>
+  <button class="tab-btn" onclick="switchTab(1)">02 · 대차평균의 원리</button>
+  <button class="tab-btn" onclick="switchTab(2)">03 · 거래란 무엇인가</button>
+  <button class="tab-btn" onclick="switchTab(3)">04 · 분개</button>
+  <button class="tab-btn" onclick="switchTab(4)">05 · 계정과목과 T-Account</button>
+  <button class="tab-btn" onclick="switchTab(5)">06 · 전표와 SAP</button>
+  <button class="tab-btn" onclick="switchTab(6)">07 · 업무 프로세스</button>
+</nav>
+
+<!-- PROGRESS DOTS -->
+<div class="tab-progress" id="tabProgress">
+  <span style="margin-right:6px;">진행</span>
+  <span class="prog-dot done" onclick="switchTab(0)"></span>
+  <span class="prog-dot" onclick="switchTab(1)"></span>
+  <span class="prog-dot" onclick="switchTab(2)"></span>
+  <span class="prog-dot" onclick="switchTab(3)"></span>
+  <span class="prog-dot" onclick="switchTab(4)"></span>
+  <span class="prog-dot" onclick="switchTab(5)"></span>
+  <span class="prog-dot" onclick="switchTab(6)"></span>
+  <span style="margin-left:6px; color:var(--gray-500);" id="progLabel">1 / 7</span>
+</div>
+
+<!-- ═══════════════════════════════ CONTENT ═══════════════════════════════ -->
+<div class="content-area">
+
+<!-- ─────────── TAB 01 ─────────── -->
+<div class="tab-panel active" id="panel-0">
+  <div class="section-eyebrow">Section 01</div>
+  <h2 class="section-title">왜 IT 컨설턴트가<br>회계를 알아야 하는가</h2>
+  <p class="section-lead">
+    "저는 기술 담당입니다. 회계는 유저 몫이죠."<br>
+    이 한 마디가 프로젝트 실패의 가장 흔한 출발점입니다.
+  </p>
+
+  <div class="card">
+    <div class="card-title">ERP 설정과 회계 이해의 관계</div>
+    <p style="font-size:14px; color:var(--gray-700); margin-bottom:16px;">
+      SAP FI/CO 구현에서 발생하는 설정 오류의 상당수는 회계 처리 로직에 대한 이해 부족에서 비롯됩니다.
+      아래는 회계 지식이 직접 필요한 SAP 설정 항목들입니다.
+    </p>
+    <div class="grid-3">
+      <div style="background:var(--navy-pale); border-radius:6px; padding:16px;">
+        <div style="font-family:var(--mono); font-size:12px; font-weight:700; color:var(--navy); margin-bottom:8px;">POSTING KEY</div>
+        <p style="font-size:13px; color:var(--gray-700);">차변/대변 방향과 계정 유형을 동시에 정의. 회계적 의미 없이 설정 불가.</p>
+      </div>
+      <div style="background:var(--navy-pale); border-radius:6px; padding:16px;">
+        <div style="font-family:var(--mono); font-size:12px; font-weight:700; color:var(--navy); margin-bottom:8px;">ACCOUNT GROUP</div>
+        <p style="font-size:13px; color:var(--gray-700);">G/L 계정의 성격(자산/부채/수익/비용)에 따라 그룹 분류. 재무제표 구조와 직결.</p>
+      </div>
+      <div style="background:var(--navy-pale); border-radius:6px; padding:16px;">
+        <div style="font-family:var(--mono); font-size:12px; font-weight:700; color:var(--navy); margin-bottom:8px;">DOCUMENT TYPE</div>
+        <p style="font-size:13px; color:var(--gray-700);">SA, KR, DR, KZ 등 문서 유형은 회계 거래의 성격을 분류하는 체계.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">"IT는 구현, 회계는 유저 몫"이라는 착각</div>
+    <div class="process-steps">
+      <div class="process-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">고객이 "계정 매핑을 이렇게 해주세요"라고 요청합니다</div>
+          <div class="step-desc">회계를 모르는 컨설턴트는 그대로 설정합니다. 잘못된 요청인지 판단할 수 없습니다.</div>
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">결산 시점에 재무제표 숫자가 이상합니다</div>
+          <div class="step-desc">매출이 자산으로 잡히거나, 비용이 부채로 집계되는 상황이 발생합니다.</div>
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">원인 분석에 수 주가 걸립니다</div>
+          <div class="step-desc">초기 설정 오류는 거래가 쌓인 뒤에 발견될수록 수정 비용이 기하급수적으로 커집니다.</div>
+        </div>
+      </div>
+    </div>
+    <div class="callout callout-navy">
+      <div class="callout-label">핵심 관점</div>
+      SAP FI 컨설턴트는 회계사일 필요는 없습니다. 그러나 분개가 어떻게 전기되는지, 계정 유형이 재무제표에 어떤 영향을 주는지 <strong>이해하는 수준</strong>은 필수입니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">이 모듈에서 배우는 것</div>
+    <div class="flow-wrap">
+      <div class="flow-node active">회계 등식</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node active">거래</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node active">분개</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node active">계정</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node active">전표</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node active">SAP 설정</div>
+    </div>
+    <p style="font-size:14px; color:var(--gray-500);">이 흐름은 실제 프로젝트에서 주니어 컨설턴트가 경험하며 체득하는 학습 순서와 동일합니다. 이 모듈은 그 과정을 체계적으로 압축합니다.</p>
+  </div>
+
+  <div style="text-align:right; margin-top:24px;">
+    <button onclick="switchTab(1)" style="background:var(--navy); color:#fff; border:none; padding:12px 28px; border-radius:6px; font-size:14px; font-weight:600; cursor:pointer; font-family:'Noto Sans KR',sans-serif;">다음: 대차평균의 원리 →</button>
+  </div>
+</div>
+
+<!-- ─────────── TAB 02 ─────────── -->
+<div class="tab-panel" id="panel-1">
+  <div class="section-eyebrow">Section 02</div>
+  <h2 class="section-title">회계의 기본 공리<br>대차평균의 원리</h2>
+  <p class="section-lead">
+    회계의 모든 규칙은 단 하나의 등식에서 출발합니다.<br>이 등식을 이해하면 이후 모든 개념이 논리적으로 연결됩니다.
+  </p>
+
+  <div class="eq-box">
+    <div class="eq-label">회계 등식 (Accounting Equation)</div>
+    자산 (Assets) = 부채 (Liabilities) + 자본 (Equity)
+  </div>
+
+  <div class="card">
+    <div class="card-title">이 등식은 왜 항상 성립하는가</div>
+    <p style="font-size:14px; color:var(--gray-700); margin-bottom:16px;">
+      회사가 보유한 모든 자원(자산)은 반드시 누군가가 제공한 것입니다. 그 출처는 두 가지뿐입니다.
+    </p>
+    <div class="grid-2">
+      <div style="background:var(--navy-pale); border-radius:6px; padding:18px;">
+        <div style="font-size:13px; font-weight:700; color:var(--navy); margin-bottom:6px;">부채 (Liabilities)</div>
+        <p style="font-size:13px; color:var(--gray-700);">타인에게서 빌린 것. 은행 대출, 외상 매입대금 등. 언젠가 갚아야 합니다.</p>
+      </div>
+      <div style="background:var(--navy-pale); border-radius:6px; padding:18px;">
+        <div style="font-size:13px; font-weight:700; color:var(--navy); margin-bottom:6px;">자본 (Equity)</div>
+        <p style="font-size:13px; color:var(--gray-700);">주주가 출자하거나 회사가 벌어들인 것. 자본금, 이익잉여금 등.</p>
+      </div>
+    </div>
+    <div class="callout callout-navy" style="margin-top:4px;">
+      따라서 자산 = 부채 + 자본은 정의(Definition)입니다. 이 등식은 깨질 수 없으며, 모든 거래는 이 등식을 유지하면서 발생합니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">차변(Debit)과 대변(Credit) — 방향이 아니라 위치</div>
+    <div class="callout callout-warn">
+      <div class="callout-label">가장 흔한 오해</div>
+      차변 = 돈이 들어온다, 대변 = 돈이 나간다 → <strong>완전히 틀린 이해입니다.</strong>
+    </div>
+    <p style="font-size:14px; color:var(--gray-700); margin-bottom:16px;">
+      차변과 대변은 회계 장부의 <strong>왼쪽(Left)</strong>과 <strong>오른쪽(Right)</strong>을 가리키는 위치 개념입니다. 현금이 늘어도, 줄어도 모두 차변과 대변 양쪽에 기록됩니다.
+    </p>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0; border:2px solid var(--navy); border-radius:6px; overflow:hidden; margin-bottom:16px;">
+      <div style="padding:16px; background:var(--navy-pale);">
+        <div style="font-family:var(--mono); font-size:13px; font-weight:700; color:var(--navy); margin-bottom:8px;">차변 (Debit · 借邊)</div>
+        <p style="font-size:13px; color:var(--gray-700);">장부의 왼쪽. 자산 증가, 부채 감소, 자본 감소, 비용 발생 시 기록.</p>
+      </div>
+      <div style="padding:16px; background:#f5f7fa; border-left:2px solid var(--navy);">
+        <div style="font-family:var(--mono); font-size:13px; font-weight:700; color:var(--gray-700); margin-bottom:8px;">대변 (Credit · 貸邊)</div>
+        <p style="font-size:13px; color:var(--gray-700);">장부의 오른쪽. 자산 감소, 부채 증가, 자본 증가, 수익 발생 시 기록.</p>
+      </div>
+    </div>
+    <div class="callout callout-correct">
+      <div class="callout-label">핵심 원칙</div>
+      모든 거래는 차변 합계 = 대변 합계가 되도록 기록합니다. 이것이 <strong>대차평균(Balance)의 원리</strong>입니다.
+    </div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- 재무제표 맛보기 -->
+  <div class="card">
+    <div class="card-title">재무제표는 무엇으로 구성되는가 — 맛보기</div>
+    <p style="font-size:14px; color:var(--gray-700); margin-bottom:16px;">
+      회계 등식의 구성요소(자산/부채/자본)와 이후 배울 계정과목은 재무제표와 직접 연결됩니다. 지금은 구조만 파악하세요. 각 항목은 Section 05에서 다시 배웁니다.
+    </p>
+    <div class="grid-2">
+      <div class="fs-tree">
+        <div class="fs-section">
+          <div class="fs-root">📋 재무상태표 (Balance Sheet)</div>
+          <div class="fs-child">├ 자산 (Assets)</div>
+          <div class="fs-grandchild">├ 유동자산 (현금, 매출채권 등)</div>
+          <div class="fs-grandchild">└ 비유동자산 (건물, 설비 등)</div>
+          <div class="fs-child">├ 부채 (Liabilities)</div>
+          <div class="fs-grandchild">├ 유동부채 (매입채무 등)</div>
+          <div class="fs-grandchild">└ 비유동부채 (장기차입금 등)</div>
+          <div class="fs-child">└ 자본 (Equity)</div>
+          <div class="fs-grandchild">├ 자본금</div>
+          <div class="fs-grandchild">└ 이익잉여금</div>
+        </div>
+      </div>
+      <div class="fs-tree">
+        <div class="fs-section">
+          <div class="fs-root">📊 손익계산서 (P&amp;L Statement)</div>
+          <div class="fs-child">├ 수익 (Revenue)</div>
+          <div class="fs-grandchild">└ 매출, 기타수익 등</div>
+          <div class="fs-child">└ 비용 (Expense)</div>
+          <div class="fs-grandchild">├ 매출원가</div>
+          <div class="fs-grandchild">├ 판매관리비</div>
+          <div class="fs-grandchild">└ 기타비용</div>
+        </div>
+        <div style="margin-top:12px; padding-top:12px; border-top:1px dashed var(--border);">
+          <div style="font-size:12px; color:var(--gray-500); font-family:var(--mono);">수익 − 비용 = 당기순이익</div>
+          <div style="font-size:12px; color:var(--gray-500); font-family:var(--mono); margin-top:4px;">→ 자본(이익잉여금)으로 귀속</div>
+        </div>
+      </div>
+    </div>
+    <div class="callout callout-navy">
+      <div class="callout-label">Section 05에서 다시 배웁니다</div>
+      재무상태표 계정(BS Account)과 손익계산서 계정(PL Account)의 구분은 SAP G/L 계정 설정의 핵심입니다. 지금은 "두 개의 재무제표가 있다"는 것만 기억하세요.
+    </div>
+  </div>
+
+  <div style="text-align:right; margin-top:24px;">
+    <button onclick="switchTab(2)" style="background:var(--navy); color:#fff; border:none; padding:12px 28px; border-radius:6px; font-size:14px; font-weight:600; cursor:pointer; font-family:'Noto Sans KR',sans-serif;">다음: 거래란 무엇인가 →</button>
+  </div>
+</div>
+
+<!-- ─────────── TAB 03 ─────────── -->
+<div class="tab-panel" id="panel-2">
+  <div class="section-eyebrow">Section 03</div>
+  <h2 class="section-title">거래(Transaction)란<br>무엇인가</h2>
+  <p class="section-lead">
+    회계는 거래를 기록하는 언어입니다.<br>
+    분개를 배우기 전에 먼저 "무엇을 기록하는가"를 이해해야 합니다.
+  </p>
+
+  <div class="card">
+    <div class="card-title">회계적 거래(Accounting Transaction)의 정의</div>
+    <p style="font-size:14px; color:var(--gray-700); margin-bottom:16px;">
+      모든 사건이 회계에 기록되는 것은 아닙니다. <strong>재무상태표의 등식에 변화를 일으키는 사건</strong>만이 회계 거래가 됩니다.
+    </p>
+    <div class="grid-2">
+      <div>
+        <div class="callout callout-correct">
+          <div class="callout-label">회계 거래 O</div>
+          현금으로 비품을 구매했다<br>
+          은행에서 돈을 빌렸다<br>
+          고객에게 상품을 팔고 현금을 받았다
+        </div>
+      </div>
+      <div>
+        <div class="callout callout-wrong">
+          <div class="callout-label">회계 거래 X (기록 안 함)</div>
+          직원을 채용 면접했다<br>
+          계약서에 서명만 했다 (미이행)<br>
+          내부 업무 회의를 했다
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">거래가 재무상태표를 어떻게 바꾸는가</div>
+    <p style="font-size:14px; color:var(--gray-700); margin-bottom:20px;">
+      아래 3가지 예시를 통해 거래가 회계 등식에 미치는 영향을 확인합니다. 등식은 항상 유지됩니다.
+    </p>
+
+    <!-- 예시 1 -->
+    <div class="accordion">
+      <div class="accordion-header" onclick="toggleAccordion(this)">
+        <span><span class="num-badge" style="margin-right:10px;">1</span>현금으로 비품 500,000원을 구매했다</span>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="accordion-body">
+        <div class="grid-2" style="margin-bottom:12px;">
+          <div style="text-align:center; padding:14px; background:var(--red-bg); border-radius:6px; border:1px solid #fca5a5;">
+            <div style="font-size:11px; color:var(--red); font-family:var(--mono); margin-bottom:4px;">현금 (자산) 감소</div>
+            <div style="font-size:22px; font-weight:700; color:var(--red);">▼ 500,000</div>
+          </div>
+          <div style="text-align:center; padding:14px; background:var(--green-bg); border-radius:6px; border:1px solid #86efac;">
+            <div style="font-size:11px; color:var(--green); font-family:var(--mono); margin-bottom:4px;">비품 (자산) 증가</div>
+            <div style="font-size:22px; font-weight:700; color:var(--green);">▲ 500,000</div>
+          </div>
+        </div>
+        <div class="callout callout-navy">자산이 현금 → 비품으로 교체됩니다. 부채와 자본은 변하지 않습니다. 등식은 유지됩니다.</div>
+      </div>
+    </div>
+
+    <!-- 예시 2 -->
+    <div class="accordion">
+      <div class="accordion-header" onclick="toggleAccordion(this)">
+        <span><span class="num-badge" style="margin-right:10px;">2</span>은행에서 1,000,000원을 차입했다</span>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="accordion-body">
+        <div class="grid-2" style="margin-bottom:12px;">
+          <div style="text-align:center; padding:14px; background:var(--green-bg); border-radius:6px; border:1px solid #86efac;">
+            <div style="font-size:11px; color:var(--green); font-family:var(--mono); margin-bottom:4px;">현금 (자산) 증가</div>
+            <div style="font-size:22px; font-weight:700; color:var(--green);">▲ 1,000,000</div>
+          </div>
+          <div style="text-align:center; padding:14px; background:var(--amber-bg); border-radius:6px; border:1px solid #fcd34d;">
+            <div style="font-size:11px; color:var(--amber); font-family:var(--mono); margin-bottom:4px;">차입금 (부채) 증가</div>
+            <div style="font-size:22px; font-weight:700; color:var(--amber);">▲ 1,000,000</div>
+          </div>
+        </div>
+        <div class="callout callout-navy">자산과 부채가 동시에 증가합니다. 자본은 변하지 않습니다. 등식은 여전히 성립합니다.</div>
+      </div>
+    </div>
+
+    <!-- 예시 3 -->
+    <div class="accordion">
+      <div class="accordion-header" onclick="toggleAccordion(this)">
+        <span><span class="num-badge" style="margin-right:10px;">3</span>상품을 외상으로 800,000원에 매입했다</span>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="accordion-body">
+        <div class="grid-2" style="margin-bottom:12px;">
+          <div style="text-align:center; padding:14px; background:var(--green-bg); border-radius:6px; border:1px solid #86efac;">
+            <div style="font-size:11px; color:var(--green); font-family:var(--mono); margin-bottom:4px;">재고자산 (자산) 증가</div>
+            <div style="font-size:22px; font-weight:700; color:var(--green);">▲ 800,000</div>
+          </div>
+          <div style="text-align:center; padding:14px; background:var(--amber-bg); border-radius:6px; border:1px solid #fcd34d;">
+            <div style="font-size:11px; color:var(--amber); font-family:var(--mono); margin-bottom:4px;">매입채무 (부채) 증가</div>
+            <div style="font-size:22px; font-weight:700; color:var(--amber);">▲ 800,000</div>
+          </div>
+        </div>
+        <div class="callout callout-navy">현금은 아직 지불하지 않았습니다. 자산(재고)과 부채(매입채무)가 함께 증가합니다.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">거래 → 분개로 이어지는 논리</div>
+    <div class="flow-wrap" style="justify-content:center; gap:4px; flex-wrap:nowrap; overflow-x:auto; padding-bottom:4px;">
+      <div class="flow-node active" style="font-size:12px; padding:10px 14px;">거래 발생</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="font-size:12px; padding:10px 14px;">회계적 영향<br>분석</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="font-size:12px; padding:10px 14px;">어느 계정이<br>변동하는가</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="font-size:12px; padding:10px 14px;">차변/대변<br>결정</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="font-size:12px; padding:10px 14px;">분개 작성</div>
+    </div>
+    <p style="font-size:13px; color:var(--gray-500); margin-top:12px;">분개는 갑자기 등장하는 것이 아닙니다. 거래를 분석하는 과정의 결과물입니다.</p>
+  </div>
+
+  <!-- 퀴즈 -->
+  <div class="quiz-box">
+    <div class="quiz-q">❓ 퀴즈: 다음 중 회계 거래에 해당하는 것은?</div>
+    <div class="quiz-options">
+      <button class="quiz-option" data-answer="0" onclick="checkQuiz(this, 'q03-1', false)">A. 신제품 개발 아이디어 회의를 했다</button>
+      <button class="quiz-option" data-answer="1" onclick="checkQuiz(this, 'q03-1', true)">B. 임직원에게 급여 3,000,000원을 현금으로 지급했다</button>
+      <button class="quiz-option" data-answer="2" onclick="checkQuiz(this, 'q03-1', false)">C. 공급업체와 1년 납품 계약을 체결했다 (아직 납품 없음)</button>
+      <button class="quiz-option" data-answer="3" onclick="checkQuiz(this, 'q03-1', false)">D. 내년 사업 계획을 수립했다</button>
+    </div>
+    <div class="quiz-feedback" id="q03-1"></div>
+  </div>
+
+  <div style="text-align:right; margin-top:24px;">
+    <button onclick="switchTab(3)" style="background:var(--navy); color:#fff; border:none; padding:12px 28px; border-radius:6px; font-size:14px; font-weight:600; cursor:pointer; font-family:'Noto Sans KR',sans-serif;">다음: 분개 →</button>
+  </div>
+</div>
+
+<!-- ─────────── TAB 04 ─────────── -->
+<div class="tab-panel" id="panel-3">
+  <div class="section-eyebrow">Section 04</div>
+  <h2 class="section-title">분개(Journal Entry)<br>란 무엇인가</h2>
+  <p class="section-lead">
+    분개는 거래를 회계 언어로 표현하는 방법입니다.<br>
+    차변과 대변에 계정과 금액을 기록하는 형식으로, 모든 회계 기록의 출발점입니다.
+  </p>
+
+  <div class="card">
+    <div class="card-title">분개의 4요소</div>
+    <div class="grid-2">
+      <div style="background:var(--navy-pale); border-radius:6px; padding:14px;">
+        <div style="font-family:var(--mono); font-size:12px; font-weight:700; color:var(--navy); margin-bottom:4px;">① 날짜 (Date)</div>
+        <p style="font-size:13px; color:var(--gray-700);">거래가 발생한 날짜. SAP에서 Posting Date와 Document Date로 분리됩니다.</p>
+      </div>
+      <div style="background:var(--navy-pale); border-radius:6px; padding:14px;">
+        <div style="font-family:var(--mono); font-size:12px; font-weight:700; color:var(--navy); margin-bottom:4px;">② 계정 (Account)</div>
+        <p style="font-size:13px; color:var(--gray-700);">어느 계정이 영향을 받는가. SAP의 G/L Account에 해당합니다.</p>
+      </div>
+      <div style="background:var(--navy-pale); border-radius:6px; padding:14px;">
+        <div style="font-family:var(--mono); font-size:12px; font-weight:700; color:var(--navy); margin-bottom:4px;">③ 금액 (Amount)</div>
+        <p style="font-size:13px; color:var(--gray-700);">차변 합계와 대변 합계는 반드시 일치해야 합니다.</p>
+      </div>
+      <div style="background:var(--navy-pale); border-radius:6px; padding:14px;">
+        <div style="font-family:var(--mono); font-size:12px; font-weight:700; color:var(--navy); margin-bottom:4px;">④ 적요 (Text/Narration)</div>
+        <p style="font-size:13px; color:var(--gray-700);">거래 내용 설명. SAP Document의 Reference 및 Text 필드에 해당합니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">실전 분개 예시 3종</div>
+
+    <!-- 예시 1 -->
+    <div style="margin-bottom:24px;">
+      <div style="font-size:13px; font-weight:700; color:var(--navy); margin-bottom:8px; font-family:var(--mono);">① 현금 매출 1,000,000원 발생</div>
+      <div class="je-box">
+        <div class="je-row dr"><span style="font-size:11px; color:var(--gray-500); width:40px;">차변</span><span class="je-acct">현금 및 현금성자산</span><span class="je-amt" style="color:var(--navy);">1,000,000</span></div>
+        <hr class="je-divider">
+        <div class="je-row cr"><span style="font-size:11px; color:var(--gray-500); width:40px;">대변</span><span class="je-acct">매출</span><span class="je-amt" style="color:var(--gray-700);">1,000,000</span></div>
+      </div>
+      <p style="font-size:13px; color:var(--gray-700);">현금(자산) 증가 → 차변. 매출(수익) 발생 → 대변. 합계 일치.</p>
+    </div>
+
+    <!-- 예시 2 -->
+    <div style="margin-bottom:24px;">
+      <div style="font-size:13px; font-weight:700; color:var(--navy); margin-bottom:8px; font-family:var(--mono);">② 원재료 500,000원을 외상으로 매입</div>
+      <div class="je-box">
+        <div class="je-row dr"><span style="font-size:11px; color:var(--gray-500); width:40px;">차변</span><span class="je-acct">원재료</span><span class="je-amt" style="color:var(--navy);">500,000</span></div>
+        <hr class="je-divider">
+        <div class="je-row cr"><span style="font-size:11px; color:var(--gray-500); width:40px;">대변</span><span class="je-acct">매입채무</span><span class="je-amt" style="color:var(--gray-700);">500,000</span></div>
+      </div>
+      <p style="font-size:13px; color:var(--gray-700);">원재료(자산) 증가 → 차변. 매입채무(부채) 증가 → 대변. 현금 지급은 아직 없습니다.</p>
+      <div class="callout callout-navy" style="margin-top:10px; font-size:13px;">원재료는 구매 시점에 즉시 비용이 되지 않습니다. 생산 투입 또는 소비 시점에 비용(재료비)으로 전환됩니다. SAP MM에서 Goods Issue(출고) 시 재고자산 → 비용 전환 분개가 자동 생성됩니다.</div>
+    </div>
+
+    <!-- 예시 3 -->
+    <div>
+      <div style="font-size:13px; font-weight:700; color:var(--navy); margin-bottom:8px; font-family:var(--mono);">③ 급여 2,000,000원을 은행 계좌에서 이체</div>
+      <div class="je-box">
+        <div class="je-row dr"><span style="font-size:11px; color:var(--gray-500); width:40px;">차변</span><span class="je-acct">급여</span><span class="je-amt" style="color:var(--navy);">2,000,000</span></div>
+        <hr class="je-divider">
+        <div class="je-row cr"><span style="font-size:11px; color:var(--gray-500); width:40px;">대변</span><span class="je-acct">보통예금</span><span class="je-amt" style="color:var(--gray-700);">2,000,000</span></div>
+      </div>
+      <p style="font-size:13px; color:var(--gray-700);">급여(비용) 발생 → 차변. 보통예금(자산) 감소 → 대변. 자산이 줄어도 대변에 기록합니다.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">흔한 오해 교정: "대변 = 돈이 나간다"는 왜 틀렸는가</div>
+    <div class="callout callout-wrong">
+      <div class="callout-label">오해</div>
+      대변에 기록되면 돈이 나가는 것이다.
+    </div>
+    <div class="callout callout-correct">
+      <div class="callout-label">정확한 이해</div>
+      대변은 자산의 <strong>감소</strong> 또는 부채/자본/수익의 <strong>증가</strong>를 나타냅니다.<br>
+      위 ①번 예시에서 매출(대변)은 돈이 나가는 것이 아니라 <strong>수익이 발생</strong>하는 것입니다.
+    </div>
+    <table class="data-table" style="margin-top:12px;">
+      <thead><tr><th>계정 유형</th><th>차변</th><th>대변</th></tr></thead>
+      <tbody>
+        <tr><td>자산 (Asset)</td><td class="debit">증가 ▲</td><td>감소 ▼</td></tr>
+        <tr><td>부채 (Liability)</td><td>감소 ▼</td><td class="debit">증가 ▲</td></tr>
+        <tr><td>자본 (Equity)</td><td>감소 ▼</td><td class="debit">증가 ▲</td></tr>
+        <tr><td>수익 (Revenue)</td><td>감소 ▼</td><td class="debit">발생 ▲</td></tr>
+        <tr><td>비용 (Expense)</td><td class="debit">발생 ▲</td><td>감소 ▼</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- SAP 연결 -->
+  <div class="card">
+    <div class="card-title">분개와 SAP의 관계 — 어디에서 보이는가</div>
+    <p style="font-size:14px; color:var(--gray-700); margin-bottom:16px;">
+      분개가 SAP에서 어떤 경로로 재무제표까지 연결되는지 흐름을 확인합니다.
+    </p>
+    <div class="flow-wrap" style="flex-direction:column; align-items:flex-start; gap:8px;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="flow-node active" style="min-width:130px; text-align:center; font-size:13px;">거래 발생</div>
+        <span style="font-size:13px; color:var(--gray-500);">비품 구매, 매출 발생, 급여 지급 등</span>
+      </div>
+      <div style="padding-left:20px; color:var(--gray-300); font-size:18px;">↓</div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="flow-node active" style="min-width:130px; text-align:center; font-size:13px;">회계 문서 생성</div>
+        <span class="hl-box">FB50 / MIRO / F-02</span>
+      </div>
+      <div style="padding-left:20px; color:var(--gray-300); font-size:18px;">↓</div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="flow-node active" style="min-width:130px; text-align:center; font-size:13px;">분개 (Line Item)</div>
+        <span class="hl-box">FB03</span><span style="font-size:13px; color:var(--gray-500);">로 조회</span>
+      </div>
+      <div style="padding-left:20px; color:var(--gray-300); font-size:18px;">↓</div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="flow-node active" style="min-width:130px; text-align:center; font-size:13px;">G/L 계정 반영</div>
+        <span class="hl-box">FBL3N</span><span style="font-size:13px; color:var(--gray-500);">&nbsp;/&nbsp;</span><span class="hl-box">FAGLL03</span>
+      </div>
+      <div style="padding-left:20px; color:var(--gray-300); font-size:18px;">↓</div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="flow-node active" style="min-width:130px; text-align:center; font-size:13px;">재무제표 생성</div>
+        <span class="hl-box">S_ALR_87012284</span>
+      </div>
+    </div>
+    <div class="callout callout-navy" style="margin-top:16px;">
+      분개 한 줄이 쌓여 G/L 계정의 잔액이 되고, 그 잔액이 재무제표의 숫자가 됩니다. SAP는 이 과정을 자동화할 뿐, 회계 논리는 동일합니다.
+    </div>
+  </div>
+
+  <!-- 퀴즈 -->
+  <div class="quiz-box">
+    <div class="quiz-q">❓ 퀴즈: 은행에서 2,000,000원을 차입했을 때 올바른 분개는?</div>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="checkQuiz(this, 'q04-1', false)">A. (차) 차입금 2,000,000 / (대) 현금 2,000,000</button>
+      <button class="quiz-option" onclick="checkQuiz(this, 'q04-1', true)">B. (차) 현금 2,000,000 / (대) 차입금 2,000,000</button>
+      <button class="quiz-option" onclick="checkQuiz(this, 'q04-1', false)">C. (차) 이자비용 2,000,000 / (대) 차입금 2,000,000</button>
+      <button class="quiz-option" onclick="checkQuiz(this, 'q04-1', false)">D. (차) 현금 2,000,000 / (대) 자본금 2,000,000</button>
+    </div>
+    <div class="quiz-feedback" id="q04-1"></div>
+  </div>
+
+  <div style="text-align:right; margin-top:24px;">
+    <button onclick="switchTab(4)" style="background:var(--navy); color:#fff; border:none; padding:12px 28px; border-radius:6px; font-size:14px; font-weight:600; cursor:pointer; font-family:'Noto Sans KR',sans-serif;">다음: 계정과목과 T-Account →</button>
+  </div>
+</div>
+
+<!-- ─────────── TAB 05 ─────────── -->
+<div class="tab-panel" id="panel-4">
+  <div class="section-eyebrow">Section 05</div>
+  <h2 class="section-title">계정과목 체계와<br>T-Account</h2>
+  <p class="section-lead">
+    분개에 등장하는 계정들은 체계적으로 분류됩니다.<br>
+    T-Account로 시각화하면 잔액이 어떻게 만들어지는지 직관적으로 이해할 수 있습니다.
+  </p>
+
+  <div class="card">
+    <div class="card-title">BS 계정 vs PL 계정</div>
+    <p style="font-size:14px; color:var(--gray-700); margin-bottom:16px;">
+      Section 02에서 재무제표가 두 가지(재무상태표/손익계산서)임을 배웠습니다. 계정과목도 이 두 가지로 나뉩니다.
+    </p>
+    <table class="data-table">
+      <thead>
+        <tr><th>구분</th><th>재무상태표 계정 (BS Account)</th><th>손익계산서 계정 (PL Account)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>포함 항목</td><td>자산, 부채, 자본</td><td>수익, 비용</td></tr>
+        <tr><td>잔액 이월</td><td>기말 잔액 → 차기로 이월됨</td><td>기말에 이익잉여금으로 대체 후 0으로 마감</td></tr>
+        <tr><td>SAP 설정</td><td>G/L Account: Account Type = Balance Sheet</td><td>G/L Account: Account Type = P&L Statement</td></tr>
+        <tr><td>예시</td><td>현금, 매출채권, 차입금, 자본금</td><td>매출, 급여, 이자비용</td></tr>
+      </tbody>
+    </table>
+    <div class="callout callout-warn">
+      <div class="callout-label">실무 주의</div>
+      SAP에서 계정 생성 시 Account Type을 잘못 설정하면 결산 마감 시 잔액이 이월되거나 소멸되는 오류가 발생합니다. BS/PL 구분은 설정의 첫 번째 판단 포인트입니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">계정의 정상잔액 (Normal Balance)</div>
+    <p style="font-size:14px; color:var(--gray-700); margin-bottom:16px;">
+      각 계정 유형은 통상적으로 차변 또는 대변 쪽에 잔액이 생깁니다. 이를 정상잔액이라 합니다.
+    </p>
+    <table class="data-table">
+      <thead><tr><th>계정 유형</th><th>정상잔액</th><th>이유</th></tr></thead>
+      <tbody>
+        <tr><td>자산</td><td class="debit">차변 잔액</td><td>자산 증가가 차변에 기록되므로</td></tr>
+        <tr><td>부채</td><td>대변 잔액</td><td>부채 증가가 대변에 기록되므로</td></tr>
+        <tr><td>자본</td><td>대변 잔액</td><td>자본 증가가 대변에 기록되므로</td></tr>
+        <tr><td>수익</td><td>대변 잔액</td><td>수익 발생이 대변에 기록되므로</td></tr>
+        <tr><td>비용</td><td class="debit">차변 잔액</td><td>비용 발생이 차변에 기록되므로</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">T-Account로 보는 잔액·원장·집계</div>
+    <p style="font-size:14px; color:var(--gray-700); margin-bottom:16px;">
+      T-Account는 계정원장을 단순화한 시각적 표현입니다. 왼쪽이 차변, 오른쪽이 대변입니다.
+      아래는 위 Section 04의 분개 예시 3건을 T-Account로 표현한 것입니다.
+    </p>
+    <div class="t-account-wrap">
+      <div class="t-account">
+        <div class="t-account-title">현금 및 현금성자산</div>
+        <div class="t-account-body">
+          <div class="t-col">
+            <div class="t-col-label">차변 (DR)</div>
+            <div class="t-entry"><span class="t-label">현금매출</span><span class="t-amt">1,000,000</span></div>
+            <div class="t-entry"><span class="t-label">추가입금</span><span class="t-amt">2,000,000</span></div>
+          </div>
+          <div class="t-col">
+            <div class="t-col-label">대변 (CR)</div>
+            <div class="t-entry"><span class="t-label">급여지급</span><span class="t-amt">2,000,000</span></div>
+          </div>
+          <div class="t-balance-row">
+            <span>잔액 (차변)</span>
+            <span>1,000,000</span>
+          </div>
+        </div>
+      </div>
+      <div class="t-account">
+        <div class="t-account-title">매출 (Revenue)</div>
+        <div class="t-account-body">
+          <div class="t-col">
+            <div class="t-col-label">차변 (DR)</div>
+          </div>
+          <div class="t-col">
+            <div class="t-col-label">대변 (CR)</div>
+            <div class="t-entry"><span class="t-label">현금매출</span><span class="t-amt">1,000,000</span></div>
+          </div>
+          <div class="t-balance-row">
+            <span>잔액 (대변)</span>
+            <span>1,000,000</span>
+          </div>
+        </div>
+      </div>
+      <div class="t-account">
+        <div class="t-account-title">원재료 (Inventory)</div>
+        <div class="t-account-body">
+          <div class="t-col">
+            <div class="t-col-label">차변 (DR)</div>
+            <div class="t-entry"><span class="t-label">매입</span><span class="t-amt">500,000</span></div>
+          </div>
+          <div class="t-col">
+            <div class="t-col-label">대변 (CR)</div>
+          </div>
+          <div class="t-balance-row">
+            <span>잔액 (차변)</span>
+            <span>500,000</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout callout-navy">
+      T-Account의 잔액이 곧 G/L 계정의 잔액입니다. SAP FBL3N / FAGLL03에서 조회하는 "계정 잔액"이 바로 이것입니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">SAP G/L Account 구조와 연결</div>
+    <div class="grid-3" style="margin-bottom:16px;">
+      <div style="background:var(--navy-pale); border-radius:6px; padding:14px;">
+        <div style="font-family:var(--mono); font-size:12px; font-weight:700; color:var(--navy); margin-bottom:6px;">Chart of Accounts</div>
+        <p style="font-size:13px; color:var(--gray-700);">계정과목 목록 전체. 회사 코드가 공유하는 마스터. (예: INT, CAKR)</p>
+      </div>
+      <div style="background:var(--navy-pale); border-radius:6px; padding:14px;">
+        <div style="font-family:var(--mono); font-size:12px; font-weight:700; color:var(--navy); margin-bottom:6px;">Account Group</div>
+        <p style="font-size:13px; color:var(--gray-700);">계정 번호 범위 및 필수 입력 필드를 제어. BS/PL 성격 분류에 활용.</p>
+      </div>
+      <div style="background:var(--navy-pale); border-radius:6px; padding:14px;">
+        <div style="font-family:var(--mono); font-size:12px; font-weight:700; color:var(--navy); margin-bottom:6px;">FSG (Field Status)</div>
+        <p style="font-size:13px; color:var(--gray-700);">전기 시 입력 화면의 필드를 Required/Optional/Suppress로 제어.</p>
+      </div>
+    </div>
+    <div class="callout callout-warn">
+      <div class="callout-label">계정 매핑 오류 사례</div>
+      매출 계정을 BS Account(자산)로 잘못 생성하면 → 매출이 손익계산서에 반영되지 않고 재무상태표 자산으로 집계됩니다. 결산 마감 후에야 오류가 발견되면 수정 비용이 매우 큽니다.
+    </div>
+  </div>
+
+  <div style="text-align:right; margin-top:24px;">
+    <button onclick="switchTab(5)" style="background:var(--navy); color:#fff; border:none; padding:12px 28px; border-radius:6px; font-size:14px; font-weight:600; cursor:pointer; font-family:'Noto Sans KR',sans-serif;">다음: 전표와 SAP →</button>
+  </div>
+</div>
+
+<!-- ─────────── TAB 06 ─────────── -->
+<div class="tab-panel" id="panel-5">
+  <div class="section-eyebrow">Section 06</div>
+  <h2 class="section-title">전표(Document)의<br>구조와 SAP 연결</h2>
+  <p class="section-lead">
+    분개와 전표는 다릅니다.<br>
+    분개는 회계 개념이고, 전표는 SAP 시스템의 객체입니다.
+  </p>
+
+  <div class="card">
+    <div class="card-title">전표 ≠ 분개 — 가장 중요한 구분</div>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>비교 항목</th>
+          <th class="concept-col">분개 (Journal Entry)</th>
+          <th class="sap-col">전표 (SAP Document)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>성격</td><td>회계 개념 · 논리적 표현</td><td>SAP 시스템의 데이터 객체</td></tr>
+        <tr><td>존재 방식</td><td>이론/교육에서 표현하는 형식</td><td>데이터베이스에 저장된 레코드</td></tr>
+        <tr><td>구성</td><td>차변/대변 계정과 금액</td><td>Header + Line Items</td></tr>
+        <tr><td>식별자</td><td>없음 (개념적)</td><td>Document Number (채번)</td></tr>
+        <tr><td>SAP 조회</td><td>—</td><td>FB03으로 조회 가능</td></tr>
+      </tbody>
+    </table>
+    <div class="callout callout-navy">
+      <div class="callout-label">핵심 이해</div>
+      거래가 발생하면 → 분개 논리에 따라 → SAP에 전표(Document)가 생성됩니다.<br>
+      전표는 분개의 SAP 구현체입니다. Document Type, Number Range, Posting Key가 존재하는 이유가 여기 있습니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">SAP 회계 문서의 Header / Line Item 구조</div>
+    <div class="sap-screen">
+      <div class="sap-screen-bar">
+        <span class="sap-tcode">FB03</span>
+        <span class="sap-title">Display Document: Overview</span>
+      </div>
+      <div class="sap-body">
+        <div class="sap-field-row">
+          <div class="sap-field">
+            <div class="sap-field-label">DOCUMENT NUMBER</div>
+            <div class="sap-field-value">1900000123</div>
+          </div>
+          <div class="sap-field">
+            <div class="sap-field-label">COMPANY CODE</div>
+            <div class="sap-field-value">1000</div>
+          </div>
+          <div class="sap-field">
+            <div class="sap-field-label">FISCAL YEAR</div>
+            <div class="sap-field-value">2025</div>
+          </div>
+          <div class="sap-field">
+            <div class="sap-field-label">DOC DATE</div>
+            <div class="sap-field-value">2025.10.15</div>
+          </div>
+          <div class="sap-field">
+            <div class="sap-field-label">DOC TYPE</div>
+            <div class="sap-field-value">SA</div>
+          </div>
+        </div>
+        <table class="sap-line-table">
+          <thead>
+            <tr><th>Itm</th><th>PK</th><th>Account</th><th>Description</th><th>Amount</th><th>D/C</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>001</td>
+              <td>40</td>
+              <td class="dr-cell">110100</td>
+              <td>현금 및 현금성자산</td>
+              <td>1,000,000</td>
+              <td class="dr-cell">Debit</td>
+            </tr>
+            <tr>
+              <td>002</td>
+              <td>50</td>
+              <td class="cr-cell">400000</td>
+              <td>매출</td>
+              <td>1,000,000</td>
+              <td class="cr-cell">Credit</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="grid-2" style="margin-top:4px;">
+      <div class="callout callout-navy" style="margin-bottom:0;">
+        <div class="callout-label">Header</div>
+        Document Number, Company Code, Fiscal Year, Document Date, Posting Date, Document Type, Currency
+      </div>
+      <div class="callout callout-navy" style="margin-bottom:0;">
+        <div class="callout-label">Line Item</div>
+        Item 번호, Posting Key, G/L Account, 금액, Text. 분개의 차변/대변 라인 하나하나가 Line Item이 됩니다.
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Document Type · Posting Key · Number Range — 왜 존재하는가</div>
+    <div class="accordion">
+      <div class="accordion-header" onclick="toggleAccordion(this)">
+        <span>Document Type (문서 유형)</span>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="accordion-body">
+        <p style="font-size:14px; color:var(--gray-700); margin-bottom:12px;">거래의 성격을 분류하는 2자리 코드. Number Range를 제어하고, 어떤 계정 유형에 전기할 수 있는지 결정합니다.</p>
+        <table class="data-table">
+          <thead><tr><th>유형</th><th>설명</th><th>주요 용도</th></tr></thead>
+          <tbody>
+            <tr><td class="debit">SA</td><td>General Document</td><td>수기 G/L 전기</td></tr>
+            <tr><td class="debit">KR</td><td>Vendor Invoice</td><td>공급업체 인보이스</td></tr>
+            <tr><td class="debit">KZ</td><td>Vendor Payment</td><td>공급업체 대금 지급</td></tr>
+            <tr><td class="debit">DR</td><td>Customer Invoice</td><td>고객 청구서</td></tr>
+            <tr><td class="debit">DZ</td><td>Customer Payment</td><td>고객 입금 처리</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="accordion">
+      <div class="accordion-header" onclick="toggleAccordion(this)">
+        <span>Posting Key (전기 키)</span>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="accordion-body">
+        <p style="font-size:14px; color:var(--gray-700); margin-bottom:12px;">Line Item별로 차변/대변 방향과 계정 유형(G/L, Vendor, Customer, Asset)을 동시에 지정하는 2자리 숫자 코드입니다.</p>
+        <table class="data-table">
+          <thead><tr><th>PK</th><th>D/C</th><th>계정 유형</th></tr></thead>
+          <tbody>
+            <tr><td class="debit">40</td><td>Debit</td><td>G/L Account</td></tr>
+            <tr><td>50</td><td>Credit</td><td>G/L Account</td></tr>
+            <tr><td class="debit">31</td><td>Credit</td><td>Vendor (공급업체)</td></tr>
+            <tr><td class="debit">25</td><td>Debit</td><td>Vendor (공급업체)</td></tr>
+            <tr><td class="debit">01</td><td>Debit</td><td>Customer (고객)</td></tr>
+            <tr><td>15</td><td>Credit</td><td>Customer (고객)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="accordion">
+      <div class="accordion-header" onclick="toggleAccordion(this)">
+        <span>Number Range (번호 범위)</span>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="accordion-body">
+        <p style="font-size:14px; color:var(--gray-700);">Document Type마다 할당되는 전표 번호 채번 구간. 예: SA 유형은 1900000000~1999999999 범위. 번호 범위가 고갈되면 전기 불가 오류가 발생하므로 연간 채번 계획이 필요합니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-divider">
+
+  <div class="card">
+    <div class="card-title">Open Item Management — 미결항목과 Clearing 맛보기</div>
+    <p style="font-size:14px; color:var(--gray-700); margin-bottom:16px;">
+      주니어 컨설턴트가 AR/AP를 배울 때 반드시 묻는 질문이 있습니다:
+    </p>
+    <div class="callout callout-warn" style="font-size:15px; font-style:italic;">
+      "외상으로 판매했을 때 생긴 매출채권은 언제 없어지나요?"
+    </div>
+    <div class="process-steps">
+      <div class="process-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Open Item 생성</div>
+          <div class="step-desc">인보이스 전기 시 매출채권 잔액이 생깁니다. 이 항목은 미결(Open) 상태입니다.</div>
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">입금 전기</div>
+          <div class="step-desc">고객에게서 대금이 입금되면 별도 전표가 생성됩니다.</div>
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Clearing (상계 처리)</div>
+          <div class="step-desc">인보이스 전표와 입금 전표를 매칭하면 → 두 항목 모두 Cleared 상태가 됩니다. 매출채권 잔액이 0이 됩니다.</div>
+        </div>
+      </div>
+    </div>
+    <div class="callout callout-navy">
+      Open Item Management는 FBL5N(Customer), FBL1N(Vendor)에서 확인합니다. Aging Report, Credit Management, Dunning은 모두 Open Item 관리에서 출발합니다. Section 07에서 실제 프로세스 흐름으로 연결됩니다.
+    </div>
+  </div>
+
+  <!-- 퀴즈 -->
+  <div class="quiz-box">
+    <div class="quiz-q">❓ 퀴즈: 고객 인보이스 전표에서 매출채권(Customer 계정)을 <strong>차변</strong>에 전기할 때 사용하는 Posting Key는?</div>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="checkQuiz(this, 'q06-1', true)">A. 01 — Customer 계정 차변</button>
+      <button class="quiz-option" onclick="checkQuiz(this, 'q06-1', false)">B. 11 — Customer 계정 대변</button>
+      <button class="quiz-option" onclick="checkQuiz(this, 'q06-1', false)">C. 40 — G/L 계정 차변</button>
+      <button class="quiz-option" onclick="checkQuiz(this, 'q06-1', false)">D. 50 — G/L 계정 대변</button>
+    </div>
+    <div class="quiz-feedback" id="q06-1"></div>
+  </div>
+
+  <div style="text-align:right; margin-top:24px;">
+    <button onclick="switchTab(6)" style="background:var(--navy); color:#fff; border:none; padding:12px 28px; border-radius:6px; font-size:14px; font-weight:600; cursor:pointer; font-family:'Noto Sans KR',sans-serif;">다음: 업무 프로세스 →</button>
+  </div>
+</div>
+
+<!-- ─────────── TAB 07 ─────────── -->
+<div class="tab-panel" id="panel-6">
+  <div class="section-eyebrow">Section 07</div>
+  <h2 class="section-title">전표로 읽는<br>업무 프로세스</h2>
+  <p class="section-lead">
+    전표 두 장으로 AR 프로세스 전체가 보입니다.<br>
+    이 관점을 갖추면 FI, SD, MM 연계 설정의 맥락이 자연스럽게 이해됩니다.
+  </p>
+
+  <div class="card">
+    <div class="card-title">케이스 A — 고객 인보이스 발행 (SD → FI 연계)</div>
+    <p style="font-size:14px; color:var(--gray-700); margin-bottom:16px;">
+      고객에게 상품 1,000,000원을 외상으로 판매합니다.
+    </p>
+    <div class="je-box">
+      <div class="je-row dr"><span style="font-size:11px; color:var(--gray-500); width:40px;">차변</span><span class="je-acct">매출채권 (고객 계정)</span><span class="je-amt" style="color:var(--navy);">1,000,000</span></div>
+      <hr class="je-divider">
+      <div class="je-row cr"><span style="font-size:11px; color:var(--gray-500); width:40px;">대변</span><span class="je-acct">매출 (수익 계정)</span><span class="je-amt" style="color:var(--gray-700);">1,000,000</span></div>
+    </div>
+    <div class="grid-3" style="margin-bottom:0;">
+      <div style="background:var(--navy-pale); border-radius:6px; padding:12px; font-size:13px;">
+        <div style="font-weight:700; color:var(--navy); margin-bottom:4px;">SAP 문서 유형</div>
+        DR (Customer Invoice)
+      </div>
+      <div style="background:var(--navy-pale); border-radius:6px; padding:12px; font-size:13px;">
+        <div style="font-weight:700; color:var(--navy); margin-bottom:4px;">Posting Key</div>
+        01 (DR · Customer)
+      </div>
+      <div style="background:var(--navy-pale); border-radius:6px; padding:12px; font-size:13px;">
+        <div style="font-weight:700; color:var(--navy); margin-bottom:4px;">상태</div>
+        매출채권 Open Item 생성
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">케이스 B — 고객 입금 처리 (Clearing)</div>
+    <p style="font-size:14px; color:var(--gray-700); margin-bottom:16px;">
+      고객이 1,000,000원을 보통예금 계좌로 이체합니다.
+    </p>
+    <div class="je-box">
+      <div class="je-row dr"><span style="font-size:11px; color:var(--gray-500); width:40px;">차변</span><span class="je-acct">보통예금 (Bank 계정)</span><span class="je-amt" style="color:var(--navy);">1,000,000</span></div>
+      <hr class="je-divider">
+      <div class="je-row cr"><span style="font-size:11px; color:var(--gray-500); width:40px;">대변</span><span class="je-acct">매출채권 (고객 계정)</span><span class="je-amt" style="color:var(--gray-700);">1,000,000</span></div>
+    </div>
+    <div class="callout callout-correct">
+      <div class="callout-label">Clearing 발생</div>
+      케이스 A의 인보이스 전표와 이 입금 전표가 매칭(Clearing)되면 → 매출채권 Open Item이 Cleared 됩니다. 잔액 0.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">전표 두 장에서 출발하는 개념들</div>
+    <p style="font-size:14px; color:var(--gray-700); margin-bottom:16px;">
+      위의 DR 전표 + DZ 전표 두 개를 이해하면 아래 개념들이 자연스럽게 연결됩니다.
+    </p>
+    <div class="grid-2">
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAccordion(this)" style="font-size:13px;">
+          <span>SD → FI 자동 전기</span>
+          <span class="accordion-arrow">▼</span>
+        </div>
+        <div class="accordion-body">
+          <p style="font-size:13px; color:var(--gray-700);">SD에서 Billing Document 생성 시 자동으로 FI DR 전표가 생성됩니다. 이 연계는 Account Determination(VKOA) 설정으로 제어됩니다. 어떤 G/L 계정으로 전기될지 결정하는 설정입니다.</p>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAccordion(this)" style="font-size:13px;">
+          <span>AR Aging 분석</span>
+          <span class="accordion-arrow">▼</span>
+        </div>
+        <div class="accordion-body">
+          <p style="font-size:13px; color:var(--gray-700);">Open Item으로 남아 있는 매출채권을 기간별로 분류한 것이 AR Aging Report입니다. 30일 이내, 31~60일, 61~90일 등으로 구분하여 회수 위험을 평가합니다.</p>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAccordion(this)" style="font-size:13px;">
+          <span>Credit Management</span>
+          <span class="accordion-arrow">▼</span>
+        </div>
+        <div class="accordion-body">
+          <p style="font-size:13px; color:var(--gray-700);">고객별 Open Item 잔액(미결 매출채권)이 Credit Limit을 초과하면 신규 수주/출고를 차단합니다. 전표가 쌓이는 속도와 Clearing 속도의 차이가 Credit 가용 한도를 결정합니다.</p>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAccordion(this)" style="font-size:13px;">
+          <span>Dunning (채권 독촉)</span>
+          <span class="accordion-arrow">▼</span>
+        </div>
+        <div class="accordion-body">
+          <p style="font-size:13px; color:var(--gray-700);">기한이 지난 Open Item에 대해 자동으로 독촉 서한을 발송하는 기능입니다. Dunning Level이 올라갈수록 강도가 높아집니다. Open Item Clearing이 되면 더 이상 독촉 대상에서 제외됩니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">케이스 C — 공급업체 인보이스 수취 (AP 흐름)</div>
+    <p style="font-size:14px; color:var(--gray-700); margin-bottom:16px;">
+      원재료 공급업체로부터 인보이스 800,000원을 수취합니다.
+    </p>
+    <div class="je-box">
+      <div class="je-row dr"><span style="font-size:11px; color:var(--gray-500); width:40px;">차변</span><span class="je-acct">원재료</span><span class="je-amt" style="color:var(--navy);">800,000</span></div>
+      <hr class="je-divider">
+      <div class="je-row cr"><span style="font-size:11px; color:var(--gray-500); width:40px;">대변</span><span class="je-acct">매입채무 (공급업체 계정)</span><span class="je-amt" style="color:var(--gray-700);">800,000</span></div>
+    </div>
+    <p style="font-size:14px; color:var(--gray-700); margin-bottom:12px;">대금 지급 시:</p>
+    <div class="je-box">
+      <div class="je-row dr"><span style="font-size:11px; color:var(--gray-500); width:40px;">차변</span><span class="je-acct">매입채무 (공급업체 계정)</span><span class="je-amt" style="color:var(--navy);">800,000</span></div>
+      <hr class="je-divider">
+      <div class="je-row cr"><span style="font-size:11px; color:var(--gray-500); width:40px;">대변</span><span class="je-acct">보통예금</span><span class="je-amt" style="color:var(--gray-700);">800,000</span></div>
+    </div>
+    <div class="callout callout-navy">
+      MM-IV(Invoice Verification)에서 MIRO로 인보이스 입력 시 위 첫 번째 전표가 자동 생성됩니다. 대금 지급(F110 자동 지급 또는 F-53 수동 지급)으로 두 번째 전표가 생성되며 AP Open Item이 Cleared 됩니다.
+    </div>
+  </div>
+
+  <hr class="section-divider">
+
+  <div class="card">
+    <div class="card-title">이후 학습 로드맵 — 이 모듈에서 어디로 연결되는가</div>
+    <div class="flow-wrap" style="flex-direction:column; gap:8px;">
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <div class="flow-node active" style="font-size:12px; min-width:120px; text-align:center;">본 모듈 완료</div>
+        <div class="flow-arrow">→</div>
+        <span style="font-size:13px; color:var(--gray-700);">거래 · 분개 · 전표 · SAP 기초 이해</span>
+      </div>
+      <div style="padding-left:20px; color:var(--gray-300); font-size:18px;">↓</div>
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <div class="flow-node" style="font-size:12px; min-width:120px; text-align:center; border-color:var(--navy); color:var(--navy);">FI 심화</div>
+        <div class="flow-arrow">→</div>
+        <span style="font-size:13px; color:var(--gray-700);">AR/AP/GL 설정, 결산 마감, 외화 평가, 자산 회계</span>
+      </div>
+      <div style="padding-left:20px; color:var(--gray-300); font-size:18px;">↓</div>
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <div class="flow-node" style="font-size:12px; min-width:120px; text-align:center; border-color:var(--navy); color:var(--navy);">MM / SD 연계</div>
+        <div class="flow-arrow">→</div>
+        <span style="font-size:13px; color:var(--gray-700);">Invoice Verification, SD Billing, Account Determination 설정</span>
+      </div>
+      <div style="padding-left:20px; color:var(--gray-300); font-size:18px;">↓</div>
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <div class="flow-node" style="font-size:12px; min-width:120px; text-align:center; border-color:var(--navy); color:var(--navy);">CO / Group Reporting</div>
+        <div class="flow-arrow">→</div>
+        <span style="font-size:13px; color:var(--gray-700);">ACDOCA Universal Journal, 원가 관리, 연결 결산 보고</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 최종 퀴즈 -->
+  <div class="quiz-box">
+    <div class="quiz-q">❓ 최종 퀴즈: 고객 인보이스 전기 후 매출채권 Open Item이 Cleared 되는 시점은?</div>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="checkQuiz(this, 'q07-1', false)">A. 고객에게 인보이스를 이메일로 발송했을 때</button>
+      <button class="quiz-option" onclick="checkQuiz(this, 'q07-1', false)">B. 회계 담당자가 FBL5N에서 조회했을 때</button>
+      <button class="quiz-option" onclick="checkQuiz(this, 'q07-1', true)">C. 입금 전표와 인보이스 전표가 Clearing 처리되었을 때</button>
+      <button class="quiz-option" onclick="checkQuiz(this, 'q07-1', false)">D. 고객과의 계약 기간이 종료되었을 때</button>
+    </div>
+    <div class="quiz-feedback" id="q07-1"></div>
+  </div>
+
+  <div class="callout callout-navy" style="margin-top:24px;">
+    <div class="callout-label">학습 완료</div>
+    거래 → 분개 → 계정 → 전표 → SAP 설정 → 업무 프로세스까지의 흐름을 이해했습니다. 이 기초 위에 FI/CO 심화 학습을 진행하세요.
+  </div>
+</div>
+
+</div>
+<!-- END CONTENT -->
+
+<script>
+// ── TAB SWITCHING ──
+function switchTab(idx) {
+  const panels = document.querySelectorAll('.tab-panel');
+  const btns = document.querySelectorAll('.tab-btn');
+  const dots = document.querySelectorAll('.prog-dot');
+  panels.forEach((p, i) => p.classList.toggle('active', i === idx));
+  btns.forEach((b, i) => b.classList.toggle('active', i === idx));
+  dots.forEach((d, i) => {
+    d.classList.toggle('done', i <= idx);
+  });
+  document.getElementById('progLabel').textContent = (idx + 1) + ' / 7';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── ACCORDION ──
+function toggleAccordion(header) {
+  const body = header.nextElementSibling;
+  const isOpen = header.classList.contains('open');
+  // close all in same parent card
+  const card = header.closest('.card') || document.body;
+  card.querySelectorAll('.accordion-header.open').forEach(h => {
+    h.classList.remove('open');
+    h.nextElementSibling.classList.remove('open');
+  });
+  if (!isOpen) {
+    header.classList.add('open');
+    body.classList.add('open');
+  }
+}
+
+// ── QUIZ ──
+function checkQuiz(btn, feedbackId, isCorrect) {
+  const container = btn.closest('.quiz-box');
+  const allOpts = container.querySelectorAll('.quiz-option');
+  allOpts.forEach(o => o.classList.add('disabled'));
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+  const fb = document.getElementById(feedbackId);
+  fb.classList.add('show', isCorrect ? 'ok' : 'ng');
+  if (isCorrect) {
+    fb.textContent = '✓ 정답입니다! ' + getCorrectMsg(feedbackId);
+  } else {
+    fb.textContent = '✗ 다시 생각해보세요. ' + getWrongMsg(feedbackId);
+    // highlight correct
+    allOpts.forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes('true')) {
+        o.classList.remove('disabled');
+        o.classList.add('correct');
+      }
+    });
+  }
+}
+
+function getCorrectMsg(id) {
+  const msgs = {
+    'q03-1': '급여 지급은 현금(자산) 감소와 비용 발생이라는 재무제표 변화를 일으키므로 회계 거래입니다.',
+    'q04-1': '차입금 수취 시 현금(자산)이 증가하므로 차변에, 차입금(부채)이 증가하므로 대변에 기록합니다.',
+    'q06-1': '고객 인보이스에서 매출채권(Customer)은 차변 증가이며 PK 01을 사용합니다. PK 40은 G/L 계정 차변 전기로 매출(대변, PK 50)과 쌍을 이룹니다.',
+    'q07-1': 'Open Item은 입금 전표와 인보이스 전표가 Clearing 처리되어야 Cleared 상태가 됩니다.',
+  };
+  return msgs[id] || '';
+}
+
+function getWrongMsg(id) {
+  const msgs = {
+    'q03-1': '회계 거래는 재무제표에 실제 변화를 일으키는 사건이어야 합니다.',
+    'q04-1': '은행에서 돈을 빌리면 현금이 들어옵니다. 현금(자산) 증가 = 차변입니다.',
+    'q06-1': '올바른 Posting Key를 확인하세요. PK 40은 G/L 계정 차변 전기입니다.',
+    'q07-1': 'Open Item은 단순 조회나 발송으로 소멸되지 않습니다.',
+  };
+  return msgs[id] || '';
+}
+</script>
+</body>
+</html>
