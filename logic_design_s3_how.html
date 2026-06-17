@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>로직 설계 감각 | S3. How — 순차 vs. 일괄 처리</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #003366;
+    --navy-light: #e8eef5;
+    --navy-mid: #ccd9e8;
+    --text: #1a1a2e;
+    --text-muted: #5a6a80;
+    --bg: #f0f3f8;
+    --white: #ffffff;
+    --border: #d0d8e4;
+    --warn: #b85c00;
+    --warn-bg: #fff4e8;
+    --correct: #1a6b3c;
+    --correct-bg: #eaf5ee;
+    --wrong: #9b1c1c;
+    --wrong-bg: #fdf0f0;
+    --code-bg: #1e2432;
+    --gap: 20px;
+    --radius: 6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--text);
+    background: var(--bg);
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+
+  /* ── SERIES NAV ── */
+  .series-nav {
+    background: var(--navy);
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  .series-nav .brand {
+    font-family: 'DM Serif Display', serif;
+    color: rgba(255,255,255,0.5);
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    padding: 14px 20px 14px 0;
+    border-right: 1px solid rgba(255,255,255,0.15);
+    margin-right: 16px;
+    flex-shrink: 0;
+  }
+  .series-nav a {
+    color: rgba(255,255,255,0.55);
+    text-decoration: none;
+    font-size: 13px;
+    padding: 14px 14px;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .series-nav a:hover { color: rgba(255,255,255,0.9); }
+  .series-nav a.active { color: #fff; border-bottom-color: #fff; font-weight: 700; }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--navy);
+    color: white;
+    padding: 64px 40px 56px;
+  }
+  .hero-eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 16px;
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+  }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 42px;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    max-width: 720px;
+  }
+  .hero-sub {
+    font-size: 16px;
+    color: rgba(255,255,255,0.7);
+    max-width: 640px;
+    line-height: 1.8;
+    margin-bottom: 32px;
+  }
+  .hero-meta { display: flex; gap: 24px; flex-wrap: wrap; }
+  .hero-meta-item {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .hero-meta-item strong { color: rgba(255,255,255,0.85); }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 960px; margin: 0 auto; padding: 48px 40px; }
+
+  /* ── SECTION TITLES ── */
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 30px;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+  .section-subtitle {
+    font-size: 16px;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--navy);
+  }
+
+  /* ── CALLOUTS ── */
+  .callout {
+    border-radius: var(--radius);
+    padding: 18px 24px;
+    margin-bottom: var(--gap);
+    border-left: 4px solid;
+  }
+  .callout.navy  { background: var(--navy-light); border-color: var(--navy); }
+  .callout.warn  { background: var(--warn-bg);    border-color: var(--warn); }
+  .callout.correct { background: var(--correct-bg); border-color: var(--correct); }
+  .callout.wrong   { background: var(--wrong-bg);   border-color: var(--wrong); }
+  .callout-label {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 6px;
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+  }
+  .callout.navy    .callout-label { color: var(--navy); }
+  .callout.warn    .callout-label { color: var(--warn); }
+  .callout.correct .callout-label { color: var(--correct); }
+  .callout.wrong   .callout-label { color: var(--wrong); }
+
+  /* ── CODE ── */
+  .code-wrap {
+    background: var(--code-bg);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: var(--gap);
+    overflow-x: auto;
+  }
+  .code-label {
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: #64748b; margin-bottom: 10px;
+  }
+  pre {
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+    font-size: 13px; line-height: 1.7; color: #e2e8f0; white-space: pre;
+  }
+  .kw { color: #7dd3fc; }
+  .cm { color: #64748b; font-style: italic; }
+  .st { color: #a5f3a0; }
+  .nm { color: #fbbf24; }
+  .fn { color: #c4b5fd; }
+  .op { color: #f9a8d4; }
+  .hl { color: #ffffff; font-weight: 700; }
+
+  /* ── CONCEPT SPLIT ── */
+  .concept-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: var(--gap);
+  }
+  .concept-col { background: var(--white); padding: 28px 28px; }
+  .concept-col:first-child { border-right: 1px solid var(--border); }
+  .concept-col-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px;
+  }
+  .concept-badge {
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; padding: 4px 10px;
+    border-radius: 4px;
+  }
+  .badge-seq  { background: var(--wrong-bg);   color: var(--wrong); }
+  .badge-set  { background: var(--correct-bg); color: var(--correct); }
+  .concept-col-title { font-size: 17px; font-weight: 700; color: var(--text); }
+  .concept-col p { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-bottom: 12px; }
+  .concept-when {
+    font-size: 13px; background: var(--bg);
+    border-radius: 4px; padding: 10px 14px;
+    color: var(--text);
+  }
+  .concept-when-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--text-muted);
+    margin-bottom: 4px;
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+  }
+
+  /* ── VISUAL ANIMATION AREA ── */
+  .viz-wrap {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    margin-bottom: var(--gap);
+  }
+  .viz-title {
+    font-size: 14px; font-weight: 700; color: var(--navy);
+    margin-bottom: 20px;
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+    letter-spacing: 0.05em; text-transform: uppercase;
+  }
+  .row-list {
+    display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px;
+  }
+  .data-row {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; font-family: 'JetBrains Mono', monospace;
+  }
+  .row-id {
+    background: var(--navy-light); color: var(--navy);
+    padding: 2px 8px; border-radius: 3px; font-size: 12px; font-weight: 700;
+    width: 60px; text-align: center; flex-shrink: 0;
+  }
+  .row-status {
+    padding: 2px 10px; border-radius: 3px; font-size: 12px; font-weight: 600;
+    flex-shrink: 0; width: 72px; text-align: center;
+  }
+  .s-new    { background: #dbeafe; color: #1e40af; }
+  .s-active { background: #dcfce7; color: #15803d; }
+  .s-vip    { background: #fef3c7; color: #92400e; }
+  .s-churned{ background: #fee2e2; color: #991b1b; }
+  .row-val { color: var(--text-muted); font-size: 12px; }
+  .row-result { color: var(--correct); font-weight: 700; font-size: 12px; margin-left: auto; }
+
+  /* ── CASE TABS ── */
+  .case-tabs {
+    display: flex; gap: 0;
+    border-bottom: 2px solid var(--border);
+  }
+  .case-tab {
+    padding: 12px 24px; cursor: pointer;
+    font-size: 14px; font-weight: 500; color: var(--text-muted);
+    border-bottom: 2px solid transparent; margin-bottom: -2px;
+    transition: all 0.2s; white-space: nowrap;
+  }
+  .case-tab:hover { color: var(--navy); }
+  .case-tab.active { color: var(--navy); border-bottom-color: var(--navy); font-weight: 700; }
+  .case-panel {
+    display: none;
+    background: var(--white);
+    border: 1px solid var(--border); border-top: none;
+    border-radius: 0 0 var(--radius) var(--radius);
+    padding: 28px 32px; margin-bottom: var(--gap);
+  }
+  .case-panel.active { display: block; }
+
+  /* ── CODE COMPARE ── */
+  .code-compare {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: var(--gap); margin-bottom: var(--gap);
+  }
+
+  /* ── VERDICT ── */
+  .verdict {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px; border-radius: 20px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 16px;
+  }
+  .verdict.good { background: var(--correct-bg); color: var(--correct); }
+  .verdict.bad  { background: var(--wrong-bg);   color: var(--wrong); }
+  .verdict.ok   { background: var(--warn-bg);    color: var(--warn); }
+
+  /* ── STATE MACHINE ── */
+  .sm-wrap {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    margin-bottom: var(--gap);
+    overflow-x: auto;
+  }
+  .sm-states {
+    display: flex; align-items: center; justify-content: center;
+    gap: 0; flex-wrap: nowrap;
+  }
+  .sm-state {
+    border: 2px solid var(--navy);
+    border-radius: 50%;
+    width: 90px; height: 90px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: var(--white);
+    flex-shrink: 0;
+  }
+  .sm-state.start { background: var(--navy-light); }
+  .sm-state.end   { background: var(--navy); color: white; border-color: var(--navy); }
+  .sm-state-name  { font-size: 12px; font-weight: 700; color: var(--navy); text-align: center; line-height: 1.3; }
+  .sm-state.end .sm-state-name { color: white; }
+  .sm-arrow {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 4px; padding: 0 8px; flex-shrink: 0;
+  }
+  .sm-arrow-label {
+    font-size: 11px; color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace; text-align: center;
+    max-width: 80px; line-height: 1.3;
+  }
+  .sm-arrow-line {
+    display: flex; align-items: center; gap: 0;
+    color: var(--navy); font-size: 18px;
+  }
+  .sm-arrow-bar {
+    height: 2px; width: 40px; background: var(--navy);
+  }
+
+  /* ── ORDER DEP DIAGRAM ── */
+  .order-dep {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--gap);
+    margin-bottom: var(--gap);
+  }
+  .dep-box {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+  }
+  .dep-box-title {
+    font-size: 14px; font-weight: 700; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .dep-step {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px; margin-bottom: 6px;
+    border-radius: 4px; font-size: 13px;
+  }
+  .dep-step.bad-step  { background: var(--wrong-bg);   color: var(--wrong); }
+  .dep-step.good-step { background: var(--correct-bg); color: var(--correct); }
+  .dep-step.neutral   { background: var(--bg);         color: var(--text-muted); }
+  .dep-step-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700;
+    min-width: 22px;
+  }
+  .dep-arrow {
+    text-align: center; color: var(--text-muted);
+    font-size: 18px; margin: 2px 0 2px 22px;
+    line-height: 1;
+  }
+
+  /* ── DIVIDER ── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+  /* ── SUMMARY TABLE ── */
+  .summary-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 14px; margin-bottom: var(--gap);
+  }
+  .summary-table th {
+    background: var(--navy); color: white;
+    padding: 12px 16px; text-align: left; font-weight: 500;
+  }
+  .summary-table td {
+    padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: top;
+  }
+  .summary-table tr:nth-child(even) td { background: #f8fafc; }
+
+  /* ── TAG ── */
+  .tag {
+    background: var(--navy-light); color: var(--navy);
+    font-size: 12px; padding: 3px 10px; border-radius: 20px; font-weight: 500;
+    display: inline-block; margin: 2px;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 24px 40px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 13px; color: var(--text-muted);
+    background: var(--white);
+  }
+  .footer-nav { display: flex; gap: 24px; }
+  .footer-link {
+    display: flex; align-items: center; gap: 6px;
+    color: var(--navy); font-weight: 500;
+    text-decoration: none; font-size: 14px;
+  }
+  .footer-link:hover { text-decoration: underline; }
+  .footer-link.prev { color: var(--text-muted); }
+
+  @media (max-width: 720px) {
+    .hero h1 { font-size: 28px; }
+    .concept-split { grid-template-columns: 1fr; }
+    .code-compare  { grid-template-columns: 1fr; }
+    .order-dep     { grid-template-columns: 1fr; }
+    .sm-states     { flex-wrap: wrap; justify-content: center; gap: 8px; }
+    .container     { padding: 32px 20px; }
+    .hero          { padding: 40px 20px; }
+    .series-nav    { padding: 0 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SERIES NAV -->
+<nav class="series-nav">
+  <div class="brand">로직 설계 감각</div>
+  <a href="logic_design_s1_intro.html">S1. 설계 감각</a>
+  <a href="logic_design_s2_where.html">S2. Where</a>
+  <a href="logic_design_s3_how.html" class="active">S3. How</a>
+  <a href="logic_design_s4_timing.html">S4. Timing</a>
+  <a href="logic_design_s5_patterns.html">S5. 패턴 카탈로그</a>
+  <a href="logic_design_s6_quiz.html">S6. 자가 진단</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">Section 03 / 6 &nbsp;·&nbsp; Logic Design Series</div>
+  <h1>How — 순차(Sequential) vs. 일괄(Set-based) 처리</h1>
+  <p class="hero-sub">
+    같은 데이터를 다루더라도 <strong>행 하나씩 순서대로 처리할 것인가, 조건을 속성으로 보고 집합 단위로 한 번에 처리할 것인가</strong>는 코드 복잡도와 성능을 수십 배 바꾼다.
+    언제 어떤 방식을 선택해야 하는지, 그 판단 기준을 실제 사례로 훈련한다.
+  </p>
+  <div class="hero-meta">
+    <div class="hero-meta-item">📍 <strong>핵심 질문</strong> 이 조건들, 하나씩 체크해야 하나 한 번에 처리할 수 있나?</div>
+    <div class="hero-meta-item">⏱ <strong>예상 학습 시간</strong> 35–40분</div>
+    <div class="hero-meta-item">🔗 <strong>선수 모듈</strong> S2. Where</div>
+  </div>
+</section>
+
+<div class="container">
+
+  <!-- ═══════════════════════════════════════
+       PART 1. 두 가지 사고방식
+  ═══════════════════════════════════════ -->
+  <div class="section-title">두 가지 사고방식: 순서 vs. 속성</div>
+  <div class="section-subtitle">순차 처리는 "행을 하나씩 본다". 집합 처리는 "조건을 속성으로 붙인다".</div>
+
+  <div class="concept-split">
+    <div class="concept-col">
+      <div class="concept-col-header">
+        <span class="concept-badge badge-seq">Sequential</span>
+        <span class="concept-col-title">순차 처리</span>
+      </div>
+      <p>
+        데이터를 한 행씩 꺼내서 조건을 확인하고, 조건에 따라 다른 처리를 수행한다.
+        처리 결과가 다음 행에 영향을 줄 수 있고, 순서가 중요하다.
+        루프와 IF 분기가 중심이 된다.
+      </p>
+      <p>
+        <strong>사고방식:</strong> "이 행은 VIP인가? 그러면 20% 할인. 아니면 GOLD인가? 그러면 15% 할인…"
+      </p>
+      <div class="concept-when">
+        <div class="concept-when-label">불가피한 경우</div>
+        앞 행의 처리 결과가 다음 행의 입력이 될 때.
+        외부 API 호출 등 행마다 사이드이펙트가 다를 때.
+        순서 자체가 비즈니스 의미를 가질 때.
+      </div>
+    </div>
+    <div class="concept-col">
+      <div class="concept-col-header">
+        <span class="concept-badge badge-set">Set-based</span>
+        <span class="concept-col-title">집합(Set-based) 처리</span>
+      </div>
+      <p>
+        조건을 "필터"가 아닌 <strong>"속성(attribute)"</strong>으로 본다.
+        모든 행에 동시에 조건을 적용해 결과를 한 번에 계산한다.
+        루프가 없고, 조건이 데이터에 붙는 형태가 된다.
+      </p>
+      <p>
+        <strong>사고방식:</strong> "각 행의 등급 속성에 따라 할인율 속성을 동시에 부여한다."
+      </p>
+      <div class="concept-when">
+        <div class="concept-when-label">적합한 경우</div>
+        각 행의 처리가 다른 행과 독립적일 때.
+        조건이 분류(classification)나 변환(transformation)일 때.
+        대량 데이터를 DB나 벡터 연산으로 처리할 때.
+      </div>
+    </div>
+  </div>
+
+  <!-- 시각적 비교 -->
+  <div class="viz-wrap">
+    <div class="viz-title">같은 데이터, 두 가지 처리 방식 비교</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:var(--gap);">
+      <div>
+        <div style="font-size:13px; font-weight:700; color:var(--wrong); margin-bottom:10px;">❌ 순차 처리: 행을 하나씩 꺼내서 분기</div>
+        <div class="row-list">
+          <div class="data-row">
+            <span class="row-id">ROW 1</span>
+            <span class="row-status s-vip">VIP</span>
+            <span class="row-val">→ IF VIP: 20%</span>
+            <span class="row-result">0.20</span>
+          </div>
+          <div class="data-row">
+            <span class="row-id">ROW 2</span>
+            <span class="row-status s-active">GOLD</span>
+            <span class="row-val">→ ELIF GOLD: 15%</span>
+            <span class="row-result">0.15</span>
+          </div>
+          <div class="data-row">
+            <span class="row-id">ROW 3</span>
+            <span class="row-status s-new">NEW</span>
+            <span class="row-val">→ ELIF NEW: 5%</span>
+            <span class="row-result">0.05</span>
+          </div>
+          <div class="data-row">
+            <span class="row-id">ROW 4</span>
+            <span class="row-status s-churned">이탈</span>
+            <span class="row-val">→ ELSE: 0%</span>
+            <span class="row-result">0.00</span>
+          </div>
+        </div>
+        <div style="font-size:12px; color:var(--text-muted); background:var(--bg); padding:8px 12px; border-radius:4px;">
+          4번의 분기 평가 × 행 수만큼 반복.<br>등급이 추가될 때마다 분기 수정.
+        </div>
+      </div>
+      <div>
+        <div style="font-size:13px; font-weight:700; color:var(--correct); margin-bottom:10px;">✅ Set-based: 속성을 한 번에 부여</div>
+        <div class="row-list">
+          <div class="data-row">
+            <span class="row-id">ROW 1</span>
+            <span class="row-status s-vip">VIP</span>
+            <span class="row-val" style="color:var(--navy);">→ CASE 동시 적용</span>
+            <span class="row-result">0.20</span>
+          </div>
+          <div class="data-row">
+            <span class="row-id">ROW 2</span>
+            <span class="row-status s-active">GOLD</span>
+            <span class="row-val" style="color:var(--navy);">→ CASE 동시 적용</span>
+            <span class="row-result">0.15</span>
+          </div>
+          <div class="data-row">
+            <span class="row-id">ROW 3</span>
+            <span class="row-status s-new">NEW</span>
+            <span class="row-val" style="color:var(--navy);">→ CASE 동시 적용</span>
+            <span class="row-result">0.05</span>
+          </div>
+          <div class="data-row">
+            <span class="row-id">ROW 4</span>
+            <span class="row-status s-churned">이탈</span>
+            <span class="row-val" style="color:var(--navy);">→ CASE 동시 적용</span>
+            <span class="row-result">0.00</span>
+          </div>
+        </div>
+        <div style="font-size:12px; color:var(--text-muted); background:var(--bg); padding:8px 12px; border-radius:4px;">
+          전체 행에 CASE WHEN 한 번 실행.<br>등급 추가 = CASE에 한 줄 추가.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout navy">
+    <div class="callout-label">관점의 전환</div>
+    순차 처리에서는 <strong>"이 행이 어떤 조건에 해당하는가"</strong>를 묻는다.
+    Set-based에서는 <strong>"이 속성값에 어떤 결과가 매핑되는가"</strong>를 묻는다.
+    질문이 바뀌면 코드 구조 전체가 바뀐다.
+  </div>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════
+       PART 2. 비교 사례 3개
+  ═══════════════════════════════════════ -->
+  <div class="section-title">비교 사례</div>
+  <div class="section-subtitle">세 가지 상황에서 순차와 집합 처리를 직접 비교한다</div>
+
+  <div class="case-tabs">
+    <div class="case-tab active" onclick="showCase('c1', this)">사례 ① 다중 조건 분류</div>
+    <div class="case-tab" onclick="showCase('c2', this)">사례 ② 배부 로직</div>
+    <div class="case-tab" onclick="showCase('c3', this)">사례 ③ 상태 전이</div>
+  </div>
+
+  <!-- ── CASE 1: 다중 조건 분류 ── -->
+  <div class="case-panel active" id="panel-c1">
+    <div style="margin-bottom:20px;">
+      <div style="font-size:18px; font-weight:700; color:var(--navy); margin-bottom:6px;">사례 ① 다중 조건 분류 — "각 주문의 위험도 등급을 산정해"</div>
+      <div style="font-size:14px; color:var(--text-muted);">
+        금액·연체일·신용점수 세 가지 조건의 조합으로 주문마다 위험도를 HIGH / MEDIUM / LOW 로 분류한다.
+        조건 조합이 많을수록 IF 체인이 폭발적으로 늘어난다.
+      </div>
+    </div>
+
+    <div class="code-compare">
+      <div>
+        <div class="verdict bad">❌ IF-ELSE 체인 순차 처리</div>
+        <div class="code-wrap">
+          <div class="code-label">Python — 분기 폭발</div>
+          <pre><span class="kw">def</span> <span class="fn">classify_risk</span>(order):
+    amount   = order[<span class="st">'amount'</span>]
+    overdue  = order[<span class="st">'overdue_days'</span>]
+    score    = order[<span class="st">'credit_score'</span>]
+
+    <span class="kw">if</span> amount > <span class="nm">10_000_000</span>:
+        <span class="kw">if</span> overdue > <span class="nm">30</span>:
+            <span class="kw">return</span> <span class="st">'HIGH'</span>
+        <span class="kw">elif</span> score < <span class="nm">600</span>:
+            <span class="kw">return</span> <span class="st">'HIGH'</span>
+        <span class="kw">else</span>:
+            <span class="kw">return</span> <span class="st">'MEDIUM'</span>
+    <span class="kw">elif</span> amount > <span class="nm">1_000_000</span>:
+        <span class="kw">if</span> overdue > <span class="nm">30</span>:
+            <span class="kw">return</span> <span class="st">'MEDIUM'</span>
+        <span class="kw">elif</span> score < <span class="nm">600</span>:
+            <span class="kw">return</span> <span class="st">'MEDIUM'</span>
+        <span class="kw">else</span>:
+            <span class="kw">return</span> <span class="st">'LOW'</span>
+    <span class="kw">else</span>:
+        <span class="kw">return</span> <span class="st">'LOW'</span>
+
+<span class="cm"># 조건이 하나 더 추가되면?</span>
+<span class="cm"># 분기 수가 배로 늘어난다</span></pre>
+        </div>
+        <div class="callout wrong">
+          <div class="callout-label">문제점</div>
+          조건 3개의 중첩 IF가 이미 8개 분기. 조건이 4개가 되면 16개, 5개면 32개.
+          분류 기준이 바뀌면 어디를 수정해야 할지 파악조차 어렵다.
+        </div>
+      </div>
+      <div>
+        <div class="verdict good">✅ 규칙 테이블 + Set-based 매핑</div>
+        <div class="code-wrap">
+          <div class="code-label">Python — 규칙과 로직 분리</div>
+          <pre><span class="cm"># 규칙을 데이터로 선언</span>
+<span class="cm"># (우선순위 순서로 나열)</span>
+RISK_RULES = [
+    {
+      <span class="st">'amount_min'</span>: <span class="nm">10_000_000</span>,
+      <span class="st">'overdue_min'</span>: <span class="nm">30</span>,
+      <span class="st">'level'</span>: <span class="st">'HIGH'</span>
+    },
+    {
+      <span class="st">'amount_min'</span>: <span class="nm">10_000_000</span>,
+      <span class="st">'score_max'</span>: <span class="nm">600</span>,
+      <span class="st">'level'</span>: <span class="st">'HIGH'</span>
+    },
+    <span class="cm"># ... 규칙을 데이터로 추가</span>
+]
+
+<span class="kw">def</span> <span class="fn">classify_risk</span>(order):
+    <span class="kw">for</span> rule <span class="kw">in</span> RISK_RULES:
+        <span class="kw">if</span> <span class="fn">matches</span>(order, rule):
+            <span class="kw">return</span> rule[<span class="st">'level'</span>]
+    <span class="kw">return</span> <span class="st">'LOW'</span>
+
+<span class="cm"># 규칙 추가 = RISK_RULES에</span>
+<span class="cm"># 딕셔너리 한 줄 추가</span></pre>
+        </div>
+        <div class="callout correct">
+          <div class="callout-label">개선 포인트</div>
+          분류 <em>규칙</em>은 데이터로, 분류 <em>로직</em>(matches 함수)은 코드로 분리.
+          규칙이 바뀌어도 로직은 건드리지 않는다.
+          SQL에서는 CASE WHEN으로 동일 패턴을 구현할 수 있다.
+        </div>
+      </div>
+    </div>
+
+    <div class="code-wrap" style="margin-bottom:var(--gap);">
+      <div class="code-label">SQL — CASE WHEN으로 Set-based 일괄 분류</div>
+      <pre><span class="cm">-- 전체 주문에 대해 위험도를 한 번에 부여</span>
+<span class="cm">-- 행 하나씩 Python으로 분기할 필요 없음</span>
+<span class="kw">SELECT</span>
+    order_id,
+    amount,
+    <span class="kw">CASE</span>
+        <span class="kw">WHEN</span> amount > <span class="nm">10000000</span>
+             <span class="kw">AND</span> (overdue_days > <span class="nm">30</span>
+                  <span class="kw">OR</span> credit_score < <span class="nm">600</span>)
+            <span class="kw">THEN</span> <span class="st">'HIGH'</span>
+        <span class="kw">WHEN</span> amount > <span class="nm">1000000</span>
+             <span class="kw">AND</span> (overdue_days > <span class="nm">30</span>
+                  <span class="kw">OR</span> credit_score < <span class="nm">600</span>)
+            <span class="kw">THEN</span> <span class="st">'MEDIUM'</span>
+        <span class="kw">ELSE</span> <span class="st">'LOW'</span>
+    <span class="kw">END</span> <span class="kw">AS</span> risk_level
+<span class="kw">FROM</span> orders;
+<span class="cm">-- 100만 행이어도 DB가 한 번에 처리</span></pre>
+    </div>
+
+    <div class="callout navy">
+      <div class="callout-label">핵심 전환 포인트</div>
+      IF-ELSE 체인은 "이 행은 어떤 경우인가"를 물으며 분기한다.
+      CASE WHEN은 "이 속성값에 어떤 결과를 매핑할 것인가"를 선언한다.
+      <strong>질문의 방향이 바뀌면 코드 구조도 바뀐다.</strong>
+    </div>
+  </div>
+
+  <!-- ── CASE 2: 배부 로직 ── -->
+  <div class="case-panel" id="panel-c2">
+    <div style="margin-bottom:20px;">
+      <div style="font-size:18px; font-weight:700; color:var(--navy); margin-bottom:6px;">사례 ② 배부 로직 — "공통비를 각 부서에 배분해"</div>
+      <div style="font-size:14px; color:var(--text-muted);">
+        본사 공통비를 각 부서의 인원 수 비율로 배부하는 요구사항.
+        순차 처리 방식은 겉보기에 자연스럽지만 <strong>순서 의존성</strong>이라는 구조적 함정이 숨어 있다.
+      </div>
+    </div>
+
+    <div class="order-dep">
+      <div class="dep-box">
+        <div class="dep-box-title"><span style="color:var(--wrong);">❌</span> 순차 배부의 순서 의존성 문제</div>
+        <div class="dep-step bad-step"><span class="dep-step-num">1</span> 영업부 배부 → 잔액 계산</div>
+        <div class="dep-arrow">↓ 잔액을 다음 단계 입력으로 사용</div>
+        <div class="dep-step bad-step"><span class="dep-step-num">2</span> 개발부 배부 → 잔액 계산</div>
+        <div class="dep-arrow">↓ 잔액을 다음 단계 입력으로 사용</div>
+        <div class="dep-step bad-step"><span class="dep-step-num">3</span> 지원부 배부 → 잔액 소진</div>
+        <div style="margin-top:12px; font-size:13px; color:var(--text-muted); background:var(--bg); padding:8px 12px; border-radius:4px; line-height:1.65;">
+          <strong style="color:var(--wrong);">문제:</strong> 배부 순서가 바뀌면 각 부서의 배부액이 달라진다.
+          스케줄러 순서를 누군가 바꾸거나, 새 부서가 중간에 삽입되면 결과가 틀어진다.
+          이 순서 의존성은 코드 어디에도 명시되지 않는다.
+        </div>
+      </div>
+      <div class="dep-box">
+        <div class="dep-box-title"><span style="color:var(--correct);">✅</span> Set-based 일괄 배부: 순서 없음</div>
+        <div class="dep-step good-step"><span class="dep-step-num">①</span> 전체 인원 합계 계산 (1회)</div>
+        <div class="dep-arrow" style="color:var(--correct);">↓ 모든 부서에 동시 적용</div>
+        <div class="dep-step neutral"><span class="dep-step-num">—</span> 영업부: 공통비 × (영업 인원 / 전체)</div>
+        <div class="dep-step neutral"><span class="dep-step-num">—</span> 개발부: 공통비 × (개발 인원 / 전체)</div>
+        <div class="dep-step neutral"><span class="dep-step-num">—</span> 지원부: 공통비 × (지원 인원 / 전체)</div>
+        <div style="margin-top:12px; font-size:13px; color:var(--text-muted); background:var(--bg); padding:8px 12px; border-radius:4px; line-height:1.65;">
+          <strong style="color:var(--correct);">개선:</strong> 각 부서 배부액은 서로 독립적으로 계산된다.
+          순서가 없으므로 순서를 바꿔도 결과가 동일하다. 새 부서 추가 = 행 추가.
+        </div>
+      </div>
+    </div>
+
+    <div class="code-compare">
+      <div>
+        <div class="verdict bad">❌ 순차 배부 (잔액 방식)</div>
+        <div class="code-wrap">
+          <div class="code-label">Python — 순서 의존 방식</div>
+          <pre>remaining = total_overhead  <span class="cm"># 1,000만</span>
+
+<span class="cm"># 순서에 따라 결과가 달라짐</span>
+<span class="kw">for</span> dept <span class="kw">in</span> sorted_depts:
+    ratio = dept.headcount / total_hc
+    allocated = remaining * ratio
+    dept.cost = allocated
+    remaining -= allocated  <span class="cm"># 잔액 갱신</span>
+
+<span class="cm"># sorted_depts 순서가 바뀌면</span>
+<span class="cm"># 각 dept.cost 값이 달라짐</span>
+<span class="cm"># 마지막 부서가 부동소수점</span>
+<span class="cm"># 오차를 모두 흡수함</span></pre>
+        </div>
+      </div>
+      <div>
+        <div class="verdict good">✅ Set-based 일괄 배부</div>
+        <div class="code-wrap">
+          <div class="code-label">SQL — 순서 독립 방식</div>
+          <pre><span class="cm">-- 전체 인원 합계를 한 번 계산하고</span>
+<span class="cm">-- 모든 부서에 동시 적용</span>
+<span class="kw">WITH</span> total <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> <span class="fn">SUM</span>(headcount) <span class="kw">AS</span> total_hc
+    <span class="kw">FROM</span> departments
+)
+<span class="kw">SELECT</span>
+    d.dept_name,
+    d.headcount,
+    <span class="nm">10000000</span>
+      * d.headcount
+      / t.total_hc
+      <span class="kw">AS</span> allocated_cost
+<span class="kw">FROM</span> departments d
+<span class="kw">CROSS JOIN</span> total t;
+
+<span class="cm">-- 부서 순서와 무관하게</span>
+<span class="cm">-- 항상 동일한 결과</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-label">순차 배부가 불가피한 경우</div>
+      "1차 배부 결과를 2차 배부의 기준으로 사용해야 한다"처럼 진짜로 앞 단계 결과가 다음 단계 입력이 되어야 할 때는 순차 처리가 맞다.
+      문제는 그럴 필요가 <em>없는데</em> 습관적으로 순차 처리를 선택하는 것이다.
+      먼저 "각 행이 서로 독립적인가?"를 질문하라. 독립적이라면 Set-based가 항상 더 낫다.
+    </div>
+  </div>
+
+  <!-- ── CASE 3: 상태 전이 ── -->
+  <div class="case-panel" id="panel-c3">
+    <div style="margin-bottom:20px;">
+      <div style="font-size:18px; font-weight:700; color:var(--navy); margin-bottom:6px;">사례 ③ 상태 전이 — "주문 상태를 단계별로 변경해"</div>
+      <div style="font-size:14px; color:var(--text-muted);">
+        주문이 접수 → 결제완료 → 배송중 → 완료 / 취소 상태를 거친다.
+        단계별 IF 체크 방식은 코드가 커질수록 "어떤 상태에서 어떤 상태로 갈 수 있나"를 파악하기 어렵게 만든다.
+        상태 머신(State Machine)은 이 관계를 데이터로 명시한다.
+      </div>
+    </div>
+
+    <!-- 상태 머신 다이어그램 -->
+    <div class="sm-wrap">
+      <div style="font-size:13px; font-weight:700; color:var(--text-muted); margin-bottom:20px; letter-spacing:0.05em; text-transform:uppercase; font-family:'JetBrains Mono',monospace;">상태 전이 다이어그램</div>
+      <div class="sm-states">
+        <div class="sm-state start">
+          <div class="sm-state-name">접수<br><span style="font-size:10px; font-weight:400; color:var(--text-muted);">PLACED</span></div>
+        </div>
+        <div class="sm-arrow">
+          <div class="sm-arrow-label">결제 완료</div>
+          <div class="sm-arrow-line"><div class="sm-arrow-bar"></div>▶</div>
+        </div>
+        <div class="sm-state">
+          <div class="sm-state-name">결제완료<br><span style="font-size:10px; font-weight:400; color:var(--text-muted);">PAID</span></div>
+        </div>
+        <div class="sm-arrow">
+          <div class="sm-arrow-label">출고 처리</div>
+          <div class="sm-arrow-line"><div class="sm-arrow-bar"></div>▶</div>
+        </div>
+        <div class="sm-state">
+          <div class="sm-state-name">배송중<br><span style="font-size:10px; font-weight:400; color:var(--text-muted);">SHIPPING</span></div>
+        </div>
+        <div class="sm-arrow">
+          <div class="sm-arrow-label">배송 완료</div>
+          <div class="sm-arrow-line"><div class="sm-arrow-bar"></div>▶</div>
+        </div>
+        <div class="sm-state end">
+          <div class="sm-state-name">완료<br><span style="font-size:10px; font-weight:400; opacity:0.7;">DONE</span></div>
+        </div>
+      </div>
+      <div style="text-align:center; margin-top:16px; font-size:13px; color:var(--text-muted);">
+        PLACED / PAID / SHIPPING 에서 → CANCELLED 전이 가능 &nbsp;|&nbsp; DONE / CANCELLED 은 최종 상태 (전이 불가)
+      </div>
+    </div>
+
+    <div class="code-compare">
+      <div>
+        <div class="verdict bad">❌ 단계별 IF 체크</div>
+        <div class="code-wrap">
+          <div class="code-label">Python — 상태 전이 규칙이 숨어 있음</div>
+          <pre><span class="kw">def</span> <span class="fn">cancel_order</span>(order):
+    <span class="kw">if</span> order.status == <span class="st">'PLACED'</span>:
+        order.status = <span class="st">'CANCELLED'</span>
+    <span class="kw">elif</span> order.status == <span class="st">'PAID'</span>:
+        order.status = <span class="st">'CANCELLED'</span>
+    <span class="kw">elif</span> order.status == <span class="st">'SHIPPING'</span>:
+        order.status = <span class="st">'CANCELLED'</span>
+    <span class="kw">else</span>:
+        <span class="kw">raise</span> ValueError(
+          <span class="st">"취소 불가 상태"</span>
+        )
+
+<span class="kw">def</span> <span class="fn">ship_order</span>(order):
+    <span class="kw">if</span> order.status == <span class="st">'PAID'</span>:
+        order.status = <span class="st">'SHIPPING'</span>
+    <span class="kw">else</span>:
+        <span class="kw">raise</span> ValueError(<span class="st">"출고 불가"</span>)
+
+<span class="cm"># 전이 규칙이 각 함수 안에</span>
+<span class="cm"># 분산되어 있어 전체 그림이 안 보임</span>
+<span class="cm"># 새 상태 추가 시 모든 함수 수정</span></pre>
+        </div>
+        <div class="callout wrong">
+          <div class="callout-label">문제점</div>
+          "어떤 상태에서 어떤 상태로 갈 수 있는가"라는 규칙이 여러 함수에 분산된다.
+          전이 규칙을 한눈에 볼 방법이 없고, 새 상태가 추가될 때 모든 함수를 수정해야 한다.
+        </div>
+      </div>
+      <div>
+        <div class="verdict good">✅ 상태 머신: 전이 규칙을 데이터로 선언</div>
+        <div class="code-wrap">
+          <div class="code-label">Python — 전이 테이블로 명시</div>
+          <pre><span class="cm"># 허용된 전이를 한 곳에 선언</span>
+TRANSITIONS = {
+  <span class="st">'PLACED'</span>:   [<span class="st">'PAID'</span>, <span class="st">'CANCELLED'</span>],
+  <span class="st">'PAID'</span>:     [<span class="st">'SHIPPING'</span>, <span class="st">'CANCELLED'</span>],
+  <span class="st">'SHIPPING'</span>: [<span class="st">'DONE'</span>, <span class="st">'CANCELLED'</span>],
+  <span class="st">'DONE'</span>:     [],  <span class="cm"># 최종 상태</span>
+  <span class="st">'CANCELLED'</span>:[],  <span class="cm"># 최종 상태</span>
+}
+
+<span class="kw">def</span> <span class="fn">transition</span>(order, to_status):
+    allowed = TRANSITIONS.get(
+        order.status, []
+    )
+    <span class="kw">if</span> to_status <span class="kw">not in</span> allowed:
+        <span class="kw">raise</span> InvalidTransitionError(
+            <span class="fn">f</span><span class="st">"{order.status} → {to_status}"</span>
+        )
+    order.status = to_status
+
+<span class="cm"># 새 상태? → TRANSITIONS에 한 줄</span>
+<span class="cm"># 어떤 전이가 허용되나? → 표 한 번에 파악</span></pre>
+        </div>
+        <div class="callout correct">
+          <div class="callout-label">개선 포인트</div>
+          전이 규칙(TRANSITIONS)과 전이 로직(transition 함수)이 분리됐다.
+          전체 상태 다이어그램이 코드에 그대로 표현된다.
+          이것이 S1에서 소개한 <strong>Lookup Table 치환 패턴</strong>의 상태 전이 버전이다.
+        </div>
+      </div>
+    </div>
+
+    <div class="callout navy">
+      <div class="callout-label">상태 머신이 특히 빛나는 상황</div>
+      주문, 결재, 티켓, 계약처럼 <strong>명확히 정의된 상태와 이벤트가 존재하고, 잘못된 전이를 막아야 하는</strong> 도메인에 상태 머신이 적합하다.
+      "DONE 상태에서 취소가 왜 됩니까?"라는 버그 리포트는 대부분 전이 규칙이 코드에 암묵적으로 흩어져 있을 때 발생한다.
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════
+       PART 3. 순차 처리가 불가피한 경우
+  ═══════════════════════════════════════ -->
+  <div class="section-title">순차 처리가 진짜 필요한 경우</div>
+  <div class="section-subtitle">Set-based가 항상 우월한 것은 아니다 — 순서가 의미를 가질 때를 구별하라</div>
+
+  <div style="font-size:15px; color:var(--text-muted); margin-bottom:20px; line-height:1.75;">
+    Set-based를 강조했지만, 순차 처리가 맞는 경우도 분명히 있다. 두 방식을 맹목적으로 선호하는 것이 아니라
+    <strong>왜 순차가 필요한지를 의식적으로 확인</strong>하는 것이 핵심이다.
+  </div>
+
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th style="width:30%">상황</th>
+        <th style="width:35%">순차가 불가피한 이유</th>
+        <th style="width:35%">예시</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>앞 결과가 뒤 입력이 될 때</strong></td>
+        <td>단계 N의 출력이 단계 N+1의 입력으로 사용되어 병렬화가 불가능함</td>
+        <td>복리 계산, 재귀적 BOM 원가 롤업, 체인 배부(2차 배부가 1차 결과 기반)</td>
+      </tr>
+      <tr>
+        <td><strong>외부 시스템 호출이 행마다 다를 때</strong></td>
+        <td>API 호출·파일 생성 등 사이드이펙트가 행마다 달라 일괄 처리 불가</td>
+        <td>고객별 맞춤 이메일 발송, 주문별 배송사 API 호출, 행별 파일 저장</td>
+      </tr>
+      <tr>
+        <td><strong>순서 자체가 비즈니스 의미를 가질 때</strong></td>
+        <td>선착순, 우선순위 큐, 처리 순서에 따라 결과가 달라지는 게 의도된 설계</td>
+        <td>선착순 쿠폰 발급 (한도 도달 시 중단), 우선순위 기반 자원 배정</td>
+      </tr>
+      <tr>
+        <td><strong>이전 상태를 누적해야 할 때</strong></td>
+        <td>누적 합계, 이동 평균처럼 이전 행의 값이 계산에 포함됨</td>
+        <td>일별 잔고 계산 (전일 잔고 + 오늘 입출금), 이동 평균, 런닝 토탈</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout warn">
+    <div class="callout-label">자가 질문 — 순차 처리 선택 전 확인</div>
+    <strong>"이 처리, 순서를 바꿔도 결과가 같은가?"</strong><br>
+    같다면 → Set-based로 바꿀 수 있다.<br>
+    다르다면 → 그 순서 의존성이 의도된 비즈니스 요구사항인지, 아니면 설계의 부산물인지를 구별하라.
+    의도된 것이라면 순차 처리가 맞다. 부산물이라면 Set-based로 리팩터링해야 한다.
+  </div>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════
+       PART 4. How 결정 요약
+  ═══════════════════════════════════════ -->
+  <div class="section-title">How 결정 요약</div>
+  <div class="section-subtitle">처리 방식을 선택할 때의 판단 흐름</div>
+
+  <div style="background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:28px 32px; margin-bottom:var(--gap);">
+    <div style="font-size:14px; line-height:2.2; color:var(--text-muted);">
+
+      <div style="display:flex; align-items:flex-start; gap:12px; margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid var(--border);">
+        <div style="background:var(--navy); color:white; font-size:12px; font-weight:700; padding:4px 10px; border-radius:4px; white-space:nowrap; margin-top:3px; font-family:'JetBrains Mono',monospace;">Q1</div>
+        <div>
+          <strong style="color:var(--text);">각 행의 처리가 다른 행의 결과와 독립적인가?</strong><br>
+          <span style="color:var(--correct); font-weight:600;">YES →</span> Set-based 처리 (CASE WHEN, JOIN, 벡터 연산)<br>
+          <span style="color:var(--text-muted);">NO  →</span> Q2로
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:flex-start; gap:12px; margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid var(--border);">
+        <div style="background:var(--navy); color:white; font-size:12px; font-weight:700; padding:4px 10px; border-radius:4px; white-space:nowrap; margin-top:3px; font-family:'JetBrains Mono',monospace;">Q2</div>
+        <div>
+          <strong style="color:var(--text);">순서 의존성이 의도된 비즈니스 요구인가, 설계의 부산물인가?</strong><br>
+          <span style="color:var(--correct); font-weight:600;">의도된 것 →</span> 순차 처리, 단 의존 관계를 코드 구조로 명시<br>
+          <span style="color:var(--text-muted);">부산물 →</span> Set-based로 리팩터링
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:flex-start; gap:12px; margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid var(--border);">
+        <div style="background:var(--navy); color:white; font-size:12px; font-weight:700; padding:4px 10px; border-radius:4px; white-space:nowrap; margin-top:3px; font-family:'JetBrains Mono',monospace;">Q3</div>
+        <div>
+          <strong style="color:var(--text);">조건 분기가 여러 곳에 중복되어 있는가?</strong><br>
+          <span style="color:var(--correct); font-weight:600;">YES →</span> 규칙을 데이터(테이블·딕셔너리)로 분리, 로직은 단일 함수로<br>
+          <span style="color:var(--text-muted);">NO  →</span> 현재 구조 유지
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:flex-start; gap:12px;">
+        <div style="background:var(--navy); color:white; font-size:12px; font-weight:700; padding:4px 10px; border-radius:4px; white-space:nowrap; margin-top:3px; font-family:'JetBrains Mono',monospace;">Q4</div>
+        <div>
+          <strong style="color:var(--text);">상태와 전이가 복잡하게 얽혀 있는가?</strong><br>
+          <span style="color:var(--correct); font-weight:600;">YES →</span> 상태 머신으로 전이 규칙을 선언적으로 명시<br>
+          <span style="color:var(--text-muted);">NO  →</span> 단순 조건 처리로 충분
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="callout navy">
+    <div class="callout-label">S3 핵심 요약</div>
+    순차 처리의 본질적 문제는 속도가 아니라 <strong>규칙이 코드 속에 숨는다</strong>는 것이다.
+    Set-based 처리는 조건을 데이터(속성)로 끌어내어 규칙을 가시화한다.
+    어떤 방식을 선택하든, <strong>처리 방식 자체가 설계 의도를 드러내야 한다.</strong>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <span>Logic Design Series &nbsp;·&nbsp; S3. How — 순차 vs. 일괄 처리</span>
+  <div class="footer-nav">
+    <a href="logic_design_s2_where.html" class="footer-link prev">← S2. Where</a>
+    <a href="logic_design_s4_timing.html" class="footer-link">다음: S4. Timing — Pre-compute vs. On-demand →</a>
+  </div>
+</footer>
+
+<script>
+  function showCase(id, el) {
+    document.querySelectorAll('.case-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.case-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+    el.classList.add('active');
+  }
+</script>
+
+</body>
+</html>

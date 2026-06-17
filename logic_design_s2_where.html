@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>로직 설계 감각 | S2. Where — 처리 레이어 선택 전략</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #003366;
+    --navy-light: #e8eef5;
+    --navy-mid: #ccd9e8;
+    --text: #1a1a2e;
+    --text-muted: #5a6a80;
+    --bg: #f0f3f8;
+    --white: #ffffff;
+    --border: #d0d8e4;
+    --warn: #b85c00;
+    --warn-bg: #fff4e8;
+    --correct: #1a6b3c;
+    --correct-bg: #eaf5ee;
+    --wrong: #9b1c1c;
+    --wrong-bg: #fdf0f0;
+    --code-bg: #1e2432;
+    --gap: 20px;
+    --radius: 6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--text);
+    background: var(--bg);
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+
+  /* ── SERIES NAV ── */
+  .series-nav {
+    background: var(--navy);
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  .series-nav .brand {
+    font-family: 'DM Serif Display', serif;
+    color: rgba(255,255,255,0.5);
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    padding: 14px 20px 14px 0;
+    border-right: 1px solid rgba(255,255,255,0.15);
+    margin-right: 16px;
+    flex-shrink: 0;
+  }
+  .series-nav a {
+    color: rgba(255,255,255,0.55);
+    text-decoration: none;
+    font-size: 13px;
+    padding: 14px 14px;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .series-nav a:hover { color: rgba(255,255,255,0.9); }
+  .series-nav a.active { color: #fff; border-bottom-color: #fff; font-weight: 700; }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--navy);
+    color: white;
+    padding: 64px 40px 56px;
+  }
+  .hero-eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 16px;
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+  }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 42px;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    max-width: 720px;
+  }
+  .hero-sub {
+    font-size: 16px;
+    color: rgba(255,255,255,0.7);
+    max-width: 640px;
+    line-height: 1.8;
+    margin-bottom: 32px;
+  }
+  .hero-meta { display: flex; gap: 24px; flex-wrap: wrap; }
+  .hero-meta-item {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .hero-meta-item strong { color: rgba(255,255,255,0.85); }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 960px; margin: 0 auto; padding: 48px 40px; }
+
+  /* ── SECTION TITLES ── */
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 30px;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+  .section-subtitle {
+    font-size: 16px;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--navy);
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    margin-bottom: var(--gap);
+  }
+  .card-title { font-size: 16px; font-weight: 700; color: var(--navy); margin-bottom: 12px; }
+
+  /* ── CALLOUTS ── */
+  .callout {
+    border-radius: var(--radius);
+    padding: 18px 24px;
+    margin-bottom: var(--gap);
+    border-left: 4px solid;
+  }
+  .callout.navy { background: var(--navy-light); border-color: var(--navy); }
+  .callout.warn { background: var(--warn-bg); border-color: var(--warn); }
+  .callout.correct { background: var(--correct-bg); border-color: var(--correct); }
+  .callout.wrong { background: var(--wrong-bg); border-color: var(--wrong); }
+  .callout-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+  }
+  .callout.navy .callout-label { color: var(--navy); }
+  .callout.warn .callout-label { color: var(--warn); }
+  .callout.correct .callout-label { color: var(--correct); }
+  .callout.wrong .callout-label { color: var(--wrong); }
+
+  /* ── CODE BLOCK ── */
+  .code-wrap {
+    background: var(--code-bg);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: var(--gap);
+    overflow-x: auto;
+  }
+  .code-label {
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 10px;
+  }
+  pre {
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #e2e8f0;
+    white-space: pre;
+  }
+  .kw { color: #7dd3fc; }
+  .cm { color: #64748b; font-style: italic; }
+  .st { color: #a5f3a0; }
+  .nm { color: #fbbf24; }
+  .fn { color: #c4b5fd; }
+  .op { color: #f9a8d4; }
+
+  /* ── LAYER DIAGRAM ── */
+  .layer-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-bottom: var(--gap);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .layer-row {
+    display: grid;
+    grid-template-columns: 160px 1fr 1fr;
+    border-bottom: 1px solid var(--border);
+  }
+  .layer-row:last-child { border-bottom: none; }
+  .layer-name {
+    background: var(--navy);
+    color: white;
+    padding: 18px 20px;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .layer-name .layer-sub {
+    font-size: 11px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.55);
+    margin-top: 4px;
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+  .layer-cell {
+    background: var(--white);
+    padding: 16px 20px;
+    font-size: 14px;
+    line-height: 1.6;
+    border-left: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+  .layer-cell strong { color: var(--text); display: block; margin-bottom: 4px; font-size: 13px; }
+  .layer-header {
+    background: var(--bg);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 10px 20px;
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+    border-left: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+  }
+
+  /* ── DECISION MATRIX ── */
+  .decision-matrix {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: var(--gap);
+    font-size: 14px;
+  }
+  .decision-matrix th {
+    background: var(--navy);
+    color: white;
+    padding: 12px 16px;
+    text-align: center;
+    font-weight: 500;
+    font-size: 13px;
+  }
+  .decision-matrix th:first-child { text-align: left; }
+  .decision-matrix td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+    vertical-align: middle;
+  }
+  .decision-matrix td:first-child { text-align: left; font-weight: 500; color: var(--text); }
+  .decision-matrix tr:nth-child(even) td { background: #f8fafc; }
+  .dot-strong { color: var(--navy); font-size: 20px; line-height: 1; }
+  .dot-weak { color: var(--border); font-size: 20px; line-height: 1; }
+  .dot-mid { color: var(--navy-mid); font-size: 20px; line-height: 1; }
+
+  /* ── CASE TABS ── */
+  .case-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 0;
+  }
+  .case-tab {
+    padding: 12px 24px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-muted);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .case-tab:hover { color: var(--navy); }
+  .case-tab.active { color: var(--navy); border-bottom-color: var(--navy); font-weight: 700; }
+  .case-panel {
+    display: none;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 var(--radius) var(--radius);
+    padding: 28px 32px;
+    margin-bottom: var(--gap);
+  }
+  .case-panel.active { display: block; }
+
+  /* ── TWO-COL COMPARE ── */
+  .code-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--gap);
+    margin-bottom: var(--gap);
+  }
+
+  /* ── VERDICT BADGE ── */
+  .verdict {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
+  }
+  .verdict.good { background: var(--correct-bg); color: var(--correct); }
+  .verdict.bad  { background: var(--wrong-bg);   color: var(--wrong); }
+  .verdict.warn { background: var(--warn-bg);    color: var(--warn); }
+
+  /* ── CRITERIA CARDS ── */
+  .criteria-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--gap);
+    margin-bottom: var(--gap);
+  }
+  .criteria-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+  }
+  .criteria-number {
+    font-family: 'DM Serif Display', serif;
+    font-size: 36px;
+    color: var(--navy-mid);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .criteria-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+  .criteria-desc { font-size: 14px; color: var(--text-muted); line-height: 1.65; }
+  .criteria-question {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--text);
+    background: var(--bg);
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-style: italic;
+  }
+
+  /* ── DIVIDER ── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+  /* ── ACCORDION ── */
+  .accordion {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .accordion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    cursor: pointer;
+    user-select: none;
+    font-weight: 500;
+    font-size: 15px;
+  }
+  .accordion-header:hover { background: var(--bg); }
+  .accordion-icon { font-size: 18px; color: var(--navy); transition: transform 0.25s; font-style: normal; }
+  .accordion.open .accordion-icon { transform: rotate(45deg); }
+  .accordion-body {
+    display: none;
+    padding: 0 24px 20px;
+    border-top: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.75;
+  }
+  .accordion.open .accordion-body { display: block; }
+
+  /* ── SUMMARY TABLE ── */
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: var(--gap);
+  }
+  .summary-table th {
+    background: var(--navy);
+    color: white;
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 500;
+  }
+  .summary-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .summary-table tr:nth-child(even) td { background: #f8fafc; }
+
+  /* ── FOOTER ── */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 24px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-muted);
+    background: var(--white);
+  }
+  .footer-nav { display: flex; gap: 24px; }
+  .footer-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--navy);
+    font-weight: 500;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  .footer-link:hover { text-decoration: underline; }
+  .footer-link.prev { color: var(--text-muted); }
+
+  @media (max-width: 720px) {
+    .hero h1 { font-size: 28px; }
+    .layer-row { grid-template-columns: 100px 1fr; }
+    .layer-row .layer-cell:last-child { display: none; }
+    .criteria-grid { grid-template-columns: 1fr; }
+    .code-compare { grid-template-columns: 1fr; }
+    .container { padding: 32px 20px; }
+    .hero { padding: 40px 20px; }
+    .series-nav { padding: 0 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SERIES NAV -->
+<nav class="series-nav">
+  <div class="brand">로직 설계 감각</div>
+  <a href="logic_design_s1_intro.html">S1. 설계 감각</a>
+  <a href="logic_design_s2_where.html" class="active">S2. Where</a>
+  <a href="logic_design_s3_how.html">S3. How</a>
+  <a href="logic_design_s4_timing.html">S4. Timing</a>
+  <a href="logic_design_s5_patterns.html">S5. 패턴 카탈로그</a>
+  <a href="logic_design_s6_quiz.html">S6. 자가 진단</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">Section 02 / 6 &nbsp;·&nbsp; Logic Design Series</div>
+  <h1>Where — 처리 레이어를 어디에 둘 것인가</h1>
+  <p class="hero-sub">
+    같은 로직도 <strong>어느 레이어에서 실행하느냐</strong>에 따라 성능, 보안, 재사용성이 완전히 달라진다.
+    DB인지, 앱인지, 프론트엔드인지를 결정하는 것은 취향이 아니라 판단 기준에 따른 설계 결정이다.
+  </p>
+  <div class="hero-meta">
+    <div class="hero-meta-item">📍 <strong>핵심 질문</strong> 이 로직, 어느 레이어에 두는 게 맞나?</div>
+    <div class="hero-meta-item">⏱ <strong>예상 학습 시간</strong> 30–35분</div>
+    <div class="hero-meta-item">🔗 <strong>선수 모듈</strong> S1. 설계 감각이란 무엇인가</div>
+  </div>
+</section>
+
+<div class="container">
+
+  <!-- ═══════════════════════════════════════
+       PART 1. 세 레이어의 구조와 책임
+  ═══════════════════════════════════════ -->
+  <div class="section-title">세 레이어의 구조와 책임</div>
+  <div class="section-subtitle">각 레이어는 다른 레이어가 할 수 없는 고유한 강점을 갖는다</div>
+
+  <div class="layer-stack">
+    <div class="layer-row" style="border-bottom:1px solid var(--border);">
+      <div style="background:var(--bg); padding:10px 20px; display:flex; align-items:center;">
+        <span style="font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-muted); font-family:'JetBrains Mono',monospace;">레이어</span>
+      </div>
+      <div class="layer-header">강점 · 적합한 역할</div>
+      <div class="layer-header">약점 · 피해야 할 역할</div>
+    </div>
+    <div class="layer-row">
+      <div class="layer-name">
+        DB<br>
+        <span class="layer-sub">Database Layer</span>
+      </div>
+      <div class="layer-cell">
+        <strong>✅ 여기서 잘하는 것</strong>
+        대량 데이터 집계 · 필터 · 조인을 데이터 이동 없이 처리.
+        트랜잭션 무결성 보장. 인덱스 기반 고속 조회.
+        감사(Audit) 추적이 필요한 데이터 변경 이력 관리.
+        여러 앱이 공통으로 참조하는 규칙과 마스터 데이터 보관.
+      </div>
+      <div class="layer-cell">
+        <strong>❌ 여기서 하면 안 되는 것</strong>
+        이메일 발송·API 호출 등 외부 시스템 연동.
+        사용자별로 달라지는 표현 로직 (UI 포맷, 언어 변환).
+        자주 바뀌는 비즈니스 규칙 (DB 스키마 변경 비용이 높음).
+        탐색적·실험적 계산 (쿼리 변경 사이클이 느림).
+      </div>
+    </div>
+    <div class="layer-row">
+      <div class="layer-name">
+        앱<br>
+        <span class="layer-sub">Application / Middleware</span>
+      </div>
+      <div class="layer-cell">
+        <strong>✅ 여기서 잘하는 것</strong>
+        비즈니스 규칙 오케스트레이션 (조건 분기, 흐름 제어).
+        여러 데이터 소스 취합·변환.
+        외부 시스템 연동 (메일, 결제, 알림).
+        권한 검증과 인증·인가 처리.
+        재사용 가능한 서비스 단위 캡슐화.
+      </div>
+      <div class="layer-cell">
+        <strong>❌ 여기서 하면 안 되는 것</strong>
+        수백만 행을 메모리에 올려 집계 (메모리·속도 한계).
+        데이터 무결성 강제 (DB 제약이 더 안전).
+        사용자 인터랙션에 즉각 반응해야 하는 UI 상태 관리.
+      </div>
+    </div>
+    <div class="layer-row">
+      <div class="layer-name">
+        프론트<br>
+        <span class="layer-sub">Frontend / Client</span>
+      </div>
+      <div class="layer-cell">
+        <strong>✅ 여기서 잘하는 것</strong>
+        사용자 인터랙션에 즉각 반응 (입력값 검증, 실시간 계산).
+        서버 왕복 없는 로컬 상태 조작 (장바구니, 폼 상태).
+        표현 로직 (날짜 포맷, 금액 단위, 언어 변환).
+        작은 데이터셋 필터·정렬 (이미 로드된 목록).
+      </div>
+      <div class="layer-cell">
+        <strong>❌ 여기서 하면 안 되는 것</strong>
+        보안 관련 판단 (클라이언트 코드는 조작 가능).
+        대량 데이터 처리 (브라우저 메모리·성능 한계).
+        비즈니스 핵심 규칙 단독 보관 (다른 채널 진입 시 우회됨).
+      </div>
+    </div>
+  </div>
+
+  <div class="callout navy">
+    <div class="callout-label">핵심 원칙</div>
+    레이어는 각자의 강점 영역이 있다. 문제는 대부분 <strong>한 레이어가 다른 레이어의 역할을 침범할 때</strong> 발생한다.
+    레이어 월경(Layer Crossing)은 단기적으로 편리해 보이지만, 시스템이 커질수록 유지보수 비용이 폭발적으로 증가한다.
+  </div>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════
+       PART 2. 판단 기준 4가지
+  ═══════════════════════════════════════ -->
+  <div class="section-title">판단 기준 4가지</div>
+  <div class="section-subtitle">"어디서 처리할까"를 결정할 때 반드시 따져야 하는 체크리스트</div>
+
+  <div class="criteria-grid">
+    <div class="criteria-card">
+      <div class="criteria-number">01</div>
+      <div class="criteria-name">데이터 볼륨</div>
+      <div class="criteria-desc">
+        처리할 데이터가 얼마나 되는가. 수십 행이라면 어디서 처리해도 무방하지만,
+        수백만 행이라면 데이터를 이동시키지 않고 DB에서 처리하는 것이 압도적으로 유리하다.
+        네트워크를 타고 앱으로 데이터를 끌어올려 집계하는 것은 DB에서 GROUP BY 하는 것보다
+        수십 배 느리고 메모리를 과소비한다.
+      </div>
+      <div class="criteria-question">💬 "이 데이터를 앱으로 가져오면 몇 MB인가? GB인가?"</div>
+    </div>
+    <div class="criteria-card">
+      <div class="criteria-number">02</div>
+      <div class="criteria-name">재사용성</div>
+      <div class="criteria-desc">
+        이 로직을 여러 화면, 여러 앱, 여러 채널이 공통으로 사용하는가.
+        프론트에서만 구현한 비즈니스 규칙은 모바일 앱, API, 배치 잡이 같은 규칙을 적용받지 못한다.
+        재사용 빈도가 높을수록 더 낮은 레이어(DB나 앱 서비스)로 내려야 한다.
+      </div>
+      <div class="criteria-question">💬 "이 로직, 웹 말고 다른 곳에서도 써야 하나?"</div>
+    </div>
+    <div class="criteria-card">
+      <div class="criteria-number">03</div>
+      <div class="criteria-name">감사 추적 필요 여부</div>
+      <div class="criteria-desc">
+        "누가 언제 이 데이터를 바꿨는가"를 추적해야 하는가.
+        금융 거래, 승인 이력, 재고 변경 등은 감사 로그가 필수다.
+        프론트나 앱 레이어에서만 처리하면 로그가 남지 않거나 쉽게 우회된다.
+        DB 레이어에서 트리거나 감사 테이블로 처리해야 신뢰할 수 있는 이력이 남는다.
+      </div>
+      <div class="criteria-question">💬 "나중에 '누가 바꿨냐'는 질문이 올 수 있나?"</div>
+    </div>
+    <div class="criteria-card">
+      <div class="criteria-number">04</div>
+      <div class="criteria-name">실시간성</div>
+      <div class="criteria-desc">
+        사용자가 입력할 때마다 즉각 반응해야 하는가, 아니면 조금 지연되어도 괜찮은가.
+        실시간 반응이 필요한 UI 피드백(입력값 유효성, 금액 계산)은 프론트에서 처리해야 한다.
+        서버 왕복(Round Trip)이 생기면 사용자는 지연을 체감한다.
+        반면 정확성이 중요한 최종 검증은 반드시 서버에서 한 번 더 해야 한다.
+      </div>
+      <div class="criteria-question">💬 "사용자가 이 결과를 얼마나 빨리 봐야 하나?"</div>
+    </div>
+  </div>
+
+  <table class="decision-matrix">
+    <thead>
+      <tr>
+        <th style="width:28%">기준</th>
+        <th>DB</th>
+        <th>앱 (Middleware)</th>
+        <th>프론트엔드</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>대용량 데이터 처리</td>
+        <td><span class="dot-strong">●●●</span></td>
+        <td><span class="dot-mid">●●○</span></td>
+        <td><span class="dot-weak">●○○</span></td>
+      </tr>
+      <tr>
+        <td>비즈니스 로직 재사용</td>
+        <td><span class="dot-mid">●●○</span></td>
+        <td><span class="dot-strong">●●●</span></td>
+        <td><span class="dot-weak">●○○</span></td>
+      </tr>
+      <tr>
+        <td>감사 추적 신뢰도</td>
+        <td><span class="dot-strong">●●●</span></td>
+        <td><span class="dot-mid">●●○</span></td>
+        <td><span class="dot-weak">●○○</span></td>
+      </tr>
+      <tr>
+        <td>즉각적 UI 반응</td>
+        <td><span class="dot-weak">●○○</span></td>
+        <td><span class="dot-mid">●●○</span></td>
+        <td><span class="dot-strong">●●●</span></td>
+      </tr>
+      <tr>
+        <td>보안·권한 강제력</td>
+        <td><span class="dot-strong">●●●</span></td>
+        <td><span class="dot-strong">●●●</span></td>
+        <td><span class="dot-weak">●○○</span></td>
+      </tr>
+      <tr>
+        <td>로직 변경 유연성</td>
+        <td><span class="dot-weak">●○○</span></td>
+        <td><span class="dot-strong">●●●</span></td>
+        <td><span class="dot-mid">●●○</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════
+       PART 3. 비교 사례 3개
+  ═══════════════════════════════════════ -->
+  <div class="section-title">비교 사례</div>
+  <div class="section-subtitle">같은 요구사항, 레이어가 달라지면 무엇이 바뀌는가</div>
+
+  <!-- CASE TABS -->
+  <div class="case-tabs">
+    <div class="case-tab active" onclick="showCase('c1')">사례 ① 대량 집계</div>
+    <div class="case-tab" onclick="showCase('c2')">사례 ② 유효성 검증</div>
+    <div class="case-tab" onclick="showCase('c3')">사례 ③ 권한 필터링</div>
+  </div>
+
+  <!-- CASE 1: 대량 집계 -->
+  <div class="case-panel active" id="panel-c1">
+    <div style="margin-bottom:20px;">
+      <div style="font-size:18px; font-weight:700; color:var(--navy); margin-bottom:6px;">사례 ① 대량 집계 — "월별 지역별 매출 합계를 보여줘"</div>
+      <div style="font-size:14px; color:var(--text-muted);">1,000만 건의 주문 데이터에서 월×지역 집계표를 만드는 요구사항. 어디서 처리하느냐가 성능을 수십 배 가른다.</div>
+    </div>
+
+    <div class="code-compare">
+      <div>
+        <div class="verdict bad">❌ 앱 레이어에서 집계</div>
+        <div class="code-wrap">
+          <div class="code-label">앱 서버 (Python) — 잘못된 방식</div>
+          <pre><span class="cm"># DB에서 전체 데이터를 끌어와서</span>
+<span class="cm"># 앱에서 직접 집계한다</span>
+rows = db.execute(
+    <span class="st">"SELECT * FROM orders"</span>
+)  <span class="cm"># ← 1,000만 행 전송</span>
+
+result = {}
+<span class="kw">for</span> row <span class="kw">in</span> rows:
+    key = (row.month, row.region)
+    result[key] = (
+        result.get(key, <span class="nm">0</span>)
+        + row.amount
+    )
+<span class="cm"># 메모리: 수 GB 점유</span>
+<span class="cm"># 시간: 수십 초</span></pre>
+        </div>
+        <div class="callout wrong">
+          <div class="callout-label">문제점</div>
+          1,000만 행을 네트워크로 전송해서 앱 메모리에 올린 뒤 Python 루프로 집계.
+          DB가 인덱스와 병렬 처리로 0.1초에 끝낼 일을 앱이 30초 넘게 하고 있다.
+        </div>
+      </div>
+      <div>
+        <div class="verdict good">✅ DB 레이어에서 집계</div>
+        <div class="code-wrap">
+          <div class="code-label">SQL — 올바른 방식</div>
+          <pre><span class="cm">-- 집계를 DB에서 완결한다</span>
+<span class="cm">-- 네트워크로 이동하는 행 수:</span>
+<span class="cm">-- 월 수 × 지역 수 = 수십 행</span>
+<span class="kw">SELECT</span>
+    <span class="fn">DATE_TRUNC</span>(<span class="st">'month'</span>, order_dt)
+        <span class="kw">AS</span> month,
+    region,
+    <span class="fn">SUM</span>(amount) <span class="kw">AS</span> total
+<span class="kw">FROM</span> orders
+<span class="kw">GROUP BY</span> <span class="nm">1</span>, <span class="nm">2</span>
+<span class="kw">ORDER BY</span> <span class="nm">1</span>, <span class="nm">2</span>;
+
+<span class="cm">-- 결과: 수십 행만 앱으로 전송</span>
+<span class="cm">-- 시간: 인덱스 활용 시 수백 ms</span></pre>
+        </div>
+        <div class="callout correct">
+          <div class="callout-label">개선 포인트</div>
+          데이터는 이동시키지 않고 DB 안에서 집계를 완결한다.
+          앱으로 넘어오는 것은 결과 수십 행뿐.
+          <strong>데이터는 태어난 곳에서 처리한다</strong>는 원칙이 여기서 적용된다.
+        </div>
+      </div>
+    </div>
+
+    <div class="callout navy">
+      <div class="callout-label">판단 근거 적용</div>
+      <strong>데이터 볼륨 기준 → DB.</strong>
+      1,000만 행은 앱으로 이동시키는 순간 네트워크·메모리 병목이 발생한다.
+      집계 자체는 DB가 월등히 잘한다. 앱의 역할은 결과를 받아서 화면에 그리는 것으로 한정한다.
+    </div>
+  </div>
+
+  <!-- CASE 2: 유효성 검증 -->
+  <div class="case-panel" id="panel-c2">
+    <div style="margin-bottom:20px;">
+      <div style="font-size:18px; font-weight:700; color:var(--navy); margin-bottom:6px;">사례 ② 유효성 검증 — "이메일 형식이 맞는지 확인해"</div>
+      <div style="font-size:14px; color:var(--text-muted);">검증 로직은 프론트, 앱, DB 모두에 둘 수 있다. 어디에 두느냐에 따라 사용자 경험과 보안이 달라진다. 핵심은 <strong>각 레이어가 다른 목적의 검증을 담당한다</strong>는 것이다.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">세 레이어에서 검증이 수행하는 서로 다른 역할</div>
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th style="width:18%">레이어</th>
+            <th style="width:30%">무엇을 검증하나</th>
+            <th style="width:25%">목적</th>
+            <th style="width:27%">없으면 생기는 문제</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>프론트엔드</strong></td>
+            <td>형식 (이메일 패턴, 필수 항목 빈칸)</td>
+            <td>사용자에게 즉각 피드백 — UX</td>
+            <td>서버 왕복 후 에러 반환, 느린 피드백</td>
+          </tr>
+          <tr>
+            <td><strong>앱 서버</strong></td>
+            <td>비즈니스 규칙 (중복 이메일, 도메인 화이트리스트)</td>
+            <td>보안·규칙 강제 — 최종 게이트</td>
+            <td>프론트 우회 시 (API 직접 호출) 검증 없음</td>
+          </tr>
+          <tr>
+            <td><strong>DB</strong></td>
+            <td>무결성 제약 (UNIQUE, NOT NULL, FK)</td>
+            <td>데이터 일관성 최후 보루</td>
+            <td>앱 버그로 중복 삽입, 고아 레코드 발생</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="code-compare">
+      <div>
+        <div class="verdict bad">❌ 프론트에서만 검증</div>
+        <div class="code-wrap">
+          <div class="code-label">JavaScript — 위험한 방식</div>
+          <pre><span class="cm">// 프론트에서만 중복 이메일 체크</span>
+<span class="kw">function</span> <span class="fn">validateEmail</span>(email) {
+  <span class="kw">const</span> existing = users.find(
+    u => u.email === email
+  );
+  <span class="kw">if</span> (existing) {
+    alert(<span class="st">"이미 사용 중인 이메일"</span>);
+    <span class="kw">return false</span>;
+  }
+  <span class="kw">return true</span>;
+}
+
+<span class="cm">// 문제: Postman이나 curl로</span>
+<span class="cm">// API를 직접 호출하면?</span>
+<span class="cm">// → 프론트 검증 완전 우회 가능</span></pre>
+        </div>
+        <div class="callout wrong">
+          <div class="callout-label">문제점</div>
+          클라이언트 코드는 누구나 조작·우회할 수 있다. 비즈니스 규칙을 프론트에만 두면 API를 직접 호출하는 모든 경로가 무방비 상태가 된다.
+        </div>
+      </div>
+      <div>
+        <div class="verdict good">✅ 레이어별 역할 분담</div>
+        <div class="code-wrap">
+          <div class="code-label">올바른 3-레이어 검증 구조</div>
+          <pre><span class="cm">--- 프론트: UX 피드백 (형식) ---</span>
+<span class="kw">const</span> isValid = <span class="op">/</span><span class="st">^[^@]+@[^@]+$</span><span class="op">/</span>
+    .test(email);
+<span class="cm">// 즉각 피드백, 서버 왕복 없음</span>
+
+<span class="cm">--- 앱 서버: 비즈니스 규칙 ---</span>
+<span class="kw">def</span> <span class="fn">register</span>(email):
+    <span class="kw">if</span> User.exists(email=email):
+        <span class="kw">raise</span> DuplicateEmailError
+    <span class="cm"># 어떤 경로로 와도 여기서 막힘</span>
+
+<span class="cm">--- DB: 무결성 최후 보루 ---</span>
+<span class="kw">CREATE TABLE</span> users (
+    email <span class="kw">VARCHAR</span>(<span class="nm">255</span>)
+        <span class="kw">UNIQUE NOT NULL</span>
+    <span class="cm">-- 앱 버그도 여기서 차단</span>
+);</pre>
+        </div>
+        <div class="callout correct">
+          <div class="callout-label">개선 포인트</div>
+          세 레이어가 서로 다른 목적으로 검증한다. 프론트는 UX를 위해, 앱은 보안을 위해, DB는 무결성을 위해.
+          중복이 아니라 <strong>각자 다른 위협을 막는 것</strong>이다.
+        </div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-label">흔한 오해</div>
+      "앱에서도 체크하고 DB에서도 체크하면 중복이 아닌가?" — 아니다.
+      앱 검증은 비즈니스 규칙(빠른 피드백)을 위한 것이고, DB 제약은 <em>앱 자체에 버그가 있을 때도</em> 데이터를 지키는 최후의 보루다.
+      두 레이어의 검증은 서로 다른 적을 막고 있다.
+    </div>
+  </div>
+
+  <!-- CASE 3: 권한 필터링 -->
+  <div class="case-panel" id="panel-c3">
+    <div style="margin-bottom:20px;">
+      <div style="font-size:18px; font-weight:700; color:var(--navy); margin-bottom:6px;">사례 ③ 권한 필터링 — "이 사용자가 볼 수 있는 데이터만 보여줘"</div>
+      <div style="font-size:14px; color:var(--text-muted);">Row-level 보안: 부서장은 자기 부서 데이터만, 지역 매니저는 자기 지역 데이터만 볼 수 있어야 한다. 어디서 필터링하느냐가 보안과 성능을 동시에 결정한다.</div>
+    </div>
+
+    <div class="code-compare">
+      <div>
+        <div class="verdict bad">❌ 앱 레이어에서 필터링</div>
+        <div class="code-wrap">
+          <div class="code-label">앱 서버 — 취약한 방식</div>
+          <pre><span class="cm"># 전체 데이터를 먼저 가져와서</span>
+<span class="cm"># 앱에서 권한에 따라 필터</span>
+all_orders = db.execute(
+    <span class="st">"SELECT * FROM orders"</span>
+)
+
+<span class="kw">def</span> <span class="fn">filter_by_user</span>(user, orders):
+    <span class="kw">return</span> [
+        o <span class="kw">for</span> o <span class="kw">in</span> orders
+        <span class="kw">if</span> o.dept_id == user.dept_id
+    ]
+
+result = <span class="fn">filter_by_user</span>(
+    current_user, all_orders
+)
+<span class="cm"># 문제 1: 전체 데이터 전송 후 필터</span>
+<span class="cm"># 문제 2: 새 API 엔드포인트 추가 시</span>
+<span class="cm">#         필터 적용을 빠뜨릴 수 있음</span></pre>
+        </div>
+        <div class="callout wrong">
+          <div class="callout-label">문제점</div>
+          전체 데이터를 앱으로 가져온 뒤 걸러낸다 — 비효율적이다.
+          더 심각한 문제는 새 API 엔드포인트를 추가할 때 필터 적용을 빠뜨리면 <strong>권한 없는 데이터가 노출된다</strong>.
+          보안 로직이 앱 코드 여러 곳에 분산되어 있어 누락이 생기기 쉽다.
+        </div>
+      </div>
+      <div>
+        <div class="verdict good">✅ DB 레이어에서 필터링</div>
+        <div class="code-wrap">
+          <div class="code-label">SQL Row-Level Security — 안전한 방식</div>
+          <pre><span class="cm">-- DB에 Row-Level Security 설정</span>
+<span class="cm">-- (PostgreSQL 예시)</span>
+<span class="kw">ALTER TABLE</span> orders
+    <span class="kw">ENABLE ROW LEVEL SECURITY</span>;
+
+<span class="kw">CREATE POLICY</span> dept_isolation
+    <span class="kw">ON</span> orders
+    <span class="kw">USING</span> (
+        dept_id = <span class="fn">current_setting</span>(
+            <span class="st">'app.current_dept'</span>
+        )::<span class="kw">INT</span>
+    );
+
+<span class="cm">-- 이제 어떤 쿼리를 써도</span>
+<span class="cm">-- 자동으로 부서 필터 적용됨</span>
+<span class="cm">-- 새 API가 추가되어도 안전</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> orders;
+<span class="cm">-- → 자동으로 내 부서 것만 반환</span></pre>
+        </div>
+        <div class="callout correct">
+          <div class="callout-label">개선 포인트</div>
+          권한 필터를 DB에 내장하면 <strong>어떤 쿼리, 어떤 API 경로로 접근해도</strong> 항상 적용된다.
+          앱 개발자가 필터 적용을 "기억"해야 하는 부담이 사라진다.
+          보안이 인프라 레벨에서 강제된다.
+        </div>
+      </div>
+    </div>
+
+    <div class="callout navy">
+      <div class="callout-label">판단 근거 적용</div>
+      <strong>재사용성 + 감사 추적 기준 → DB.</strong>
+      권한 규칙은 웹, API, 배치, 리포트 등 모든 접근 경로에 일관되게 적용되어야 한다.
+      앱 레이어에 두면 경로가 늘어날 때마다 적용을 확인해야 하는 부담이 생긴다.
+      DB 레이어에 내장하면 한 번 설정으로 모든 경로가 보호된다.
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════
+       PART 4. 레이어 선택 요약 & 자가 점검
+  ═══════════════════════════════════════ -->
+  <div class="section-title">레이어 선택 판단 요약</div>
+  <div class="section-subtitle">요구사항을 받았을 때 이 흐름으로 레이어를 결정하라</div>
+
+  <div class="card">
+    <div class="card-title">Where 결정 플로우차트</div>
+    <div style="font-size:14px; line-height:2; color:var(--text-muted);">
+
+      <div style="display:flex; align-items:flex-start; gap:12px; margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid var(--border);">
+        <div style="background:var(--navy); color:white; font-size:12px; font-weight:700; padding:4px 10px; border-radius:4px; white-space:nowrap; margin-top:3px; font-family:'JetBrains Mono',monospace;">Q1</div>
+        <div>
+          <strong style="color:var(--text);">사용자 인터랙션에 즉각 반응해야 하나?</strong><br>
+          <span style="color:var(--correct); font-weight:600;">YES →</span> 프론트에서 처리 (단, 최종 검증은 서버에서 반드시 한 번 더)<br>
+          <span style="color:var(--text-muted);">NO  →</span> Q2로
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:flex-start; gap:12px; margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid var(--border);">
+        <div style="background:var(--navy); color:white; font-size:12px; font-weight:700; padding:4px 10px; border-radius:4px; white-space:nowrap; margin-top:3px; font-family:'JetBrains Mono',monospace;">Q2</div>
+        <div>
+          <strong style="color:var(--text);">처리할 데이터가 수십만 행 이상인가?</strong><br>
+          <span style="color:var(--correct); font-weight:600;">YES →</span> DB에서 처리 (집계, 필터, 조인을 DB에서 완결)<br>
+          <span style="color:var(--text-muted);">NO  →</span> Q3로
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:flex-start; gap:12px; margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid var(--border);">
+        <div style="background:var(--navy); color:white; font-size:12px; font-weight:700; padding:4px 10px; border-radius:4px; white-space:nowrap; margin-top:3px; font-family:'JetBrains Mono',monospace;">Q3</div>
+        <div>
+          <strong style="color:var(--text);">여러 채널(웹/앱/API/배치)에서 공통으로 사용하나?</strong><br>
+          <span style="color:var(--correct); font-weight:600;">YES →</span> 앱 서비스 레이어에 캡슐화 (한 곳에서 관리)<br>
+          <span style="color:var(--text-muted);">NO  →</span> Q4로
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:flex-start; gap:12px; margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid var(--border);">
+        <div style="background:var(--navy); color:white; font-size:12px; font-weight:700; padding:4px 10px; border-radius:4px; white-space:nowrap; margin-top:3px; font-family:'JetBrains Mono',monospace;">Q4</div>
+        <div>
+          <strong style="color:var(--text);">감사 추적이나 무결성 보장이 필요한가?</strong><br>
+          <span style="color:var(--correct); font-weight:600;">YES →</span> DB 레이어에서 제약·트리거·감사 테이블로 처리<br>
+          <span style="color:var(--text-muted);">NO  →</span> 앱 레이어에서 처리 (비즈니스 로직 오케스트레이션)
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:flex-start; gap:12px;">
+        <div style="background:var(--navy); color:white; font-size:12px; font-weight:700; padding:4px 10px; border-radius:4px; white-space:nowrap; margin-top:3px; font-family:'JetBrains Mono',monospace;">⚠</div>
+        <div>
+          <strong style="color:var(--warn);">보안 관련 판단은 절대 프론트에만 두지 말 것.</strong><br>
+          클라이언트 코드는 누구나 수정·우회할 수 있다.
+          권한 검증, 데이터 접근 제어, 중요 비즈니스 규칙은 반드시 서버(앱 또는 DB) 레이어에서 강제한다.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="callout navy">
+    <div class="callout-label">S2 핵심 요약</div>
+    레이어 선택에 정답은 없지만 <strong>판단 기준</strong>은 있다.
+    볼륨이 크면 DB, 재사용이 필요하면 앱 서비스, 즉각 반응이 필요하면 프론트 — 그리고 보안은 항상 서버에서 한 번 더.
+    레이어를 넘나드는 설계의 대부분은 이 네 가지 기준 중 하나를 무시했을 때 발생한다.
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <span>Logic Design Series &nbsp;·&nbsp; S2. Where — 처리 레이어 선택 전략</span>
+  <div class="footer-nav">
+    <a href="logic_design_s1_intro.html" class="footer-link prev">← S1. 설계 감각</a>
+    <a href="logic_design_s3_how.html" class="footer-link">다음: S3. How — 순차 vs. 일괄 처리 →</a>
+  </div>
+</footer>
+
+<script>
+  function showCase(id) {
+    document.querySelectorAll('.case-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.case-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+    event.target.classList.add('active');
+  }
+</script>
+
+</body>
+</html>

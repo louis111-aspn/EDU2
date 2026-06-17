@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>로직 설계 감각 | S1. 설계 감각이란 무엇인가</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #003366;
+    --navy-light: #e8eef5;
+    --navy-mid: #ccd9e8;
+    --text: #1a1a2e;
+    --text-muted: #5a6a80;
+    --bg: #f0f3f8;
+    --white: #ffffff;
+    --border: #d0d8e4;
+    --warn: #b85c00;
+    --warn-bg: #fff4e8;
+    --correct: #1a6b3c;
+    --correct-bg: #eaf5ee;
+    --wrong: #9b1c1c;
+    --wrong-bg: #fdf0f0;
+    --code-bg: #1e2432;
+    --gap: 20px;
+    --radius: 6px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--text);
+    background: var(--bg);
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+
+  /* ── SERIES NAV ── */
+  .series-nav {
+    background: var(--navy);
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  .series-nav .brand {
+    font-family: 'DM Serif Display', serif;
+    color: rgba(255,255,255,0.5);
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    padding: 14px 20px 14px 0;
+    border-right: 1px solid rgba(255,255,255,0.15);
+    margin-right: 16px;
+    flex-shrink: 0;
+  }
+  .series-nav a {
+    color: rgba(255,255,255,0.55);
+    text-decoration: none;
+    font-size: 13px;
+    padding: 14px 14px;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .series-nav a:hover { color: rgba(255,255,255,0.9); }
+  .series-nav a.active {
+    color: #fff;
+    border-bottom-color: #fff;
+    font-weight: 700;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--navy);
+    color: white;
+    padding: 64px 40px 56px;
+  }
+  .hero-eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 16px;
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+  }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 42px;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    max-width: 720px;
+  }
+  .hero-sub {
+    font-size: 16px;
+    color: rgba(255,255,255,0.7);
+    max-width: 640px;
+    line-height: 1.8;
+    margin-bottom: 32px;
+  }
+  .hero-meta {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .hero-meta-item {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .hero-meta-item strong { color: rgba(255,255,255,0.85); }
+
+  /* ── LAYOUT ── */
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 48px 40px;
+  }
+
+  /* ── SECTION TITLES ── */
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 30px;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+  .section-subtitle {
+    font-size: 16px;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--navy);
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    margin-bottom: var(--gap);
+  }
+  .card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 12px;
+  }
+
+  /* ── CALLOUTS ── */
+  .callout {
+    border-radius: var(--radius);
+    padding: 18px 24px;
+    margin-bottom: var(--gap);
+    border-left: 4px solid;
+  }
+  .callout.navy { background: var(--navy-light); border-color: var(--navy); }
+  .callout.warn { background: var(--warn-bg); border-color: var(--warn); }
+  .callout.correct { background: var(--correct-bg); border-color: var(--correct); }
+  .callout.wrong { background: var(--wrong-bg); border-color: var(--wrong); }
+  .callout-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+  }
+  .callout.navy .callout-label { color: var(--navy); }
+  .callout.warn .callout-label { color: var(--warn); }
+  .callout.correct .callout-label { color: var(--correct); }
+  .callout.wrong .callout-label { color: var(--wrong); }
+
+  /* ── 3-AXIS DIAGRAM ── */
+  .axis-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--gap);
+    margin-bottom: var(--gap);
+  }
+  .axis-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    text-align: center;
+  }
+  .axis-label {
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .axis-question {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    color: var(--navy);
+    margin-bottom: 12px;
+  }
+  .axis-desc {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+  .axis-examples {
+    margin-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+  }
+  .tag {
+    background: var(--navy-light);
+    color: var(--navy);
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  /* ── COMPARISON TABLE ── */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: var(--gap);
+    font-size: 14px;
+  }
+  .compare-table th {
+    background: var(--navy);
+    color: white;
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 500;
+  }
+  .compare-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .compare-table tr:nth-child(even) td { background: #f8fafc; }
+  .compare-table .bad { color: var(--wrong); font-weight: 500; }
+  .compare-table .good { color: var(--correct); font-weight: 500; }
+
+  /* ── CODE BLOCK ── */
+  .code-wrap {
+    background: var(--code-bg);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: var(--gap);
+    overflow-x: auto;
+  }
+  .code-label {
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 10px;
+  }
+  pre {
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #e2e8f0;
+    white-space: pre;
+  }
+  .kw { color: #7dd3fc; }   /* keyword */
+  .cm { color: #64748b; font-style: italic; } /* comment */
+  .st { color: #a5f3a0; }   /* string */
+  .nm { color: #fbbf24; }   /* number/name */
+  .fn { color: #c4b5fd; }   /* function */
+
+  /* ── ANTI-PATTERN CARDS ── */
+  .anti-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--gap);
+    margin-bottom: var(--gap);
+  }
+  .anti-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .anti-header {
+    background: var(--wrong-bg);
+    border-bottom: 1px solid #f0c0c0;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .anti-number {
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+    font-size: 11px;
+    color: var(--wrong);
+    letter-spacing: 0.1em;
+    font-weight: 700;
+  }
+  .anti-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--wrong);
+  }
+  .anti-body {
+    padding: 16px 20px;
+  }
+  .anti-desc {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    line-height: 1.65;
+  }
+  .anti-signal {
+    font-size: 13px;
+    color: var(--text);
+    background: var(--bg);
+    border-radius: 4px;
+    padding: 8px 12px;
+  }
+  .anti-signal-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+  }
+
+  /* ── TOGGLE / ACCORDION ── */
+  .accordion {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .accordion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    cursor: pointer;
+    user-select: none;
+    font-weight: 500;
+    font-size: 15px;
+  }
+  .accordion-header:hover { background: var(--bg); }
+  .accordion-icon {
+    font-size: 18px;
+    color: var(--navy);
+    transition: transform 0.25s;
+    font-style: normal;
+  }
+  .accordion.open .accordion-icon { transform: rotate(45deg); }
+  .accordion-body {
+    display: none;
+    padding: 0 24px 20px;
+    border-top: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.75;
+  }
+  .accordion.open .accordion-body { display: block; }
+
+  /* ── SMELL SECTION ── */
+  .smell-intro {
+    font-size: 15px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    line-height: 1.75;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+
+  /* ── FLOW DIAGRAM ── */
+  .flow-diagram {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    margin-bottom: var(--gap);
+    text-align: center;
+  }
+  .flow-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+  }
+  .flow-box {
+    background: var(--navy-light);
+    border: 1px solid var(--navy-mid);
+    border-radius: 4px;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--navy);
+    white-space: nowrap;
+  }
+  .flow-box.center-box {
+    background: var(--navy);
+    color: white;
+    padding: 14px 24px;
+    font-size: 15px;
+  }
+  .flow-arrow {
+    color: var(--navy);
+    font-size: 20px;
+    padding: 0 10px;
+    opacity: 0.5;
+  }
+  .flow-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 8px;
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+  }
+
+  /* ── TWO-COL CODE COMPARE ── */
+  .code-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--gap);
+    margin-bottom: var(--gap);
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 24px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-muted);
+    background: var(--white);
+  }
+  .footer-next {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--navy);
+    font-weight: 500;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  .footer-next:hover { text-decoration: underline; }
+
+  @media (max-width: 720px) {
+    .hero h1 { font-size: 28px; }
+    .axis-grid { grid-template-columns: 1fr; }
+    .anti-grid { grid-template-columns: 1fr; }
+    .code-compare { grid-template-columns: 1fr; }
+    .container { padding: 32px 20px; }
+    .hero { padding: 40px 20px; }
+    .series-nav { padding: 0 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SERIES NAV -->
+<nav class="series-nav">
+  <div class="brand">로직 설계 감각</div>
+  <a href="logic_design_s1_intro.html" class="active">S1. 설계 감각</a>
+  <a href="logic_design_s2_where.html">S2. Where</a>
+  <a href="logic_design_s3_how.html">S3. How</a>
+  <a href="logic_design_s4_timing.html">S4. Timing</a>
+  <a href="logic_design_s5_patterns.html">S5. 패턴 카탈로그</a>
+  <a href="logic_design_s6_quiz.html">S6. 자가 진단</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">Section 01 / 6 &nbsp;·&nbsp; Logic Design Series</div>
+  <h1>로직 설계 감각이란 무엇인가</h1>
+  <p class="hero-sub">
+    "돌아가는 코드"와 "잘 설계된 로직"은 다르다. 설계 감각은 특정 언어나 프레임워크의 숙련도가 아니라,
+    <strong>어디서 · 언제 · 어떻게</strong> 처리할지를 판단하는 직관이다.
+    이 섹션은 그 직관을 훈련하기 위한 프레임과, 나쁜 설계가 풍기는 냄새를 다룬다.
+  </p>
+  <div class="hero-meta">
+    <div class="hero-meta-item">📍 <strong>대상</strong> 구현 경험 보유 컨설턴트</div>
+    <div class="hero-meta-item">⏱ <strong>예상 학습 시간</strong> 25–30분</div>
+    <div class="hero-meta-item">🔗 <strong>선수 지식</strong> 없음 (시리즈 첫 모듈)</div>
+  </div>
+</section>
+
+<div class="container">
+
+  <!-- ───────────────────────────────────────
+       PART 1. 두 코드의 차이
+  ─────────────────────────────────────────── -->
+  <div class="section-title">돌아가는 코드 vs. 잘 설계된 로직</div>
+  <div class="section-subtitle">같은 요구사항, 전혀 다른 설계 품질</div>
+
+  <p style="margin-bottom:20px; color: var(--text-muted);">
+    아래 두 코드는 "주문 상태에 따라 할인율을 반환한다"는 동일한 요구사항을 구현한다.
+    실행 결과는 동일하지만, 3개월 뒤 요구사항이 바뀌었을 때 어떤 일이 벌어지는지 보자.
+  </p>
+
+  <div class="code-compare">
+    <div>
+      <div class="code-wrap">
+        <div class="code-label">❌ 돌아가는 코드</div>
+        <pre><span class="kw">def</span> <span class="fn">get_discount</span>(status):
+    <span class="kw">if</span> status == <span class="st">"VIP"</span>:
+        <span class="kw">return</span> <span class="nm">0.20</span>
+    <span class="kw">elif</span> status == <span class="st">"GOLD"</span>:
+        <span class="kw">return</span> <span class="nm">0.15</span>
+    <span class="kw">elif</span> status == <span class="st">"SILVER"</span>:
+        <span class="kw">return</span> <span class="nm">0.10</span>
+    <span class="kw">elif</span> status == <span class="st">"NEW"</span>:
+        <span class="kw">return</span> <span class="nm">0.05</span>
+    <span class="kw">else</span>:
+        <span class="kw">return</span> <span class="nm">0.00</span>
+
+<span class="cm"># 6개월 뒤: PLATINUM 등급 추가</span>
+<span class="cm"># → 함수 내부를 직접 수정해야 함</span>
+<span class="cm"># → 어디에 몇 개가 있는지 찾아야 함</span></pre>
+      </div>
+      <div class="callout wrong">
+        <div class="callout-label">문제점</div>
+        새 등급이 생길 때마다 코드를 수정해야 한다. 같은 패턴이 3곳에 있으면 3곳을 모두 찾아야 한다.
+        비즈니스 규칙이 코드에 하드코딩되어 있다.
+      </div>
+    </div>
+    <div>
+      <div class="code-wrap">
+        <div class="code-label">✅ 잘 설계된 로직</div>
+        <pre><span class="cm"># 규칙을 데이터(테이블)로 분리</span>
+DISCOUNT_RULES = {
+    <span class="st">"VIP"</span>:    <span class="nm">0.20</span>,
+    <span class="st">"GOLD"</span>:   <span class="nm">0.15</span>,
+    <span class="st">"SILVER"</span>: <span class="nm">0.10</span>,
+    <span class="st">"NEW"</span>:    <span class="nm">0.05</span>,
+}
+
+<span class="kw">def</span> <span class="fn">get_discount</span>(status):
+    <span class="kw">return</span> DISCOUNT_RULES.get(
+        status, <span class="nm">0.00</span>
+    )
+
+<span class="cm"># 6개월 뒤: PLATINUM 추가</span>
+<span class="cm"># → 테이블에 한 줄만 추가</span>
+<span class="cm"># → 함수 로직은 건드리지 않음</span></pre>
+      </div>
+      <div class="callout correct">
+        <div class="callout-label">개선 포인트</div>
+        비즈니스 규칙(할인율)과 처리 로직(get_discount)이 분리됐다.
+        규칙이 바뀌어도 로직은 변하지 않는다. 이것이 <strong>Lookup Table 치환 패턴</strong>이다 (Section 5에서 심화).
+      </div>
+    </div>
+  </div>
+
+  <div class="callout navy">
+    <div class="callout-label">핵심 관점</div>
+    설계 품질의 진짜 척도는 <strong>"지금 돌아가는가"가 아니라 "요구사항이 바뀌었을 때 얼마나 적은 곳을 수정해도 되는가"</strong>다.
+    좋은 설계는 변경의 파급 범위를 최소화한다.
+  </div>
+
+  <hr class="divider">
+
+  <!-- ───────────────────────────────────────
+       PART 2. 3축 판단 프레임
+  ─────────────────────────────────────────── -->
+  <div class="section-title">설계 판단의 3축 프레임</div>
+  <div class="section-subtitle">모든 로직 설계 결정은 세 가지 질문으로 분해된다</div>
+
+  <div class="axis-grid">
+    <div class="axis-card">
+      <div class="axis-label">Axis 1</div>
+      <div class="axis-question">Where?</div>
+      <div style="font-size:14px; font-weight:700; color:var(--navy); margin-bottom:8px;">어느 레이어에서 처리할 것인가</div>
+      <div class="axis-desc">DB인가, 앱(미들웨어)인가, 프론트엔드인가. 같은 계산도 어디서 실행하느냐에 따라 성능, 보안, 재사용성이 완전히 달라진다.</div>
+      <div class="axis-examples">
+        <span class="tag">DB 집계</span>
+        <span class="tag">앱 검증</span>
+        <span class="tag">프론트 렌더</span>
+      </div>
+    </div>
+    <div class="axis-card">
+      <div class="axis-label">Axis 2</div>
+      <div class="axis-question">When?</div>
+      <div style="font-size:14px; font-weight:700; color:var(--navy); margin-bottom:8px;">언제 계산할 것인가</div>
+      <div class="axis-desc">미리 구워둘 것인가(Pre-compute), 요청이 올 때마다 즉석에서 계산할 것인가(On-demand). 타이밍이 시스템 전체의 부하 분산을 결정한다.</div>
+      <div class="axis-examples">
+        <span class="tag">배치 Pre-compute</span>
+        <span class="tag">실시간 On-demand</span>
+        <span class="tag">캐싱</span>
+      </div>
+    </div>
+    <div class="axis-card">
+      <div class="axis-label">Axis 3</div>
+      <div class="axis-question">How?</div>
+      <div style="font-size:14px; font-weight:700; color:var(--navy); margin-bottom:8px;">어떤 방식으로 처리할 것인가</div>
+      <div class="axis-desc">행 하나씩 순차 처리(Sequential)할 것인가, 조건을 속성으로 보고 집합 단위로 일괄 처리(Set-based)할 것인가. 처리 방식이 코드 복잡도를 결정한다.</div>
+      <div class="axis-examples">
+        <span class="tag">순차 IF 분기</span>
+        <span class="tag">Set-based</span>
+        <span class="tag">파이프라인</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-diagram">
+    <div style="font-size:13px; color:var(--text-muted); margin-bottom:20px; font-weight:500; letter-spacing:0.05em;">요구사항이 들어왔을 때 3축을 순서대로 질문하는 흐름</div>
+    <div class="flow-row">
+      <div>
+        <div class="flow-box">요구사항 접수</div>
+        <div class="flow-label">비즈니스 로직 확인</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div>
+        <div class="flow-box">Where<br><span style="font-size:12px; font-weight:400;">레이어 결정</span></div>
+        <div class="flow-label">S2에서 심화</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div>
+        <div class="flow-box">How<br><span style="font-size:12px; font-weight:400;">처리 방식 결정</span></div>
+        <div class="flow-label">S3에서 심화</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div>
+        <div class="flow-box">When<br><span style="font-size:12px; font-weight:400;">타이밍 결정</span></div>
+        <div class="flow-label">S4에서 심화</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div>
+        <div class="flow-box center-box">구현</div>
+        <div class="flow-label">패턴 적용 (S5)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <div class="callout-label">주의</div>
+    현실에서는 세 축이 독립적이지 않다. Where를 DB로 결정하면 How 선택지가 Set-based로 자연스럽게 좁혀진다.
+    세 축을 <strong>동시에</strong> 고려하는 습관이 설계 감각의 핵심이다.
+  </div>
+
+  <hr class="divider">
+
+  <!-- ───────────────────────────────────────
+       PART 3. Anti-Patterns
+  ─────────────────────────────────────────── -->
+  <div class="section-title">나쁜 설계의 냄새</div>
+  <div class="section-subtitle">Anti-pattern 5가지 — 냄새를 맡는 것부터가 설계 감각의 시작</div>
+
+  <p class="smell-intro">
+    코드 리뷰에서, 또는 자신이 짠 코드를 한 달 뒤 다시 볼 때 "이거 왜 이렇게 짰지?" 싶은 순간이 있다.
+    그 순간들에는 패턴이 있다. 아래 다섯 가지는 가장 흔히 나타나는 나쁜 설계의 냄새다.
+    각 항목을 눌러 냄새의 원인과 처방을 확인하라.
+  </p>
+
+  <!-- Anti-pattern 1 -->
+  <div class="accordion" id="ap1">
+    <div class="accordion-header" onclick="toggleAccordion('ap1')">
+      <span>
+        <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--wrong); margin-right:12px;">AP-01</span>
+        <strong>중복 분기 (Duplicate Branching)</strong>
+        <span style="font-size:13px; color:var(--text-muted); margin-left:12px;">같은 조건 판단이 여러 곳에 흩어져 있다</span>
+      </span>
+      <i class="accordion-icon">+</i>
+    </div>
+    <div class="accordion-body">
+      <p style="margin-bottom:12px;">
+        <strong>냄새:</strong> "VIP이면 할인" 로직이 주문 모듈, 장바구니 모듈, 알림 모듈에 각각 IF 문으로 존재한다.
+        어느 날 VIP 기준이 바뀌면 세 군데를 모두 찾아서 고쳐야 한다. 그리고 반드시 하나는 빠뜨린다.
+      </p>
+      <p style="margin-bottom:12px;">
+        <strong>원인:</strong> 비즈니스 규칙을 코드에 직접 넣고, 그 코드를 복사해서 씀.
+      </p>
+      <p>
+        <strong>처방:</strong> 규칙을 <em>한 곳</em>에 정의하고 나머지는 그것을 참조한다.
+        함수 하나, 테이블 하나, 또는 설정 파일 하나로 모든 판단의 단일 진실 공급원(Single Source of Truth)을 만든다.
+      </p>
+    </div>
+  </div>
+
+  <!-- Anti-pattern 2 -->
+  <div class="accordion" id="ap2">
+    <div class="accordion-header" onclick="toggleAccordion('ap2')">
+      <span>
+        <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--wrong); margin-right:12px;">AP-02</span>
+        <strong>순서 의존 (Order Dependency)</strong>
+        <span style="font-size:13px; color:var(--text-muted); margin-left:12px;">A를 먼저 실행해야만 B가 올바르게 동작한다</span>
+      </span>
+      <i class="accordion-icon">+</i>
+    </div>
+    <div class="accordion-body">
+      <p style="margin-bottom:12px;">
+        <strong>냄새:</strong> 배치 잡이 특정 순서로 실행되어야 한다. 누군가 스케줄러 순서를 바꾸면 결과가 틀어진다.
+        새 팀원은 이 순서를 알 방법이 없다. 주석으로만 존재한다.
+      </p>
+      <p style="margin-bottom:12px;">
+        <strong>원인:</strong> 중간 상태를 공유 테이블에 저장하고, 다음 단계가 그 상태를 전제로 설계됨.
+        또는 순차 배부처럼 앞 단계 결과가 뒤 단계의 입력이 되는 구조를 제거하지 않음.
+      </p>
+      <p>
+        <strong>처방:</strong> 각 단계를 독립적으로 만든다. 입력이 같으면 항상 같은 출력이 나와야 한다(멱등성).
+        순서 의존이 불가피하면 의존 관계를 코드 구조(DAG 등)로 명시한다.
+      </p>
+    </div>
+  </div>
+
+  <!-- Anti-pattern 3 -->
+  <div class="accordion" id="ap3">
+    <div class="accordion-header" onclick="toggleAccordion('ap3')">
+      <span>
+        <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--wrong); margin-right:12px;">AP-03</span>
+        <strong>매직 넘버 / 매직 스트링 (Magic Literals)</strong>
+        <span style="font-size:13px; color:var(--text-muted); margin-left:12px;">의미를 알 수 없는 숫자와 문자열이 코드에 직접 박혀 있다</span>
+      </span>
+      <i class="accordion-icon">+</i>
+    </div>
+    <div class="accordion-body">
+      <p style="margin-bottom:12px;">
+        <strong>냄새:</strong> <code style="font-family:monospace; background:var(--bg); padding:2px 6px; border-radius:3px;">if amount &gt; 500000</code> — 왜 50만인가? 누가 정했나? 바뀌면 어디를 고쳐야 하나?
+        <code style="font-family:monospace; background:var(--bg); padding:2px 6px; border-radius:3px;">status == "A3"</code> — A3가 무슨 의미인지 코드만 보면 알 수 없다.
+      </p>
+      <p style="margin-bottom:12px;">
+        <strong>원인:</strong> 비즈니스 의미를 가진 값을 이름 없이 코드에 직접 씀.
+      </p>
+      <p>
+        <strong>처방:</strong> 의미 있는 상수명이나 Enum으로 추출한다.
+        <code style="font-family:monospace; background:var(--bg); padding:2px 6px; border-radius:3px;">BULK_ORDER_THRESHOLD = 500000</code>,
+        <code style="font-family:monospace; background:var(--bg); padding:2px 6px; border-radius:3px;">Status.APPROVED = "A3"</code>.
+        이름이 문서가 된다.
+      </p>
+    </div>
+  </div>
+
+  <!-- Anti-pattern 4 -->
+  <div class="accordion" id="ap4">
+    <div class="accordion-header" onclick="toggleAccordion('ap4')">
+      <span>
+        <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--wrong); margin-right:12px;">AP-04</span>
+        <strong>레이어 월경 (Layer Crossing)</strong>
+        <span style="font-size:13px; color:var(--text-muted); margin-left:12px;">프론트엔드가 DB 쿼리를 직접 조립하거나, DB가 UI 렌더링 로직을 갖는다</span>
+      </span>
+      <i class="accordion-icon">+</i>
+    </div>
+    <div class="accordion-body">
+      <p style="margin-bottom:12px;">
+        <strong>냄새:</strong> 화면단 JavaScript에서 여러 테이블을 직접 조인하는 쿼리를 문자열로 만들어 서버에 보낸다.
+        또는 SQL Stored Procedure 안에 이메일 발송 로직이 들어가 있다.
+      </p>
+      <p style="margin-bottom:12px;">
+        <strong>원인:</strong> 빠른 개발을 위해 "일단 동작하게" 만들다 보면 레이어 경계가 무너진다.
+        각 레이어가 무엇을 책임지는지 명확한 기준이 없을 때 발생한다.
+      </p>
+      <p>
+        <strong>처방:</strong> 각 레이어의 책임을 명확히 정의한다. DB는 데이터 저장과 집계,
+        앱은 비즈니스 로직과 오케스트레이션, 프론트는 표현과 인터랙션.
+        경계를 넘어야 할 이유가 생기면 그것이 설계를 재검토하라는 신호다.
+      </p>
+    </div>
+  </div>
+
+  <!-- Anti-pattern 5 -->
+  <div class="accordion" id="ap5">
+    <div class="accordion-header" onclick="toggleAccordion('ap5')">
+      <span>
+        <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--wrong); margin-right:12px;">AP-05</span>
+        <strong>암묵적 상태 (Implicit State)</strong>
+        <span style="font-size:13px; color:var(--text-muted); margin-left:12px;">어딘가에 "전제 조건"이 있는데 코드 어디에도 명시되지 않았다</span>
+      </span>
+      <i class="accordion-icon">+</i>
+    </div>
+    <div class="accordion-body">
+      <p style="margin-bottom:12px;">
+        <strong>냄새:</strong> 함수 A가 전역 변수 <code style="font-family:monospace; background:var(--bg); padding:2px 6px; border-radius:3px;">current_user</code>를 직접 읽는다.
+        이 함수를 다른 맥락에서 호출하면 누구의 <code style="font-family:monospace; background:var(--bg); padding:2px 6px; border-radius:3px;">current_user</code>인지 알 수 없다.
+        배치 환경에서는 아예 없는 변수다.
+      </p>
+      <p style="margin-bottom:12px;">
+        <strong>원인:</strong> 함수가 자신의 입력 이외의 것에 의존한다(Side Effect, Hidden Dependency).
+        함수 시그니처를 보는 것만으로는 무엇이 필요한지 알 수 없다.
+      </p>
+      <p>
+        <strong>처방:</strong> 함수에 필요한 모든 것은 <em>인자로</em> 전달한다.
+        전역 상태 대신 명시적 파라미터. 함수 시그니처 자체가 계약서가 되어야 한다.
+      </p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ───────────────────────────────────────
+       PART 4. 설계 감각 자가 체크
+  ─────────────────────────────────────────── -->
+  <div class="section-title">지금 나의 설계 감각은?</div>
+  <div class="section-subtitle">코드를 짜기 전, 이 세 가지 질문을 습관처럼 던지는가</div>
+
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th style="width:5%">#</th>
+        <th style="width:35%">질문</th>
+        <th style="width:30%">던지지 않으면</th>
+        <th style="width:30%">던지는 습관이 생기면</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span style="font-family:monospace; color:var(--navy); font-weight:700;">W</span></td>
+        <td><strong>이 로직, 어느 레이어에서 처리하는 게 맞나?</strong></td>
+        <td class="bad">프론트가 DB 역할을 하거나, DB가 앱 로직을 갖게 됨</td>
+        <td class="good">레이어별 책임이 명확해지고 성능 문제가 사전에 예방됨</td>
+      </tr>
+      <tr>
+        <td><span style="font-family:monospace; color:var(--navy); font-weight:700;">H</span></td>
+        <td><strong>이 조건들, 순서대로 체크해야 하나 아니면 한 번에 처리할 수 있나?</strong></td>
+        <td class="bad">불필요한 루프와 IF 체인이 쌓이고 순서 의존성이 생김</td>
+        <td class="good">Set-based 접근으로 코드가 단순해지고 성능이 향상됨</td>
+      </tr>
+      <tr>
+        <td><span style="font-family:monospace; color:var(--navy); font-weight:700;">T</span></td>
+        <td><strong>이 계산, 미리 해두는 게 나은가 매번 하는 게 나은가?</strong></td>
+        <td class="bad">화면이 열릴 때마다 무거운 집계 쿼리가 실행됨</td>
+        <td class="good">조회 성능과 계산 비용의 균형을 의식적으로 설계함</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout navy">
+    <div class="callout-label">이 시리즈의 목표</div>
+    위 세 질문을 코드를 짜기 <em>전에</em> 자동으로 던지는 것이 이 시리즈의 목표다.
+    S2(Where), S3(How), S4(Timing)에서 각 축을 실제 사례와 함께 훈련하고,
+    S5에서 반복적으로 쓸 수 있는 패턴으로 정리한다.
+    S6에서 자신의 판단을 검증하라.
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <span>Logic Design Series &nbsp;·&nbsp; S1. 설계 감각이란 무엇인가</span>
+  <a href="logic_design_s2_where.html" class="footer-next">다음: S2. Where — 처리 레이어를 어디에 둘 것인가 →</a>
+</footer>
+
+<script>
+  function toggleAccordion(id) {
+    const el = document.getElementById(id);
+    el.classList.toggle('open');
+  }
+</script>
+
+</body>
+</html>
