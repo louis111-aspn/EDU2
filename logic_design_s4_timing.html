@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>로직 설계 감각 | S4. Timing — Pre-compute vs. On-demand</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #003366;
+    --navy-light: #e8eef5;
+    --navy-mid: #ccd9e8;
+    --text: #1a1a2e;
+    --text-muted: #5a6a80;
+    --bg: #f0f3f8;
+    --white: #ffffff;
+    --border: #d0d8e4;
+    --warn: #b85c00;
+    --warn-bg: #fff4e8;
+    --correct: #1a6b3c;
+    --correct-bg: #eaf5ee;
+    --wrong: #9b1c1c;
+    --wrong-bg: #fdf0f0;
+    --code-bg: #1e2432;
+    --gap: 20px;
+    --radius: 6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--text);
+    background: var(--bg);
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+
+  /* ── SERIES NAV ── */
+  .series-nav {
+    background: var(--navy);
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  .series-nav .brand {
+    font-family: 'DM Serif Display', serif;
+    color: rgba(255,255,255,0.5);
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    padding: 14px 20px 14px 0;
+    border-right: 1px solid rgba(255,255,255,0.15);
+    margin-right: 16px;
+    flex-shrink: 0;
+  }
+  .series-nav a {
+    color: rgba(255,255,255,0.55);
+    text-decoration: none;
+    font-size: 13px;
+    padding: 14px 14px;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .series-nav a:hover { color: rgba(255,255,255,0.9); }
+  .series-nav a.active { color: #fff; border-bottom-color: #fff; font-weight: 700; }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--navy);
+    color: white;
+    padding: 64px 40px 56px;
+  }
+  .hero-eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 16px;
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+  }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 42px;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    max-width: 760px;
+  }
+  .hero-sub {
+    font-size: 16px;
+    color: rgba(255,255,255,0.7);
+    max-width: 640px;
+    line-height: 1.8;
+    margin-bottom: 32px;
+  }
+  .hero-meta { display: flex; gap: 24px; flex-wrap: wrap; }
+  .hero-meta-item {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .hero-meta-item strong { color: rgba(255,255,255,0.85); }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 960px; margin: 0 auto; padding: 48px 40px; }
+
+  /* ── SECTION TITLES ── */
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 30px;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+  .section-subtitle {
+    font-size: 16px;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--navy);
+  }
+
+  /* ── CALLOUTS ── */
+  .callout {
+    border-radius: var(--radius);
+    padding: 18px 24px;
+    margin-bottom: var(--gap);
+    border-left: 4px solid;
+  }
+  .callout.navy    { background: var(--navy-light); border-color: var(--navy); }
+  .callout.warn    { background: var(--warn-bg);    border-color: var(--warn); }
+  .callout.correct { background: var(--correct-bg); border-color: var(--correct); }
+  .callout.wrong   { background: var(--wrong-bg);   border-color: var(--wrong); }
+  .callout-label {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 6px;
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+  }
+  .callout.navy    .callout-label { color: var(--navy); }
+  .callout.warn    .callout-label { color: var(--warn); }
+  .callout.correct .callout-label { color: var(--correct); }
+  .callout.wrong   .callout-label { color: var(--wrong); }
+
+  /* ── CODE ── */
+  .code-wrap {
+    background: var(--code-bg);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: var(--gap);
+    overflow-x: auto;
+  }
+  .code-label {
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: #64748b; margin-bottom: 10px;
+  }
+  pre {
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+    font-size: 13px; line-height: 1.7; color: #e2e8f0; white-space: pre;
+  }
+  .kw { color: #7dd3fc; }
+  .cm { color: #64748b; font-style: italic; }
+  .st { color: #a5f3a0; }
+  .nm { color: #fbbf24; }
+  .fn { color: #c4b5fd; }
+
+  /* ── CONCEPT SPLIT ── */
+  .concept-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: var(--gap);
+  }
+  .concept-col { background: var(--white); padding: 28px 28px; }
+  .concept-col:first-child { border-right: 1px solid var(--border); }
+  .concept-badge {
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; padding: 4px 10px;
+    border-radius: 4px; display: inline-block; margin-bottom: 10px;
+  }
+  .badge-pre  { background: var(--navy-light); color: var(--navy); }
+  .badge-on   { background: var(--correct-bg); color: var(--correct); }
+  .concept-col-title { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 12px; }
+  .concept-col p { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-bottom: 12px; }
+  .concept-pros-cons {
+    font-size: 13px; background: var(--bg);
+    border-radius: 4px; padding: 12px 14px; line-height: 1.8;
+  }
+  .concept-pros-cons-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--text-muted);
+    margin-bottom: 6px;
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+  }
+
+  /* ── TRADEOFF AXIS ── */
+  .tradeoff-wrap {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    margin-bottom: var(--gap);
+  }
+  .tradeoff-title {
+    font-size: 14px; font-weight: 700; color: var(--navy);
+    margin-bottom: 24px; letter-spacing: 0.04em;
+  }
+  .tradeoff-row {
+    display: grid;
+    grid-template-columns: 140px 1fr 140px;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+  .tradeoff-label {
+    font-size: 13px; font-weight: 700;
+    color: var(--text-muted); text-align: center;
+  }
+  .tradeoff-label.left  { text-align: right; color: var(--navy); }
+  .tradeoff-label.right { text-align: left;  color: var(--correct); }
+  .tradeoff-bar-bg {
+    height: 8px;
+    background: var(--bg);
+    border-radius: 4px;
+    position: relative;
+    border: 1px solid var(--border);
+  }
+  .tradeoff-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    position: absolute;
+  }
+  .fill-left  { background: var(--navy);    left: 0; }
+  .fill-right { background: var(--correct); right: 0; }
+  .tradeoff-axis-labels {
+    display: grid;
+    grid-template-columns: 140px 1fr 140px;
+    gap: 16px;
+    margin-bottom: 6px;
+  }
+  .axis-end {
+    font-size: 12px; font-weight: 700;
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .axis-end.left  { text-align: right; color: var(--navy); }
+  .axis-end.right { text-align: left;  color: var(--correct); }
+  .axis-end.center { text-align: center; color: var(--text-muted); font-size: 11px; }
+  .tradeoff-dim { font-size: 13px; color: var(--text); }
+
+  /* ── CASE TABS ── */
+  .case-tabs {
+    display: flex; gap: 0;
+    border-bottom: 2px solid var(--border);
+  }
+  .case-tab {
+    padding: 12px 24px; cursor: pointer;
+    font-size: 14px; font-weight: 500; color: var(--text-muted);
+    border-bottom: 2px solid transparent; margin-bottom: -2px;
+    transition: all 0.2s; white-space: nowrap;
+  }
+  .case-tab:hover { color: var(--navy); }
+  .case-tab.active { color: var(--navy); border-bottom-color: var(--navy); font-weight: 700; }
+  .case-panel {
+    display: none;
+    background: var(--white);
+    border: 1px solid var(--border); border-top: none;
+    border-radius: 0 0 var(--radius) var(--radius);
+    padding: 28px 32px; margin-bottom: var(--gap);
+  }
+  .case-panel.active { display: block; }
+
+  /* ── CODE COMPARE ── */
+  .code-compare {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: var(--gap); margin-bottom: var(--gap);
+  }
+
+  /* ── VERDICT ── */
+  .verdict {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px; border-radius: 20px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 16px;
+  }
+  .verdict.good { background: var(--correct-bg); color: var(--correct); }
+  .verdict.bad  { background: var(--wrong-bg);   color: var(--wrong); }
+  .verdict.mid  { background: var(--warn-bg);    color: var(--warn); }
+
+  /* ── TIMELINE DIAGRAM ── */
+  .timeline {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin-bottom: var(--gap);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .tl-phase {
+    flex: 1;
+    padding: 16px 18px;
+    border-right: 1px solid var(--border);
+    background: var(--white);
+  }
+  .tl-phase:last-child { border-right: none; }
+  .tl-phase-label {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 8px;
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+  }
+  .tl-phase-title { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+  .tl-phase-desc  { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+  .tl-phase.active-phase { background: var(--navy-light); }
+  .tl-phase.cost-phase   { background: var(--warn-bg); }
+
+  /* ── MATRIX TABLE ── */
+  .matrix-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 14px; margin-bottom: var(--gap);
+  }
+  .matrix-table th {
+    background: var(--navy); color: white;
+    padding: 12px 16px; text-align: left; font-weight: 500;
+  }
+  .matrix-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top; line-height: 1.6;
+  }
+  .matrix-table tr:nth-child(even) td { background: #f8fafc; }
+  .rec-pre { color: var(--navy);    font-weight: 700; }
+  .rec-on  { color: var(--correct); font-weight: 700; }
+  .rec-both{ color: var(--warn);    font-weight: 700; }
+
+  /* ── DECISION FLOW ── */
+  .decision-flow {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    margin-bottom: var(--gap);
+  }
+  .dflow-q {
+    display: flex; align-items: flex-start; gap: 12px;
+    margin-bottom: 14px; padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .dflow-q:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .dflow-qnum {
+    background: var(--navy); color: white;
+    font-size: 12px; font-weight: 700;
+    padding: 4px 10px; border-radius: 4px;
+    white-space: nowrap; margin-top: 3px;
+    font-family: 'JetBrains Mono', monospace;
+    flex-shrink: 0;
+  }
+  .dflow-body { font-size: 14px; line-height: 2; color: var(--text-muted); }
+  .dflow-body strong { color: var(--text); }
+  .dflow-yes { color: var(--correct); font-weight: 600; }
+  .dflow-no  { color: var(--text-muted); }
+
+  /* ── CACHE DIAGRAM ── */
+  .cache-flow {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: var(--gap);
+  }
+  .cache-box {
+    background: var(--white);
+    padding: 18px 16px;
+    text-align: center;
+    border-right: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .cache-box:last-child { border-right: none; }
+  .cache-box-icon { font-size: 22px; margin-bottom: 8px; }
+  .cache-box-title { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+  .cache-box-desc  { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+  .cache-box.hit   { background: var(--correct-bg); }
+  .cache-box.miss  { background: var(--warn-bg); }
+  .cache-arrow {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; color: var(--navy-mid);
+    border-right: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  /* ── DIVIDER ── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+  /* ── FOOTER ── */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 24px 40px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 13px; color: var(--text-muted);
+    background: var(--white);
+  }
+  .footer-nav { display: flex; gap: 24px; }
+  .footer-link {
+    display: flex; align-items: center; gap: 6px;
+    color: var(--navy); font-weight: 500;
+    text-decoration: none; font-size: 14px;
+  }
+  .footer-link:hover { text-decoration: underline; }
+  .footer-link.prev { color: var(--text-muted); }
+
+  @media (max-width: 720px) {
+    .hero h1 { font-size: 28px; }
+    .concept-split  { grid-template-columns: 1fr; }
+    .code-compare   { grid-template-columns: 1fr; }
+    .tradeoff-row   { grid-template-columns: 80px 1fr 80px; }
+    .cache-flow     { grid-template-columns: 1fr 1fr; }
+    .container      { padding: 32px 20px; }
+    .hero           { padding: 40px 20px; }
+    .series-nav     { padding: 0 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SERIES NAV -->
+<nav class="series-nav">
+  <div class="brand">로직 설계 감각</div>
+  <a href="logic_design_s1_intro.html">S1. 설계 감각</a>
+  <a href="logic_design_s2_where.html">S2. Where</a>
+  <a href="logic_design_s3_how.html">S3. How</a>
+  <a href="logic_design_s4_timing.html" class="active">S4. Timing</a>
+  <a href="logic_design_s5_patterns.html">S5. 패턴 카탈로그</a>
+  <a href="logic_design_s6_quiz.html">S6. 자가 진단</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">Section 04 / 6 &nbsp;·&nbsp; Logic Design Series</div>
+  <h1>Timing — 언제 계산할 것인가</h1>
+  <p class="hero-sub">
+    로직 설계에서 간과되기 쉬운 세 번째 축은 <strong>타이밍</strong>이다.
+    "미리 구워둘 것인가(Pre-compute), 요청이 올 때마다 계산할 것인가(On-demand)"를 결정하는 것은
+    시스템 전체의 부하 분산과 응답 속도를 좌우한다.
+    정답은 없고, 트레이드오프를 의식적으로 선택하는 것이 설계다.
+  </p>
+  <div class="hero-meta">
+    <div class="hero-meta-item">📍 <strong>핵심 질문</strong> 이 계산, 미리 해두는 게 나은가 매번 하는 게 나은가?</div>
+    <div class="hero-meta-item">⏱ <strong>예상 학습 시간</strong> 30–35분</div>
+    <div class="hero-meta-item">🔗 <strong>선수 모듈</strong> S3. How</div>
+  </div>
+</section>
+
+<div class="container">
+
+  <!-- ═══════════════════════════════════════
+       PART 1. 두 가지 타이밍 전략
+  ═══════════════════════════════════════ -->
+  <div class="section-title">두 가지 타이밍 전략</div>
+  <div class="section-subtitle">계산 비용을 언제 지불할 것인가 — 쓰기 시점과 읽기 시점 사이의 선택</div>
+
+  <div class="concept-split">
+    <div class="concept-col">
+      <span class="concept-badge badge-pre">Pre-compute</span>
+      <div class="concept-col-title">미리 계산해서 저장해 둔다</div>
+      <p>
+        데이터가 생성되거나 변경되는 <strong>쓰기 시점</strong>에 계산을 수행하고 결과를 저장한다.
+        조회 시점에는 이미 계산된 값을 그대로 읽기만 한다.
+        빵을 미리 구워서 진열해 두는 방식이다.
+      </p>
+      <p>
+        <strong>비용 지불 시점:</strong> 데이터가 바뀔 때 (쓰기)
+      </p>
+      <div class="concept-pros-cons">
+        <div class="concept-pros-cons-label">특성</div>
+        조회 속도 빠름 · 조회 부하 낮음<br>
+        데이터 변경 시 재계산 비용 발생<br>
+        결과가 최신이 아닐 수 있음 (허용 가능한 지연)
+      </div>
+    </div>
+    <div class="concept-col">
+      <span class="concept-badge badge-on">On-demand</span>
+      <div class="concept-col-title">요청이 올 때마다 계산한다</div>
+      <p>
+        조회 요청이 들어오는 <strong>읽기 시점</strong>에 실시간으로 계산을 수행한다.
+        항상 최신 데이터를 기반으로 결과를 만든다.
+        주문이 들어올 때마다 즉석에서 조리하는 방식이다.
+      </p>
+      <p>
+        <strong>비용 지불 시점:</strong> 조회가 발생할 때 (읽기)
+      </p>
+      <div class="concept-pros-cons">
+        <div class="concept-pros-cons-label">특성</div>
+        항상 최신 결과 보장<br>
+        저장 공간 추가 불필요<br>
+        조회가 많아질수록 계산 부하 누적
+      </div>
+    </div>
+  </div>
+
+  <!-- 트레이드오프 축 -->
+  <div class="tradeoff-wrap">
+    <div class="tradeoff-title">Pre-compute ←→ On-demand 트레이드오프</div>
+
+    <div class="tradeoff-axis-labels">
+      <div class="axis-end left">Pre-compute</div>
+      <div class="axis-end center">← 어디에 가까운가 →</div>
+      <div class="axis-end right">On-demand</div>
+    </div>
+
+    <div class="tradeoff-row">
+      <div class="tradeoff-label left">빠름</div>
+      <div class="tradeoff-bar-bg">
+        <div class="tradeoff-bar-fill fill-left" style="width:80%;"></div>
+      </div>
+      <div class="tradeoff-label right">느림</div>
+    </div>
+    <div style="font-size:12px; color:var(--text-muted); margin-bottom:14px; padding-left:156px;">조회 응답 속도</div>
+
+    <div class="tradeoff-row">
+      <div class="tradeoff-label left">오래됨</div>
+      <div class="tradeoff-bar-bg">
+        <div class="tradeoff-bar-fill fill-right" style="width:85%; right:0;"></div>
+      </div>
+      <div class="tradeoff-label right">최신</div>
+    </div>
+    <div style="font-size:12px; color:var(--text-muted); margin-bottom:14px; padding-left:156px;">데이터 최신성</div>
+
+    <div class="tradeoff-row">
+      <div class="tradeoff-label left">높음</div>
+      <div class="tradeoff-bar-bg">
+        <div class="tradeoff-bar-fill fill-left" style="width:70%;"></div>
+      </div>
+      <div class="tradeoff-label right">낮음</div>
+    </div>
+    <div style="font-size:12px; color:var(--text-muted); margin-bottom:14px; padding-left:156px;">저장 공간 필요량</div>
+
+    <div class="tradeoff-row">
+      <div class="tradeoff-label left">낮음</div>
+      <div class="tradeoff-bar-bg">
+        <div class="tradeoff-bar-fill fill-right" style="width:75%; right:0;"></div>
+      </div>
+      <div class="tradeoff-label right">높음</div>
+    </div>
+    <div style="font-size:12px; color:var(--text-muted); padding-left:156px;">조회 시 CPU/메모리 부하</div>
+  </div>
+
+  <div class="callout navy">
+    <div class="callout-label">설계 원칙</div>
+    <strong>결정론적(Deterministic) 계산은 Pre-compute, 탐색적(Exploratory) 계산은 On-demand.</strong>
+    "같은 입력이면 항상 같은 결과"인 계산은 미리 구워 두는 것이 경제적이다.
+    반면 사용자가 파라미터를 바꿔가며 탐색하는 계산은 경우의 수가 무한하므로 미리 구워둘 수 없다.
+  </div>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════
+       PART 2. 비교 사례 3개
+  ═══════════════════════════════════════ -->
+  <div class="section-title">비교 사례</div>
+  <div class="section-subtitle">세 가지 상황에서 타이밍 선택이 어떤 차이를 만드는가</div>
+
+  <div class="case-tabs">
+    <div class="case-tab active" onclick="showCase('c1', this)">사례 ① 누적 집계</div>
+    <div class="case-tab" onclick="showCase('c2', this)">사례 ② 파생 지표</div>
+    <div class="case-tab" onclick="showCase('c3', this)">사례 ③ 대시보드 KPI</div>
+  </div>
+
+  <!-- ── CASE 1: 누적 집계 ── -->
+  <div class="case-panel active" id="panel-c1">
+    <div style="margin-bottom:20px;">
+      <div style="font-size:18px; font-weight:700; color:var(--navy); margin-bottom:6px;">사례 ① 누적 집계 — "고객별 누적 구매액을 조회해"</div>
+      <div style="font-size:14px; color:var(--text-muted);">
+        주문이 발생할 때마다 고객의 누적 구매액을 보여주는 기능.
+        조회가 빈번하고 주문 건수가 수백만 건이 넘어갈 때, 매번 전체 합산 vs. 증분 업데이트 방식이 갈린다.
+      </div>
+    </div>
+
+    <!-- 타임라인 -->
+    <div class="timeline">
+      <div class="tl-phase">
+        <div class="tl-phase-label">이벤트</div>
+        <div class="tl-phase-title">주문 발생</div>
+        <div class="tl-phase-desc">고객 A가 50,000원 주문</div>
+      </div>
+      <div class="tl-phase cost-phase">
+        <div class="tl-phase-label">On-demand 비용 발생 시점</div>
+        <div class="tl-phase-title">조회 요청마다</div>
+        <div class="tl-phase-desc">전체 주문 SUM 재실행</div>
+      </div>
+      <div class="tl-phase active-phase">
+        <div class="tl-phase-label">Pre-compute 비용 발생 시점</div>
+        <div class="tl-phase-title">주문 저장 시</div>
+        <div class="tl-phase-desc">누적액 += 50,000 즉시 반영</div>
+      </div>
+      <div class="tl-phase">
+        <div class="tl-phase-label">조회</div>
+        <div class="tl-phase-title">결과 반환</div>
+        <div class="tl-phase-desc">Pre-compute: 저장된 값 읽기만</div>
+      </div>
+    </div>
+
+    <div class="code-compare">
+      <div>
+        <div class="verdict bad">❌ 매번 전체 SUM — On-demand</div>
+        <div class="code-wrap">
+          <div class="code-label">SQL — 조회마다 전체 집계</div>
+          <pre><span class="cm">-- 조회할 때마다 실행됨</span>
+<span class="cm">-- 주문 1,000만 건이면</span>
+<span class="cm">-- 매 조회마다 1,000만 행 스캔</span>
+<span class="kw">SELECT</span>
+    customer_id,
+    <span class="fn">SUM</span>(amount) <span class="kw">AS</span> total_purchase
+<span class="kw">FROM</span> orders
+<span class="kw">WHERE</span> customer_id = <span class="nm">:cid</span>
+<span class="kw">GROUP BY</span> customer_id;
+
+<span class="cm">-- 동시 접속자 100명이면</span>
+<span class="cm">-- DB가 100개 집계 쿼리를</span>
+<span class="cm">-- 동시에 실행해야 함</span></pre>
+        </div>
+        <div class="callout wrong">
+          <div class="callout-label">문제점</div>
+          조회 빈도 × 데이터 볼륨만큼 DB 부하가 선형 증가한다.
+          주문 이력이 쌓일수록 같은 조회가 점점 느려지는 구조적 문제가 있다.
+        </div>
+      </div>
+      <div>
+        <div class="verdict good">✅ 증분 업데이트 — Pre-compute</div>
+        <div class="code-wrap">
+          <div class="code-label">SQL — 주문 시점에 누적액 갱신</div>
+          <pre><span class="cm">-- 주문 저장 시 누적액 즉시 반영</span>
+<span class="cm">-- (트랜잭션 안에서 함께 실행)</span>
+<span class="kw">INSERT INTO</span> orders
+    (customer_id, amount, ...)
+<span class="kw">VALUES</span> (<span class="nm">:cid</span>, <span class="nm">50000</span>, ...);
+
+<span class="kw">INSERT INTO</span> customer_stats
+    (customer_id, total_purchase)
+<span class="kw">VALUES</span> (<span class="nm">:cid</span>, <span class="nm">50000</span>)
+<span class="kw">ON CONFLICT</span> (customer_id)
+<span class="kw">DO UPDATE SET</span>
+    total_purchase =
+        customer_stats.total_purchase
+        + <span class="nm">EXCLUDED</span>.total_purchase;
+
+<span class="cm">-- 조회는 단순 SELECT</span>
+<span class="kw">SELECT</span> total_purchase
+<span class="kw">FROM</span> customer_stats
+<span class="kw">WHERE</span> customer_id = <span class="nm">:cid</span>;
+<span class="cm">-- 인덱스 1건 조회, 항상 빠름</span></pre>
+        </div>
+        <div class="callout correct">
+          <div class="callout-label">개선 포인트</div>
+          계산 비용을 조회 시점이 아닌 주문 발생 시점으로 이동시킨다.
+          조회는 항상 인덱스 1건 조회로 일정하게 빠르다.
+          주문 빈도가 조회 빈도보다 낮다면 Pre-compute가 전체 부하를 낮춘다.
+        </div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-label">주의 — 증분 업데이트의 함정</div>
+      Pre-compute 누적 방식은 <strong>중간에 데이터를 직접 수정하거나 삭제하면 합계가 틀어진다.</strong>
+      주문 취소, 환불, 데이터 정정이 발생할 때 누적 테이블도 함께 갱신하는 로직이 반드시 필요하다.
+      이 복잡도가 허용되지 않는다면 On-demand가 더 안전하다.
+    </div>
+  </div>
+
+  <!-- ── CASE 2: 파생 지표 ── -->
+  <div class="case-panel" id="panel-c2">
+    <div style="margin-bottom:20px;">
+      <div style="font-size:18px; font-weight:700; color:var(--navy); margin-bottom:6px;">사례 ② 파생 지표 — 저장 컬럼 vs. 계산 뷰(View)</div>
+      <div style="font-size:14px; color:var(--text-muted);">
+        "영업이익률 = 영업이익 / 매출"처럼 다른 컬럼에서 유도되는 파생 지표.
+        DB에 미리 저장할 것인가, 조회할 때 계산하는 뷰로 둘 것인가.
+        이 선택은 정확성·유지보수·성능의 트레이드오프다.
+      </div>
+    </div>
+
+    <div class="code-compare">
+      <div>
+        <div class="verdict mid">⚠ 저장 컬럼 — Pre-compute</div>
+        <div class="code-wrap">
+          <div class="code-label">저장 파생 컬럼 방식</div>
+          <pre><span class="cm">-- 테이블에 파생 컬럼 저장</span>
+<span class="kw">ALTER TABLE</span> financials
+    <span class="kw">ADD COLUMN</span> op_margin <span class="kw">DECIMAL</span>(<span class="nm">5</span>,<span class="nm">2</span>);
+
+<span class="cm">-- 데이터 입력/수정 시마다 갱신</span>
+<span class="kw">UPDATE</span> financials
+<span class="kw">SET</span>
+    op_margin =
+        op_income / revenue * <span class="nm">100</span>
+<span class="kw">WHERE</span> id = <span class="nm">:id</span>;
+
+<span class="cm">-- 문제: revenue가 0이면?</span>
+<span class="cm">-- 문제: 산식이 바뀌면</span>
+<span class="cm">--       전체 행을 UPDATE해야 함</span>
+<span class="cm">-- 문제: op_income만 바꾸고</span>
+<span class="cm">--       op_margin 갱신을 빠뜨리면?</span></pre>
+        </div>
+        <div class="callout wrong">
+          <div class="callout-label">위험 요소</div>
+          산식이 바뀔 때마다 전체 행 UPDATE가 필요하다.
+          원본 컬럼만 수정하고 파생 컬럼 갱신을 빠뜨리면 데이터가 불일치한다.
+          <strong>파생 지표는 원본에서 결정론적으로 계산되므로 저장이 중복이다.</strong>
+        </div>
+      </div>
+      <div>
+        <div class="verdict good">✅ 계산 뷰 — On-demand</div>
+        <div class="code-wrap">
+          <div class="code-label">View / Computed Column 방식</div>
+          <pre><span class="cm">-- 파생 지표를 뷰로 정의</span>
+<span class="cm">-- 저장하지 않고 조회 시 계산</span>
+<span class="kw">CREATE VIEW</span> v_financials <span class="kw">AS</span>
+<span class="kw">SELECT</span>
+    id,
+    revenue,
+    op_income,
+    <span class="kw">CASE</span>
+        <span class="kw">WHEN</span> revenue = <span class="nm">0</span>
+            <span class="kw">THEN NULL</span>
+        <span class="kw">ELSE</span>
+            op_income::float
+            / revenue * <span class="nm">100</span>
+    <span class="kw">END</span> <span class="kw">AS</span> op_margin
+<span class="kw">FROM</span> financials;
+
+<span class="cm">-- 산식이 바뀌면 뷰 하나만 수정</span>
+<span class="cm">-- 항상 원본 기반으로 계산</span>
+<span class="cm">-- 불일치 발생 불가능</span></pre>
+        </div>
+        <div class="callout correct">
+          <div class="callout-label">개선 포인트</div>
+          파생 지표는 원본에서 항상 유도 가능하므로 저장이 불필요하다.
+          산식 변경은 뷰 하나만 수정하면 전체에 즉시 반영된다.
+          원본과 파생값의 불일치가 구조적으로 발생하지 않는다.
+        </div>
+      </div>
+    </div>
+
+    <div class="callout navy">
+      <div class="callout-label">파생 지표 저장이 정당화되는 경우</div>
+      뷰가 아닌 저장 컬럼이 맞는 경우도 있다. <strong>계산 비용이 매우 높고</strong> 조회 빈도가 극히 높을 때,
+      또는 <strong>특정 시점의 스냅샷</strong>을 영구 보존해야 할 때 (예: 결산 시점의 환율로 환산한 금액).
+      스냅샷은 "나중에 재계산하면 달라진다"는 점이 저장의 이유다.
+      단순 산술 파생 지표는 저장하지 않는 것이 원칙이다.
+    </div>
+  </div>
+
+  <!-- ── CASE 3: 대시보드 KPI ── -->
+  <div class="case-panel" id="panel-c3">
+    <div style="margin-bottom:20px;">
+      <div style="font-size:18px; font-weight:700; color:var(--navy); margin-bottom:6px;">사례 ③ 대시보드 KPI — 실시간 쿼리 vs. 배치 Pre-aggregation</div>
+      <div style="font-size:14px; color:var(--text-muted);">
+        경영진 대시보드에서 "전사 매출 / 주문 건수 / 재고 현황"을 보여주는 요구사항.
+        사용자 100명이 동시에 접속해서 새로고침을 누를 때, 매번 실시간 집계 vs. 배치로 미리 집계해 두는 방식이 갈린다.
+      </div>
+    </div>
+
+    <!-- 캐시/배치 흐름 다이어그램 -->
+    <div style="margin-bottom:var(--gap);">
+      <div style="font-size:13px; font-weight:700; color:var(--text-muted); margin-bottom:12px; letter-spacing:0.05em; text-transform:uppercase; font-family:'JetBrains Mono',monospace;">배치 Pre-aggregation 흐름</div>
+      <div class="cache-flow">
+        <div class="cache-box">
+          <div class="cache-box-icon">🏭</div>
+          <div class="cache-box-title">원본 데이터</div>
+          <div class="cache-box-desc">수천만 건 거래 테이블</div>
+        </div>
+        <div class="cache-box" style="background:var(--navy-light);">
+          <div class="cache-box-icon">⏰</div>
+          <div class="cache-box-title">배치 집계</div>
+          <div class="cache-box-desc">매시간 / 매일 집계 실행<br>결과를 요약 테이블에 저장</div>
+        </div>
+        <div class="cache-box hit">
+          <div class="cache-box-icon">📊</div>
+          <div class="cache-box-title">요약 테이블</div>
+          <div class="cache-box-desc">수십~수백 행<br>이미 집계된 결과</div>
+        </div>
+        <div class="cache-box" style="background:var(--correct-bg);">
+          <div class="cache-box-icon">🖥️</div>
+          <div class="cache-box-title">대시보드 조회</div>
+          <div class="cache-box-desc">요약 테이블에서<br>단순 SELECT</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-compare">
+      <div>
+        <div class="verdict bad">❌ 실시간 집계 — On-demand</div>
+        <div class="code-wrap">
+          <div class="code-label">대시보드 조회 시마다 실행</div>
+          <pre><span class="cm">-- 100명이 동시에 새로고침하면</span>
+<span class="cm">-- 이 쿼리 100개가 동시 실행됨</span>
+<span class="kw">SELECT</span>
+    <span class="fn">DATE_TRUNC</span>(<span class="st">'day'</span>, order_dt)
+        <span class="kw">AS</span> day,
+    <span class="fn">COUNT</span>(*) <span class="kw">AS</span> order_cnt,
+    <span class="fn">SUM</span>(amount) <span class="kw">AS</span> revenue,
+    <span class="fn">SUM</span>(cost) <span class="kw">AS</span> total_cost
+<span class="kw">FROM</span> orders
+<span class="kw">WHERE</span> order_dt >= <span class="st">'2024-01-01'</span>
+<span class="kw">GROUP BY</span> <span class="nm">1</span>
+<span class="kw">ORDER BY</span> <span class="nm">1</span>;
+<span class="cm">-- 수천만 행 스캔 × 100 동시 실행</span>
+<span class="cm">-- DB CPU 100% → 전체 서비스 지연</span></pre>
+        </div>
+        <div class="callout wrong">
+          <div class="callout-label">문제점</div>
+          대시보드 KPI는 <em>1분 전</em>과 <em>지금</em>이 크게 다르지 않은 경우가 대부분이다.
+          그런데도 매 조회마다 수천만 행을 스캔하면, 동시 접속자가 늘어날수록 DB 전체가 마비된다.
+        </div>
+      </div>
+      <div>
+        <div class="verdict good">✅ 배치 Pre-aggregation</div>
+        <div class="code-wrap">
+          <div class="code-label">배치 (매시간 실행)</div>
+          <pre><span class="cm">-- 매시간 배치가 집계 실행</span>
+<span class="kw">INSERT INTO</span> kpi_daily_summary
+    (day, order_cnt, revenue, total_cost)
+<span class="kw">SELECT</span>
+    <span class="fn">DATE_TRUNC</span>(<span class="st">'day'</span>, order_dt),
+    <span class="fn">COUNT</span>(*),
+    <span class="fn">SUM</span>(amount),
+    <span class="fn">SUM</span>(cost)
+<span class="kw">FROM</span> orders
+<span class="kw">WHERE</span> order_dt >= <span class="fn">NOW</span>() - <span class="st">'1 hour'</span>
+<span class="kw">GROUP BY</span> <span class="nm">1</span>
+<span class="kw">ON CONFLICT</span> (day) <span class="kw">DO UPDATE</span> ...;
+
+<span class="cm">-- 대시보드 조회는 요약 테이블만</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> kpi_daily_summary
+<span class="kw">ORDER BY</span> day <span class="kw">DESC</span>;
+<span class="cm">-- 수십 행 조회, 0.001초</span></pre>
+        </div>
+        <div class="callout correct">
+          <div class="callout-label">개선 포인트</div>
+          집계 비용을 배치 실행 1회로 지불하고, 100명이 동시에 조회해도 부하는 동일하다.
+          "최신에서 최대 1시간 지연"이 비즈니스 요구를 충족한다면 이 방식이 압도적으로 유리하다.
+        </div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-label">배치 Pre-aggregation이 맞지 않는 경우</div>
+      실시간성이 진짜로 필요한 경우 — 예를 들어 재고가 0이 되는 순간 즉시 알림이 가야 하거나,
+      금융 포지션이 실시간으로 위험 한도를 넘는지 모니터링해야 하는 경우 —
+      배치 지연이 비즈니스 위험을 만든다. 이때는 스트리밍 처리 또는 이벤트 기반 아키텍처가 필요하다.
+      <strong>허용 가능한 지연이 얼마인지를 비즈니스 요구사항으로 명확히 정의하는 것이 먼저다.</strong>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════
+       PART 3. 캐싱 — Pre-compute의 중간 전략
+  ═══════════════════════════════════════ -->
+  <div class="section-title">캐싱 — 두 전략 사이의 중간 지점</div>
+  <div class="section-subtitle">On-demand로 계산하되, 결과를 일정 시간 재사용한다</div>
+
+  <p style="font-size:15px; color:var(--text-muted); margin-bottom:20px; line-height:1.75;">
+    캐싱은 완전한 Pre-compute(영구 저장)와 순수한 On-demand(매번 계산) 사이의 실용적 중간 전략이다.
+    처음 요청은 On-demand로 계산하고, 그 결과를 TTL(Time-To-Live) 동안 보관해 재사용한다.
+    TTL이 만료되면 다시 계산해서 갱신한다.
+  </p>
+
+  <table class="matrix-table">
+    <thead>
+      <tr>
+        <th style="width:22%">전략</th>
+        <th style="width:25%">계산 시점</th>
+        <th style="width:20%">최신성</th>
+        <th style="width:33%">적합한 상황</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="rec-pre">Pre-compute</span><br><span style="font-size:12px; color:var(--text-muted);">영구 저장</span></td>
+        <td>데이터 변경 시 (쓰기)</td>
+        <td>변경 즉시 반영</td>
+        <td>변경 빈도 낮음 + 조회 빈도 높음 + 결정론적 계산</td>
+      </tr>
+      <tr>
+        <td><span style="color:#6b46c1; font-weight:700;">Cache</span><br><span style="font-size:12px; color:var(--text-muted);">TTL 보관</span></td>
+        <td>첫 조회 시, TTL 만료 후 재계산</td>
+        <td>TTL 주기만큼 지연 허용</td>
+        <td>조회 빈도 높음 + 일정 지연 허용 + 계산 비용 높음</td>
+      </tr>
+      <tr>
+        <td><span class="rec-on">On-demand</span><br><span style="font-size:12px; color:var(--text-muted);">매번 계산</span></td>
+        <td>조회 시마다 (읽기)</td>
+        <td>항상 최신</td>
+        <td>탐색적 계산 + 경우의 수 무한 + 최신성이 필수</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout navy">
+    <div class="callout-label">캐시 무효화 — 가장 어려운 문제</div>
+    캐싱에서 가장 어려운 것은 <strong>언제 캐시를 버릴 것인가</strong>다.
+    TTL 기반(일정 시간 후 자동 만료)은 단순하지만 지연이 생긴다.
+    이벤트 기반(원본 데이터 변경 시 즉시 무효화)은 정확하지만 구현이 복잡하다.
+    캐싱 전략을 도입하기 전에 "이 데이터, 얼마나 오래된 것까지 허용되는가"를 먼저 정의하라.
+  </div>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════
+       PART 4. Timing 결정 플로우
+  ═══════════════════════════════════════ -->
+  <div class="section-title">Timing 결정 플로우</div>
+  <div class="section-subtitle">계산 타이밍을 결정할 때의 판단 순서</div>
+
+  <div class="decision-flow">
+    <div class="dflow-q">
+      <div class="dflow-qnum">Q1</div>
+      <div class="dflow-body">
+        <strong>이 계산의 결과가 탐색적인가 — 사용자가 파라미터를 바꿔가며 다양한 결과를 볼 것인가?</strong><br>
+        <span class="dflow-yes">YES →</span> On-demand. 경우의 수가 무한하므로 미리 구워둘 수 없다.<br>
+        <span class="dflow-no">NO  →</span> Q2로
+      </div>
+    </div>
+    <div class="dflow-q">
+      <div class="dflow-qnum">Q2</div>
+      <div class="dflow-body">
+        <strong>이 값이 다른 컬럼에서 결정론적으로 유도되는 파생 지표인가?</strong><br>
+        <span class="dflow-yes">YES →</span> View / Computed Column. 저장하지 말고 항상 원본에서 계산하라.<br>
+        <span class="dflow-no">NO  →</span> Q3로
+      </div>
+    </div>
+    <div class="dflow-q">
+      <div class="dflow-qnum">Q3</div>
+      <div class="dflow-body">
+        <strong>조회 빈도가 쓰기(변경) 빈도보다 훨씬 높은가?</strong><br>
+        <span class="dflow-yes">YES →</span> Pre-compute 또는 캐싱. 조회 비용을 낮추는 것이 경제적이다.<br>
+        <span class="dflow-no">NO  →</span> Q4로
+      </div>
+    </div>
+    <div class="dflow-q">
+      <div class="dflow-qnum">Q4</div>
+      <div class="dflow-body">
+        <strong>결과가 최신에서 얼마나 지연되어도 허용되는가?</strong><br>
+        <span class="dflow-yes">즉시 →</span> On-demand (또는 이벤트 기반 Pre-compute)<br>
+        <span class="dflow-yes">분~시간 허용 →</span> 캐싱 (TTL 설정)<br>
+        <span class="dflow-yes">일 단위 허용 →</span> 배치 Pre-aggregation
+      </div>
+    </div>
+    <div class="dflow-q">
+      <div class="dflow-qnum">⚠</div>
+      <div class="dflow-body">
+        <strong style="color:var(--warn);">Pre-compute 도입 전 반드시 확인할 것</strong><br>
+        원본 데이터가 수정·삭제될 때 Pre-compute 결과도 함께 갱신하는 로직이 있는가?
+        없다면 데이터 불일치가 발생한다. 유지 비용이 조회 비용 절감보다 클 수 있다.
+      </div>
+    </div>
+  </div>
+
+  <div class="callout navy">
+    <div class="callout-label">S4 핵심 요약</div>
+    타이밍 선택의 본질은 <strong>계산 비용을 언제 지불할 것인가</strong>다.
+    Pre-compute는 쓰기 시점에 미리 지불해 조회를 빠르게 만들고,
+    On-demand는 조회 시점에 지불해 항상 최신을 보장한다.
+    캐싱은 그 사이의 실용적 타협이다.
+    어떤 전략도 "항상 옳지" 않다 — <strong>허용 지연, 변경 빈도, 조회 빈도 세 가지를 먼저 파악하고 선택하라.</strong>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <span>Logic Design Series &nbsp;·&nbsp; S4. Timing — Pre-compute vs. On-demand</span>
+  <div class="footer-nav">
+    <a href="logic_design_s3_how.html" class="footer-link prev">← S3. How</a>
+    <a href="logic_design_s5_patterns.html" class="footer-link">다음: S5. 설계 패턴 카탈로그 →</a>
+  </div>
+</footer>
+
+<script>
+  function showCase(id, el) {
+    document.querySelectorAll('.case-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.case-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+    el.classList.add('active');
+  }
+</script>
+
+</body>
+</html>
