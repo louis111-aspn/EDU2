@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>로직 설계 감각 | S6. 자가 진단</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #003366;
+    --navy-light: #e8eef5;
+    --navy-mid: #ccd9e8;
+    --text: #1a1a2e;
+    --text-muted: #5a6a80;
+    --bg: #f0f3f8;
+    --white: #ffffff;
+    --border: #d0d8e4;
+    --warn: #b85c00;
+    --warn-bg: #fff4e8;
+    --correct: #1a6b3c;
+    --correct-bg: #eaf5ee;
+    --wrong: #9b1c1c;
+    --wrong-bg: #fdf0f0;
+    --code-bg: #1e2432;
+    --gap: 20px;
+    --radius: 6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--text);
+    background: var(--bg);
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+
+  /* ── SERIES NAV ── */
+  .series-nav {
+    background: var(--navy);
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  .series-nav .brand {
+    font-family: 'DM Serif Display', serif;
+    color: rgba(255,255,255,0.5);
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    padding: 14px 20px 14px 0;
+    border-right: 1px solid rgba(255,255,255,0.15);
+    margin-right: 16px;
+    flex-shrink: 0;
+  }
+  .series-nav a {
+    color: rgba(255,255,255,0.55);
+    text-decoration: none;
+    font-size: 13px;
+    padding: 14px 14px;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .series-nav a:hover { color: rgba(255,255,255,0.9); }
+  .series-nav a.active { color: #fff; border-bottom-color: #fff; font-weight: 700; }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--navy);
+    color: white;
+    padding: 64px 40px 56px;
+  }
+  .hero-eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 16px;
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+  }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 42px;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    max-width: 760px;
+  }
+  .hero-sub {
+    font-size: 16px;
+    color: rgba(255,255,255,0.7);
+    max-width: 640px;
+    line-height: 1.8;
+    margin-bottom: 32px;
+  }
+  .hero-meta { display: flex; gap: 24px; flex-wrap: wrap; }
+  .hero-meta-item {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .hero-meta-item strong { color: rgba(255,255,255,0.85); }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 860px; margin: 0 auto; padding: 48px 40px; }
+
+  /* ── PROGRESS BAR ── */
+  .progress-wrap {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 40px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .progress-label {
+    font-size: 13px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+  }
+  .progress-bar-bg {
+    flex: 1;
+    height: 6px;
+    background: var(--bg);
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--navy);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+  .progress-score {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+    white-space: nowrap;
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+    min-width: 60px;
+    text-align: right;
+  }
+
+  /* ── QUIZ CARD ── */
+  .quiz-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 28px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .quiz-card.answered { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+
+  .quiz-header {
+    padding: 20px 28px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .quiz-num {
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+  .quiz-axis {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+    margin-top: 2px;
+    flex-shrink: 0;
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+  }
+  .axis-where   { background: var(--navy-light); color: var(--navy); }
+  .axis-how     { background: var(--correct-bg); color: var(--correct); }
+  .axis-timing  { background: var(--warn-bg);    color: var(--warn); }
+  .axis-pattern { background: #f3e8ff;           color: #6b21a8; }
+
+  .quiz-scenario {
+    padding: 16px 28px 0;
+  }
+  .quiz-scenario-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+  }
+  .quiz-scenario-text {
+    font-size: 15px;
+    color: var(--text);
+    line-height: 1.75;
+    margin-bottom: 12px;
+  }
+  .quiz-scenario-code {
+    background: var(--code-bg);
+    border-radius: 4px;
+    padding: 14px 18px;
+    margin-bottom: 4px;
+    overflow-x: auto;
+  }
+  .quiz-scenario-code pre {
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+    font-size: 12px;
+    line-height: 1.65;
+    color: #e2e8f0;
+    white-space: pre;
+  }
+  .kw { color: #7dd3fc; }
+  .cm { color: #64748b; font-style: italic; }
+  .st { color: #a5f3a0; }
+  .nm { color: #fbbf24; }
+  .fn { color: #c4b5fd; }
+
+  .quiz-question {
+    padding: 14px 28px 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.6;
+  }
+
+  /* ── OPTIONS ── */
+  .quiz-options {
+    padding: 16px 28px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .quiz-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text);
+    background: var(--white);
+    text-align: left;
+    width: 100%;
+  }
+  .quiz-option:hover:not(:disabled) {
+    background: var(--navy-light);
+    border-color: var(--navy-mid);
+  }
+  .quiz-option:disabled { cursor: default; }
+  .quiz-option.correct-ans {
+    background: var(--correct-bg);
+    border-color: var(--correct);
+    color: var(--correct);
+  }
+  .quiz-option.wrong-ans {
+    background: var(--wrong-bg);
+    border-color: #f0c0c0;
+    color: var(--wrong);
+  }
+  .quiz-option.unchosen {
+    opacity: 0.45;
+  }
+  .opt-key {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 7px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .quiz-option.correct-ans .opt-key { background: var(--correct); color: white; border-color: var(--correct); }
+  .quiz-option.wrong-ans   .opt-key { background: var(--wrong);   color: white; border-color: var(--wrong); }
+
+  /* ── FEEDBACK ── */
+  .quiz-feedback {
+    display: none;
+    margin: 0 28px 24px;
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    border-left: 4px solid;
+    font-size: 14px;
+    line-height: 1.75;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct {
+    background: var(--correct-bg);
+    border-color: var(--correct);
+  }
+  .quiz-feedback.wrong {
+    background: var(--wrong-bg);
+    border-color: var(--wrong);
+  }
+  .feedback-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+  }
+  .quiz-feedback.correct .feedback-label { color: var(--correct); }
+  .quiz-feedback.wrong   .feedback-label { color: var(--wrong); }
+  .feedback-why {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(0,0,0,0.08);
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .feedback-why strong { color: var(--text); }
+
+  /* ── RESULT PANEL ── */
+  .result-panel {
+    display: none;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 40px;
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .result-panel.show { display: block; }
+  .result-score-big {
+    font-family: 'DM Serif Display', serif;
+    font-size: 72px;
+    color: var(--navy);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .result-total {
+    font-size: 16px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+  .result-grade {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 12px;
+  }
+  .result-comment {
+    font-size: 15px;
+    color: var(--text-muted);
+    max-width: 480px;
+    margin: 0 auto 28px;
+    line-height: 1.75;
+  }
+  .result-breakdown {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+  .breakdown-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 20px;
+    min-width: 100px;
+  }
+  .breakdown-axis {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+    margin-bottom: 6px;
+  }
+  .breakdown-val {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .result-retry-btn {
+    background: var(--navy);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    padding: 12px 32px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: opacity 0.15s;
+  }
+  .result-retry-btn:hover { opacity: 0.85; }
+
+  /* ── CALLOUT ── */
+  .callout {
+    border-radius: var(--radius);
+    padding: 18px 24px;
+    margin-bottom: var(--gap);
+    border-left: 4px solid;
+  }
+  .callout.navy { background: var(--navy-light); border-color: var(--navy); }
+  .callout-label {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 6px;
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+    color: var(--navy);
+  }
+
+  /* ── SERIES COMPLETE ── */
+  .series-complete {
+    background: var(--navy);
+    color: white;
+    border-radius: var(--radius);
+    padding: 32px 36px;
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .sc-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: rgba(255,255,255,0.5);
+    margin-bottom: 12px;
+    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+  }
+  .sc-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px; color: white; margin-bottom: 12px;
+  }
+  .sc-desc {
+    font-size: 14px; color: rgba(255,255,255,0.65);
+    line-height: 1.75; max-width: 520px; margin: 0 auto 24px;
+  }
+  .sc-links {
+    display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;
+  }
+  .sc-link {
+    background: rgba(255,255,255,0.12);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: var(--radius);
+    padding: 8px 20px;
+    font-size: 13px; font-weight: 500;
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+  .sc-link:hover { background: rgba(255,255,255,0.22); }
+
+  /* ── FOOTER ── */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 24px 40px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 13px; color: var(--text-muted);
+    background: var(--white);
+  }
+  .footer-link {
+    display: flex; align-items: center; gap: 6px;
+    color: var(--navy); font-weight: 500;
+    text-decoration: none; font-size: 14px;
+  }
+  .footer-link:hover { text-decoration: underline; }
+  .footer-link.prev { color: var(--text-muted); }
+
+  @media (max-width: 720px) {
+    .hero h1 { font-size: 28px; }
+    .container { padding: 32px 20px; }
+    .hero { padding: 40px 20px; }
+    .series-nav { padding: 0 20px; }
+    .progress-wrap { padding: 12px 20px; }
+    .result-breakdown { gap: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SERIES NAV -->
+<nav class="series-nav">
+  <div class="brand">로직 설계 감각</div>
+  <a href="logic_design_s1_intro.html">S1. 설계 감각</a>
+  <a href="logic_design_s2_where.html">S2. Where</a>
+  <a href="logic_design_s3_how.html">S3. How</a>
+  <a href="logic_design_s4_timing.html">S4. Timing</a>
+  <a href="logic_design_s5_patterns.html">S5. 패턴 카탈로그</a>
+  <a href="logic_design_s6_quiz.html" class="active">S6. 자가 진단</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">Section 06 / 6 &nbsp;·&nbsp; Logic Design Series</div>
+  <h1>설계 감각 자가 진단</h1>
+  <p class="hero-sub">
+    S1–S5에서 훈련한 판단 기준을 실제 시나리오에 적용해본다.
+    각 문제는 <strong>Where / How / Timing / Pattern</strong> 중 하나의 판단 포인트를 다룬다.
+    선택 후 즉각 피드백과 오답 해설을 확인하라.
+  </p>
+  <div class="hero-meta">
+    <div class="hero-meta-item">📋 <strong>문항 수</strong> 5문제</div>
+    <div class="hero-meta-item">⏱ <strong>예상 소요 시간</strong> 15–20분</div>
+    <div class="hero-meta-item">🔗 <strong>선수 모듈</strong> S1–S5 전체</div>
+  </div>
+</section>
+
+<!-- PROGRESS -->
+<div class="progress-wrap">
+  <div class="progress-label" id="prog-label">0 / 5 완료</div>
+  <div class="progress-bar-bg">
+    <div class="progress-bar-fill" id="prog-fill" style="width:0%"></div>
+  </div>
+  <div class="progress-score" id="prog-score">— 점</div>
+</div>
+
+<div class="container">
+
+  <!-- ══════════════════════════════════════
+       Q1 — WHERE
+  ══════════════════════════════════════ -->
+  <div class="quiz-card" id="qcard-1">
+    <div class="quiz-header">
+      <span class="quiz-num">Q1</span>
+      <span class="quiz-axis axis-where">Where</span>
+    </div>
+    <div class="quiz-scenario">
+      <div class="quiz-scenario-label">시나리오</div>
+      <div class="quiz-scenario-text">
+        전국 500개 매장의 일별 판매 데이터가 DB에 누적되어 있다 (총 5,000만 행).
+        경영진이 "지난 3년간 지역별·월별 매출 추이"를 볼 수 있는 리포트를 요청했다.
+        개발팀에서 아래와 같은 구현 방안을 제안했다.
+      </div>
+      <div class="quiz-scenario-code">
+        <pre><span class="cm">-- 제안 A: 앱 서버에서 처리</span>
+all_rows = db.execute(<span class="st">"SELECT * FROM sales"</span>)
+result = aggregate_in_python(all_rows)
+
+<span class="cm">-- 제안 B: DB에서 집계 완결</span>
+<span class="kw">SELECT</span> region, <span class="fn">DATE_TRUNC</span>(<span class="st">'month'</span>, sale_dt),
+       <span class="fn">SUM</span>(amount)
+<span class="kw">FROM</span> sales
+<span class="kw">GROUP BY</span> <span class="nm">1</span>, <span class="nm">2</span>
+<span class="kw">ORDER BY</span> <span class="nm">1</span>, <span class="nm">2</span>;</pre>
+      </div>
+    </div>
+    <div class="quiz-question">어떤 제안이 맞는가, 그리고 그 핵심 이유는?</div>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answer(1, 'A', this)">
+        <span class="opt-key">A</span>
+        <span>제안 A — 앱 레이어에서 처리해야 비즈니스 로직 변경이 유연하다</span>
+      </button>
+      <button class="quiz-option" onclick="answer(1, 'B', this)">
+        <span class="opt-key">B</span>
+        <span>제안 B — 데이터 볼륨이 크므로 DB에서 집계를 완결하고 결과만 앱으로 전송한다</span>
+      </button>
+      <button class="quiz-option" onclick="answer(1, 'C', this)">
+        <span class="opt-key">C</span>
+        <span>제안 A — 5,000만 행은 DB보다 Python이 더 빠르게 처리할 수 있다</span>
+      </button>
+      <button class="quiz-option" onclick="answer(1, 'D', this)">
+        <span class="opt-key">D</span>
+        <span>제안 B — 프론트엔드에서 처리하면 보안 문제가 생기기 때문이다</span>
+      </button>
+    </div>
+    <div class="quiz-feedback" id="fb-1">
+      <div class="feedback-label" id="fb-label-1"></div>
+      <div id="fb-main-1"></div>
+      <div class="feedback-why" id="fb-why-1"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       Q2 — HOW
+  ══════════════════════════════════════ -->
+  <div class="quiz-card" id="qcard-2">
+    <div class="quiz-header">
+      <span class="quiz-num">Q2</span>
+      <span class="quiz-axis axis-how">How</span>
+    </div>
+    <div class="quiz-scenario">
+      <div class="quiz-scenario-label">시나리오</div>
+      <div class="quiz-scenario-text">
+        물류 시스템에서 화물의 운송비를 산정한다.
+        운송비는 무게 구간(0–10kg, 10–30kg, 30kg 초과)과
+        배송 유형(일반, 특급, 당일)의 조합으로 결정되며, 총 9가지 경우가 존재한다.
+        아래 두 가지 구현 방식이 제시되었다.
+      </div>
+      <div class="quiz-scenario-code">
+        <pre><span class="cm">-- 방식 X: 중첩 IF</span>
+<span class="kw">if</span> weight <= <span class="nm">10</span>:
+    <span class="kw">if</span>   type == <span class="st">'일반'</span>: fee = <span class="nm">3000</span>
+    <span class="kw">elif</span> type == <span class="st">'특급'</span>: fee = <span class="nm">5000</span>
+    <span class="kw">else</span>:              fee = <span class="nm">8000</span>
+<span class="kw">elif</span> weight <= <span class="nm">30</span>:
+    <span class="kw">if</span>   type == <span class="st">'일반'</span>: fee = <span class="nm">5000</span>
+    <span class="kw">elif</span> type == <span class="st">'특급'</span>: fee = <span class="nm">8000</span>
+    <span class="kw">else</span>:              fee = <span class="nm">12000</span>
+<span class="kw">else</span>: ...
+
+<span class="cm">-- 방식 Y: Lookup Table</span>
+FEE_TABLE = {
+  (<span class="st">'S'</span>, <span class="st">'일반'</span>): <span class="nm">3000</span>, (<span class="st">'S'</span>, <span class="st">'특급'</span>): <span class="nm">5000</span>, (<span class="st">'S'</span>, <span class="st">'당일'</span>): <span class="nm">8000</span>,
+  (<span class="st">'M'</span>, <span class="st">'일반'</span>): <span class="nm">5000</span>, (<span class="st">'M'</span>, <span class="st">'특급'</span>): <span class="nm">8000</span>, (<span class="st">'M'</span>, <span class="st">'당일'</span>): <span class="nm">12000</span>,
+  (<span class="st">'L'</span>, <span class="st">'일반'</span>): <span class="nm">8000</span>, (<span class="st">'L'</span>, <span class="st">'특급'</span>): <span class="nm">13000</span>, (<span class="st">'L'</span>, <span class="st">'당일'</span>): <span class="nm">20000</span>,
+}
+weight_band = <span class="st">'S'</span> <span class="kw">if</span> weight<=<span class="nm">10</span> <span class="kw">else</span> <span class="st">'M'</span> <span class="kw">if</span> weight<=<span class="nm">30</span> <span class="kw">else</span> <span class="st">'L'</span>
+fee = FEE_TABLE.get((weight_band, type), <span class="nm">0</span>)</pre>
+      </div>
+    </div>
+    <div class="quiz-question">6개월 뒤 "프리미엄" 배송 유형이 추가된다면, 어느 방식이 유지보수가 쉬운가?</div>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answer(2, 'A', this)">
+        <span class="opt-key">A</span>
+        <span>방식 X — 중첩 IF가 각 경우를 명시적으로 보여주므로 추가하기 쉽다</span>
+      </button>
+      <button class="quiz-option" onclick="answer(2, 'B', this)">
+        <span class="opt-key">B</span>
+        <span>방식 Y — FEE_TABLE에 3줄을 추가하면 끝이고 로직 함수는 변경 없다</span>
+      </button>
+      <button class="quiz-option" onclick="answer(2, 'C', this)">
+        <span class="opt-key">C</span>
+        <span>두 방식 모두 동일하다 — 어차피 코드를 수정해야 하므로 차이가 없다</span>
+      </button>
+      <button class="quiz-option" onclick="answer(2, 'D', this)">
+        <span class="opt-key">D</span>
+        <span>방식 X — DB 테이블을 쓰지 않으므로 성능이 더 빠르다</span>
+      </button>
+    </div>
+    <div class="quiz-feedback" id="fb-2">
+      <div class="feedback-label" id="fb-label-2"></div>
+      <div id="fb-main-2"></div>
+      <div class="feedback-why" id="fb-why-2"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       Q3 — TIMING
+  ══════════════════════════════════════ -->
+  <div class="quiz-card" id="qcard-3">
+    <div class="quiz-header">
+      <span class="quiz-num">Q3</span>
+      <span class="quiz-axis axis-timing">Timing</span>
+    </div>
+    <div class="quiz-scenario">
+      <div class="quiz-scenario-label">시나리오</div>
+      <div class="quiz-scenario-text">
+        쇼핑몰에서 "상품 상세 페이지"에 해당 상품의 <strong>평균 평점과 리뷰 수</strong>를 표시해야 한다.
+        상품은 10만 개, 리뷰는 총 3,000만 건이 누적되어 있으며 하루 신규 리뷰는 약 5,000건이다.
+        상품 상세 페이지는 하루 200만 회 조회된다.
+        "리뷰 수 / 평균 평점"이 1시간 정도 최신이 아니어도 비즈니스상 무방하다는 확인을 받았다.
+      </div>
+    </div>
+    <div class="quiz-question">가장 적합한 구현 전략은?</div>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answer(3, 'A', this)">
+        <span class="opt-key">A</span>
+        <span>상품 상세 조회마다 해당 상품의 리뷰를 COUNT·AVG 하는 쿼리를 실행한다</span>
+      </button>
+      <button class="quiz-option" onclick="answer(3, 'B', this)">
+        <span class="opt-key">B</span>
+        <span>매시간 배치로 상품별 리뷰 수·평균 평점을 집계해 요약 테이블에 저장하고, 상세 조회는 요약 테이블에서 읽는다</span>
+      </button>
+      <button class="quiz-option" onclick="answer(3, 'C', this)">
+        <span class="opt-key">C</span>
+        <span>리뷰가 등록될 때마다 해당 상품의 평점 합계와 리뷰 수를 증분 업데이트한다</span>
+      </button>
+      <button class="quiz-option" onclick="answer(3, 'D', this)">
+        <span class="opt-key">D</span>
+        <span>프론트엔드에서 JavaScript로 전체 리뷰 목록을 받아 계산한다</span>
+      </button>
+    </div>
+    <div class="quiz-feedback" id="fb-3">
+      <div class="feedback-label" id="fb-label-3"></div>
+      <div id="fb-main-3"></div>
+      <div class="feedback-why" id="fb-why-3"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       Q4 — HOW (순서 의존성)
+  ══════════════════════════════════════ -->
+  <div class="quiz-card" id="qcard-4">
+    <div class="quiz-header">
+      <span class="quiz-num">Q4</span>
+      <span class="quiz-axis axis-how">How</span>
+    </div>
+    <div class="quiz-scenario">
+      <div class="quiz-scenario-label">시나리오</div>
+      <div class="quiz-scenario-text">
+        인사 시스템에서 매월 말 전 직원의 급여를 계산해 지급한다.
+        급여 계산 배치는 아래 순서로 실행된다.
+      </div>
+      <div class="quiz-scenario-code">
+        <pre><span class="cm"># 현재 배치 실행 순서</span>
+<span class="nm">1</span>. 기본급 계산  → salary_base 테이블 INSERT
+<span class="nm">2</span>. 수당 계산    → salary_base 읽어서 allowance 계산 → 저장
+<span class="nm">3</span>. 세금 계산    → salary_base + allowance 읽어서 tax 계산 → 저장
+<span class="nm">4</span>. 실수령액 계산 → 위 세 테이블 합산 → final_salary 저장
+
+<span class="cm"># 신입 개발자가 "세금 계산"을 1번으로 옮겼다가</span>
+<span class="cm"># 전 직원 세금이 0원으로 계산되는 장애 발생</span></pre>
+      </div>
+      <div class="quiz-scenario-text" style="margin-top:12px;">
+        이 장애의 근본 원인은 무엇인가?
+      </div>
+    </div>
+    <div class="quiz-question">올바른 진단과 개선 방향은?</div>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answer(4, 'A', this)">
+        <span class="opt-key">A</span>
+        <span>신입 개발자 실수이므로 코드 리뷰 프로세스를 강화하면 된다</span>
+      </button>
+      <button class="quiz-option" onclick="answer(4, 'B', this)">
+        <span class="opt-key">B</span>
+        <span>순서 의존성(Order Dependency)이 코드 어디에도 명시되지 않은 것이 근본 원인이다. 의존 관계를 코드 구조로 강제해야 한다</span>
+      </button>
+      <button class="quiz-option" onclick="answer(4, 'C', this)">
+        <span class="opt-key">C</span>
+        <span>배치를 하나의 트랜잭션으로 묶으면 순서 문제가 해결된다</span>
+      </button>
+      <button class="quiz-option" onclick="answer(4, 'D', this)">
+        <span class="opt-key">D</span>
+        <span>테이블을 분리하지 말고 하나의 쿼리로 합치면 순서 문제가 사라진다</span>
+      </button>
+    </div>
+    <div class="quiz-feedback" id="fb-4">
+      <div class="feedback-label" id="fb-label-4"></div>
+      <div id="fb-main-4"></div>
+      <div class="feedback-why" id="fb-why-4"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       Q5 — PATTERN (멱등성)
+  ══════════════════════════════════════ -->
+  <div class="quiz-card" id="qcard-5">
+    <div class="quiz-header">
+      <span class="quiz-num">Q5</span>
+      <span class="quiz-axis axis-pattern">Pattern</span>
+    </div>
+    <div class="quiz-scenario">
+      <div class="quiz-scenario-label">시나리오</div>
+      <div class="quiz-scenario-text">
+        매일 새벽 2시에 전날 주문 데이터를 집계해 <code style="font-family:monospace; background:var(--bg); padding:1px 6px; border-radius:3px;">daily_stats</code> 테이블에 저장하는 배치가 있다.
+        어느 날 서버 장애로 배치가 중간에 중단됐고, 복구 후 다시 실행했다.
+        아래 두 가지 구현 중 재실행이 안전한 방식은?
+      </div>
+      <div class="quiz-scenario-code">
+        <pre><span class="cm">-- 구현 P</span>
+<span class="kw">INSERT INTO</span> daily_stats (dt, order_cnt, revenue)
+<span class="kw">SELECT</span> order_dt, <span class="fn">COUNT</span>(*), <span class="fn">SUM</span>(amount)
+<span class="kw">FROM</span> orders
+<span class="kw">WHERE</span> order_dt = <span class="st">'2024-03-15'</span>
+<span class="kw">GROUP BY</span> order_dt;
+
+<span class="cm">-- 구현 Q</span>
+<span class="kw">DELETE FROM</span> daily_stats
+<span class="kw">WHERE</span> dt = <span class="st">'2024-03-15'</span>;
+
+<span class="kw">INSERT INTO</span> daily_stats (dt, order_cnt, revenue)
+<span class="kw">SELECT</span> order_dt, <span class="fn">COUNT</span>(*), <span class="fn">SUM</span>(amount)
+<span class="kw">FROM</span> orders
+<span class="kw">WHERE</span> order_dt = <span class="st">'2024-03-15'</span>
+<span class="kw">GROUP BY</span> order_dt;</pre>
+      </div>
+    </div>
+    <div class="quiz-question">배치가 두 번 실행되어도 데이터가 정확한 구현은?</div>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answer(5, 'A', this)">
+        <span class="opt-key">A</span>
+        <span>구현 P — INSERT만 사용하므로 코드가 단순하고 빠르다</span>
+      </button>
+      <button class="quiz-option" onclick="answer(5, 'B', this)">
+        <span class="opt-key">B</span>
+        <span>구현 Q — DELETE 후 INSERT로 멱등성을 보장한다. 몇 번 실행해도 결과가 동일하다</span>
+      </button>
+      <button class="quiz-option" onclick="answer(5, 'C', this)">
+        <span class="opt-key">C</span>
+        <span>구현 P — 트랜잭션으로 묶으면 중복 삽입이 자동 방지된다</span>
+      </button>
+      <button class="quiz-option" onclick="answer(5, 'D', this)">
+        <span class="opt-key">D</span>
+        <span>두 구현 모두 재실행 시 같은 문제가 발생하므로 차이가 없다</span>
+      </button>
+    </div>
+    <div class="quiz-feedback" id="fb-5">
+      <div class="feedback-label" id="fb-label-5"></div>
+      <div id="fb-main-5"></div>
+      <div class="feedback-why" id="fb-why-5"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       RESULT
+  ══════════════════════════════════════ -->
+  <div class="result-panel" id="result-panel">
+    <div class="result-score-big" id="result-score-big">0</div>
+    <div class="result-total">/ 5문제 정답</div>
+    <div class="result-grade" id="result-grade"></div>
+    <div class="result-comment" id="result-comment"></div>
+    <div class="result-breakdown" id="result-breakdown"></div>
+    <button class="result-retry-btn" onclick="retryQuiz()">다시 풀기</button>
+  </div>
+
+  <!-- 시리즈 완주 -->
+  <div class="series-complete" id="series-complete" style="display:none;">
+    <div class="sc-label">Series Complete</div>
+    <div class="sc-title">로직 설계 감각 시리즈 완주</div>
+    <div class="sc-desc">
+      Where · How · Timing 세 축과 4가지 설계 패턴을 모두 훈련했다.
+      이제 요구사항을 받았을 때 "어디서, 어떻게, 언제"를 자동으로 묻는 습관이 생겼다면
+      이 시리즈의 목표는 달성된 것이다.
+    </div>
+    <div class="sc-links">
+      <a href="logic_design_s1_intro.html" class="sc-link">S1. 처음부터 복습</a>
+      <a href="logic_design_s5_patterns.html" class="sc-link">S5. 패턴 카탈로그 참조</a>
+    </div>
+  </div>
+
+  <div class="callout navy" style="margin-top: 8px;">
+    <div class="callout-label">출제 포인트 요약</div>
+    Q1 <strong>Where</strong> — 대용량은 DB에서 집계 완결 &nbsp;|&nbsp;
+    Q2 <strong>How</strong> — Lookup Table로 규칙과 로직 분리 &nbsp;|&nbsp;
+    Q3 <strong>Timing</strong> — 허용 지연 있으면 배치 Pre-aggregation &nbsp;|&nbsp;
+    Q4 <strong>How</strong> — 순서 의존성을 코드 구조로 명시 &nbsp;|&nbsp;
+    Q5 <strong>Pattern</strong> — DELETE+INSERT로 멱등성 보장
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <span>Logic Design Series &nbsp;·&nbsp; S6. 자가 진단 — 시리즈 완결</span>
+  <a href="logic_design_s5_patterns.html" class="footer-link prev">← S5. 패턴 카탈로그</a>
+</footer>
+
+<script>
+  /* ── 정답 & 피드백 데이터 ── */
+  const ANSWERS = {
+    1: 'B',
+    2: 'B',
+    3: 'B',
+    4: 'B',
+    5: 'B',
+  };
+
+  const FEEDBACK = {
+    1: {
+      correct: {
+        main: '정확합니다. <strong>데이터 볼륨 기준</strong>으로 Where를 결정해야 합니다.',
+        why: '<strong>핵심 원칙:</strong> 5,000만 행을 네트워크로 앱에 전송한 뒤 Python으로 집계하는 것은 DB가 인덱스·병렬 처리로 처리하는 것보다 수십 배 느리고 메모리를 과소비합니다. 앱 레이어의 유연성 논리는 집계 로직에 적용되지 않습니다. 집계 SQL은 GROUP BY 컬럼을 바꾸는 것으로 충분히 유연합니다.'
+      },
+      wrong: {
+        A: { main: '틀렸습니다. 비즈니스 로직 유연성과 집계 레이어 선택은 별개의 문제입니다.', why: '집계 유연성은 SQL GROUP BY 절을 수정하거나 뷰를 변경하는 방식으로 확보할 수 있습니다. 앱 레이어로 전체 데이터를 올리는 것은 유연성 확보가 아니라 볼륨 문제를 무시하는 것입니다.' },
+        C: { main: '틀렸습니다. Python 루프는 5,000만 행 집계에서 DB보다 빠를 수 없습니다.', why: 'DB는 인덱스, 병렬 스캔, 버퍼 캐시를 활용해 집계를 처리합니다. Python은 네트워크 전송 시간 + 메모리 적재 시간 + 루프 처리 시간을 모두 합산해야 합니다. 데이터 볼륨이 클수록 격차는 벌어집니다.' },
+        D: { main: '제안 B가 맞긴 하지만 이유가 틀렸습니다. 이 문제는 보안이 아니라 볼륨의 문제입니다.', why: '프론트엔드 보안 문제는 별도의 판단 기준입니다. 이 시나리오의 핵심 이유는 <strong>5,000만 행을 이동시키지 않고 DB에서 집계를 완결</strong>해야 한다는 데이터 볼륨 기준입니다.' },
+      }
+    },
+    2: {
+      correct: {
+        main: '정확합니다. <strong>Lookup Table 치환 패턴</strong>의 핵심 장점을 제대로 파악했습니다.',
+        why: '<strong>핵심 원칙:</strong> 방식 X에서 "프리미엄" 추가 시 IF 블록 3개(무게 구간별)를 각각 찾아 수정해야 합니다. 방식 Y에서는 FEE_TABLE에 3개 키-값 쌍을 추가하면 끝이고, 로직 함수(get 호출)는 변경 없습니다. 규칙이 데이터로 분리되면 로직은 영구적으로 안정됩니다.'
+      },
+      wrong: {
+        A: { main: '틀렸습니다. 명시적으로 보인다는 것은 분기 수가 늘어날 때 오히려 문제가 됩니다.', why: '"프리미엄" 추가 시 방식 X는 무게 구간(3개) × 배송 유형(1개 추가) = 3곳을 수정해야 합니다. 만약 또 다른 배송 유형이 추가되면 수정 범위는 계속 늘어납니다. 명시적이라는 것은 중복이 많다는 뜻이기도 합니다.' },
+        C: { main: '틀렸습니다. 코드를 수정해야 하는 것은 같지만, 수정 범위와 방식이 전혀 다릅니다.', why: '방식 X는 분산된 여러 IF 블록을 찾아 각각 수정해야 합니다. 방식 Y는 테이블에 항목을 추가하기만 하면 됩니다. 수정 범위의 차이가 유지보수 비용을 결정합니다.' },
+        D: { main: '틀렸습니다. 성능 차이와 유지보수성은 별개의 문제입니다.', why: '9개 원소짜리 딕셔너리 조회는 IF 체인과 성능 차이가 무의미합니다. 이 시나리오에서 판단 기준은 성능이 아니라 <strong>규칙 변경 시 수정 범위의 차이</strong>입니다.' },
+      }
+    },
+    3: {
+      correct: {
+        main: '정확합니다. <strong>허용 지연 + 높은 조회 빈도 → 배치 Pre-aggregation</strong>의 전형적인 적용 사례입니다.',
+        why: '<strong>핵심 계산:</strong> 하루 200만 회 조회 × 상품당 리뷰 평균 300건 스캔 = 6억 건 스캔/일이 On-demand 방식의 비용입니다. 반면 하루 신규 리뷰 5,000건만 처리하는 배치는 비교할 수 없이 가볍습니다. "1시간 지연 허용"이라는 비즈니스 확인이 배치 선택을 정당화합니다.'
+      },
+      wrong: {
+        A: { main: '틀렸습니다. 200만 회 조회마다 3,000만 건 리뷰를 집계하면 DB가 버티지 못합니다.', why: '리뷰 수·평균 평점은 초 단위 최신성이 필요하지 않습니다. On-demand 집계는 조회가 많아질수록 DB 부하가 선형으로 늘어납니다. "1시간 허용"이 확인된 상황에서 On-demand는 불필요한 비용입니다.' },
+        C: { main: '나쁜 선택은 아니지만, 이 시나리오에서는 배치보다 복잡도가 높습니다.', why: '증분 업데이트(C)는 리뷰 취소·수정·삭제 시 역방향 업데이트 로직이 필요해 복잡도가 올라갑니다. 반면 배치(B)는 매시간 전체를 재계산하므로 취소·수정이 자동으로 반영됩니다. 정확도와 구현 단순성 모두 배치가 유리합니다.' },
+        D: { main: '틀렸습니다. 3,000만 건 리뷰 목록을 프론트로 전송하는 것은 물리적으로 불가능합니다.', why: '프론트엔드는 이미 로드된 소규모 데이터의 필터·정렬에 적합합니다. 수천만 건 집계를 클라이언트에서 처리하는 것은 레이어 월경(Layer Crossing) Anti-pattern의 전형입니다.' },
+      }
+    },
+    4: {
+      correct: {
+        main: '정확합니다. <strong>순서 의존성(Order Dependency) Anti-pattern</strong>의 정확한 진단입니다.',
+        why: '<strong>핵심 원칙:</strong> "세금은 기본급+수당을 알아야 계산할 수 있다"는 의존 관계가 스케줄러 설정 파일에만 존재하고 코드 구조에는 없었습니다. 해결책은 의존 관계를 코드로 표현하는 것입니다. 예: 세금 계산 함수가 기본급·수당 계산 함수를 직접 호출하거나, DAG(방향 비순환 그래프)로 의존성을 선언합니다. 그러면 순서를 바꾸는 것이 구조적으로 불가능해집니다.'
+      },
+      wrong: {
+        A: { main: '틀렸습니다. 코드 리뷰는 증상을 막을 수 있지만 근본 원인을 제거하지는 못합니다.', why: '코드 리뷰를 강화해도 "순서가 중요하다"는 사실이 코드 어디에도 보이지 않으면, 다음 개발자도 같은 실수를 반복할 수 있습니다. 근본 원인은 암묵적 순서 의존성 자체입니다.' },
+        C: { main: '틀렸습니다. 트랜잭션은 원자성(모두 성공 또는 모두 실패)을 보장하지, 실행 순서 의존성을 해결하지 않습니다.', why: '트랜잭션 안에서도 잘못된 순서로 실행하면 세금 계산이 0이 나오는 것은 동일합니다. 트랜잭션은 데이터 무결성 도구이지 의존성 관리 도구가 아닙니다.' },
+        D: { main: '부분적으로 맞지만, 단일 쿼리로 합치는 것이 항상 가능하지 않으며 본질적 해결책이 아닙니다.', why: '단일 쿼리로 합치면 순서 문제가 사라질 수 있지만, 복잡한 급여 계산을 하나의 SQL에 담는 것은 유지보수를 더 어렵게 만들 수 있습니다. 핵심은 의존 관계를 코드 구조로 <strong>명시</strong>하는 것입니다.' },
+      }
+    },
+    5: {
+      correct: {
+        main: '정확합니다. <strong>DELETE + INSERT 패턴으로 멱등성을 보장</strong하는 올바른 접근입니다.',
+        why: '<strong>핵심 원칙:</strong> 구현 P는 두 번 실행하면 2024-03-15 데이터가 두 행 INSERT되어 집계값이 두 배가 됩니다. 구현 Q는 먼저 해당 날짜 데이터를 DELETE하고 INSERT하므로 몇 번 실행해도 결과가 동일합니다. 장애 복구, 재처리, 테스트 재실행 모두 안전합니다. UPSERT(ON CONFLICT DO UPDATE)도 동일한 멱등성을 제공하는 대안입니다.'
+      },
+      wrong: {
+        A: { main: '틀렸습니다. 구현 P는 두 번 실행하면 같은 날짜 데이터가 두 행 삽입되어 집계가 두 배가 됩니다.', why: 'INSERT만 있는 구현은 기본적으로 멱등성이 없습니다. UNIQUE 제약이나 ON CONFLICT 처리 없이 단순 INSERT를 반복하면 중복 행이 쌓입니다. 배치는 언제든 재실행될 수 있으므로 멱등성 설계가 필수입니다.' },
+        C: { main: '틀렸습니다. 트랜잭션은 ACID를 보장하지만 중복 실행을 막지는 않습니다.', why: '트랜잭션으로 묶으면 "한 번의 배치 실행"은 원자적이 됩니다. 하지만 배치를 두 번 실행하면 트랜잭션이 두 번 성공해 두 행이 삽입됩니다. 멱등성은 "재실행해도 결과가 같은 것"이고, 트랜잭션의 원자성과는 다른 개념입니다.' },
+        D: { main: '틀렸습니다. 두 구현은 재실행 안전성에서 명확히 다릅니다.', why: '구현 P는 재실행 시 중복 삽입이 발생하지만, 구현 Q는 DELETE로 기존 데이터를 먼저 제거하므로 재실행해도 결과가 항상 동일합니다. 멱등성 유무의 차이가 장애 복구 시 데이터 정합성을 결정합니다.' },
+      }
+    }
+  };
+
+  /* ── 상태 ── */
+  let answered = {};   // { qNum: chosenKey }
+  let correct  = {};   // { qNum: true/false }
+  let axisTrack = {
+    'Where': { total: 1, hit: 0 },
+    'How':   { total: 2, hit: 0 },
+    'Timing':{ total: 1, hit: 0 },
+    'Pattern':{ total: 1, hit: 0 },
+  };
+  const Q_AXIS = { 1:'Where', 2:'How', 3:'Timing', 4:'How', 5:'Pattern' };
+
+  function answer(qNum, chosen, btnEl) {
+    if (answered[qNum]) return;
+    answered[qNum] = chosen;
+
+    const isCorrect = (chosen === ANSWERS[qNum]);
+    correct[qNum] = isCorrect;
+    if (isCorrect) axisTrack[Q_AXIS[qNum]].hit++;
+
+    // disable all options
+    const card = document.getElementById('qcard-' + qNum);
+    card.classList.add('answered');
+    const opts = card.querySelectorAll('.quiz-option');
+    opts.forEach(o => {
+      o.disabled = true;
+      const key = o.querySelector('.opt-key').textContent.trim();
+      if (key === ANSWERS[qNum]) {
+        o.classList.add('correct-ans');
+      } else if (key === chosen && !isCorrect) {
+        o.classList.add('wrong-ans');
+      } else if (key !== chosen) {
+        o.classList.add('unchosen');
+      }
+    });
+
+    // feedback
+    const fb = document.getElementById('fb-' + qNum);
+    const fbLabel = document.getElementById('fb-label-' + qNum);
+    const fbMain  = document.getElementById('fb-main-'  + qNum);
+    const fbWhy   = document.getElementById('fb-why-'   + qNum);
+    fb.classList.add('show');
+
+    if (isCorrect) {
+      fb.classList.add('correct');
+      fbLabel.textContent = '✅ 정답';
+      fbMain.innerHTML  = FEEDBACK[qNum].correct.main;
+      fbWhy.innerHTML   = FEEDBACK[qNum].correct.why;
+    } else {
+      fb.classList.add('wrong');
+      fbLabel.textContent = '❌ 오답';
+      const wrongFB = FEEDBACK[qNum].wrong[chosen];
+      fbMain.innerHTML = wrongFB ? wrongFB.main : '틀렸습니다.';
+      fbWhy.innerHTML  = wrongFB ? wrongFB.why  : '';
+    }
+
+    updateProgress();
+
+    // show result when all answered
+    if (Object.keys(answered).length === 5) {
+      setTimeout(showResult, 500);
+    }
+  }
+
+  function updateProgress() {
+    const done  = Object.keys(answered).length;
+    const score = Object.values(correct).filter(Boolean).length;
+    document.getElementById('prog-label').textContent = done + ' / 5 완료';
+    document.getElementById('prog-fill').style.width  = (done / 5 * 100) + '%';
+    document.getElementById('prog-score').textContent = done > 0 ? score + '점' : '— 점';
+  }
+
+  function showResult() {
+    const score = Object.values(correct).filter(Boolean).length;
+    const panel = document.getElementById('result-panel');
+    panel.classList.add('show');
+    document.getElementById('result-score-big').textContent = score;
+
+    const grades = [
+      { min: 5, grade: '설계 직관 완성', comment: '세 축과 패턴을 현장에서 즉시 적용할 수 있는 수준입니다. 이제 설계 리뷰에서 판단 근거를 구조적으로 설명할 수 있습니다.' },
+      { min: 4, grade: '설계 감각 양호', comment: '대부분의 판단 기준을 체득했습니다. 오답 문항의 해설을 다시 읽고 해당 섹션을 복습하면 완성됩니다.' },
+      { min: 3, grade: '기준 인지 단계', comment: '핵심 프레임은 이해했지만 적용 시 놓치는 부분이 있습니다. S2–S4를 다시 훑으며 판단 기준을 되새기세요.' },
+      { min: 0, grade: '복습 필요', comment: 'S1부터 차근차근 다시 읽어보세요. 각 섹션 말미의 판단 플로우차트를 먼저 암기하는 것이 효과적입니다.' },
+    ];
+    const g = grades.find(g => score >= g.min);
+    document.getElementById('result-grade').textContent = g.grade;
+    document.getElementById('result-comment').textContent = g.comment;
+
+    // breakdown
+    const bd = document.getElementById('result-breakdown');
+    bd.innerHTML = Object.entries(axisTrack).map(([axis, v]) => `
+      <div class="breakdown-item">
+        <div class="breakdown-axis">${axis}</div>
+        <div class="breakdown-val">${v.hit} / ${v.total}</div>
+      </div>
+    `).join('');
+
+    // series complete
+    if (score === 5) {
+      document.getElementById('series-complete').style.display = 'block';
+    }
+
+    panel.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function retryQuiz() {
+    answered = {};
+    correct  = {};
+    Object.keys(axisTrack).forEach(k => axisTrack[k].hit = 0);
+
+    // reset cards
+    for (let i = 1; i <= 5; i++) {
+      const card = document.getElementById('qcard-' + i);
+      card.classList.remove('answered');
+      card.querySelectorAll('.quiz-option').forEach(o => {
+        o.disabled = false;
+        o.classList.remove('correct-ans', 'wrong-ans', 'unchosen');
+      });
+      const fb = document.getElementById('fb-' + i);
+      fb.classList.remove('show', 'correct', 'wrong');
+    }
+
+    document.getElementById('result-panel').classList.remove('show');
+    document.getElementById('series-complete').style.display = 'none';
+    updateProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+
+</body>
+</html>
