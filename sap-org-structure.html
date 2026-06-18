@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAP 조직구조 완전 이해 | ASPN BAC</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 15px;
+  background: #f0f3f8;
+  color: #1a2233;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  overflow-x: hidden;
+}
+
+/* ── NAV ── */
+.sticky-nav {
+  position: sticky; top: 0; z-index: 100;
+  background: #003366;
+  display: flex; align-items: center;
+  padding: 0 32px;
+  box-shadow: 0 2px 8px rgba(0,51,102,.25);
+}
+.nav-brand {
+  font-family: 'DM Serif Display', serif;
+  color: #fff;
+  font-size: 15px;
+  white-space: nowrap;
+  padding: 14px 0;
+  margin-right: 28px;
+  opacity: .85;
+  letter-spacing: .03em;
+}
+.nav-tabs {
+  display: flex; gap: 0; overflow-x: auto;
+  scrollbar-width: none;
+}
+.nav-tabs::-webkit-scrollbar { display: none; }
+.nav-tab {
+  color: rgba(255,255,255,.65);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 16px 18px;
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 3px solid transparent;
+  transition: color .2s, border-color .2s;
+  user-select: none;
+}
+.nav-tab:hover { color: #fff; }
+.nav-tab.active { color: #fff; border-bottom-color: #7eb8f7; }
+
+/* ── HERO ── */
+.hero {
+  background: #003366;
+  padding: 56px 48px 48px;
+  color: #fff;
+}
+.hero-eyebrow {
+  font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
+  font-size: 12px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.55);
+  margin-bottom: 14px;
+}
+.hero h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 38px;
+  line-height: 1.2;
+  margin-bottom: 14px;
+}
+.hero-sub {
+  color: rgba(255,255,255,.72);
+  font-size: 15px;
+  max-width: 680px;
+  line-height: 1.7;
+}
+.hero-chips {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-top: 24px;
+}
+.hero-chip {
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.2);
+  color: rgba(255,255,255,.85);
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  padding: 4px 12px;
+  border-radius: 2px;
+}
+
+/* ── SECTION ── */
+.section { display: none; padding: 40px 48px 64px; max-width: 1100px; margin: 0 auto; }
+.section.active { display: block; }
+
+.section-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px;
+  color: #003366;
+  margin-bottom: 6px;
+}
+.section-lead {
+  color: #4a5568;
+  font-size: 15px;
+  line-height: 1.8;
+  margin-bottom: 32px;
+  max-width: 760px;
+}
+
+/* ── CARDS ── */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 28px; }
+.card {
+  background: #fff;
+  border: 1px solid #dce3ef;
+  border-radius: 4px;
+  padding: 24px 24px 20px;
+}
+.card-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #003366;
+  margin-bottom: 8px;
+}
+.card h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1a2233;
+  margin-bottom: 10px;
+}
+.card p { font-size: 14px; color: #4a5568; line-height: 1.75; }
+
+/* ── CALLOUTS ── */
+.callout {
+  border-left: 4px solid #003366;
+  background: #eef3fb;
+  padding: 16px 20px;
+  border-radius: 0 4px 4px 0;
+  margin-bottom: 20px;
+  font-size: 14px;
+  line-height: 1.75;
+  color: #1a2233;
+}
+.callout.warn { border-color: #b45309; background: #fef3c7; }
+.callout.correct { border-color: #2e7d32; background: #e8f5e9; }
+.callout.wrong { border-color: #c0392b; background: #fdecea; }
+.callout strong { font-weight: 700; }
+
+/* ── RELATION TABLE ── */
+.rel-table { width: 100%; border-collapse: collapse; margin-bottom: 28px; font-size: 14px; }
+.rel-table th {
+  background: #003366;
+  color: #fff;
+  text-align: left;
+  padding: 11px 16px;
+  font-weight: 600;
+  font-size: 13px;
+}
+.rel-table td {
+  padding: 11px 16px;
+  border-bottom: 1px solid #dce3ef;
+  color: #1a2233;
+  vertical-align: top;
+  line-height: 1.65;
+}
+.rel-table tr:nth-child(even) td { background: #f7f9fc; }
+.badge {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  background: #003366;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+.badge.gray { background: #64748b; }
+.badge.green { background: #2e7d32; }
+.badge.warn { background: #b45309; }
+
+/* ── FLOW ── */
+.flow-row {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 0;
+  margin-bottom: 16px;
+}
+.flow-node {
+  background: #fff;
+  border: 2px solid #003366;
+  border-radius: 4px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #003366;
+  white-space: nowrap;
+}
+.flow-node.secondary { border-color: #7eb8f7; color: #1a4a8a; border-width: 1px; }
+.flow-arrow {
+  font-size: 20px;
+  color: #003366;
+  padding: 0 10px;
+  flex-shrink: 0;
+}
+.flow-label {
+  font-size: 12px;
+  color: #64748b;
+  padding: 0 4px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ── DRILL TOGGLE ── */
+.drill { margin-bottom: 16px; border: 1px solid #dce3ef; border-radius: 4px; background: #fff; }
+.drill-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 600;
+  font-size: 14px;
+  color: #1a2233;
+}
+.drill-header:hover { background: #f7f9fc; }
+.drill-icon { color: #003366; font-size: 18px; transition: transform .25s; }
+.drill.open .drill-icon { transform: rotate(90deg); }
+.drill-body { display: none; padding: 0 18px 16px; font-size: 14px; color: #4a5568; line-height: 1.75; }
+.drill.open .drill-body { display: block; }
+
+/* ── QUIZ ── */
+.quiz-block { background: #fff; border: 1px solid #dce3ef; border-radius: 4px; padding: 22px 24px; margin-bottom: 20px; }
+.quiz-q { font-weight: 700; font-size: 15px; margin-bottom: 14px; color: #1a2233; }
+.quiz-options { display: flex; flex-direction: column; gap: 8px; }
+.quiz-opt {
+  border: 1.5px solid #dce3ef;
+  border-radius: 4px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #1a2233;
+  background: #fff;
+  text-align: left;
+  transition: border-color .15s, background .15s;
+}
+.quiz-opt:hover:not([disabled]) { border-color: #003366; background: #eef3fb; }
+.quiz-opt.correct-ans { border-color: #2e7d32 !important; background: #e8f5e9 !important; color: #1b5e20; font-weight: 600; }
+.quiz-opt.wrong-ans { border-color: #c0392b !important; background: #fdecea !important; color: #7f1d1d; }
+.quiz-feedback { margin-top: 12px; font-size: 13px; display: none; }
+
+/* ── DIAGRAM (SVG wrapper) ── */
+.diagram-wrap {
+  background: #fff;
+  border: 1px solid #dce3ef;
+  border-radius: 4px;
+  padding: 28px;
+  margin-bottom: 28px;
+  overflow-x: auto;
+}
+
+/* ── CHECKLIST ── */
+.checklist { list-style: none; margin-bottom: 24px; }
+.checklist li {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #eef0f4;
+  font-size: 14px;
+  color: #1a2233;
+  line-height: 1.6;
+}
+.checklist li:last-child { border: none; }
+.check-box {
+  width: 20px; height: 20px; min-width: 20px;
+  border: 2px solid #003366;
+  border-radius: 2px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  color: #003366;
+  transition: background .15s;
+  margin-top: 1px;
+}
+.check-box.checked { background: #003366; color: #fff; }
+
+.progress-bar-wrap {
+  background: #dce3ef;
+  border-radius: 4px;
+  height: 8px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  background: #003366;
+  border-radius: 4px;
+  transition: width .3s;
+  width: 0%;
+}
+.progress-label {
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+
+/* ── TWO-COL ── */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+@media(max-width:720px) { .two-col { grid-template-columns: 1fr; } .section { padding: 28px 20px 48px; } .hero { padding: 36px 20px 32px; } .hero h1 { font-size: 28px; } }
+
+.divider { border: none; border-top: 1px solid #dce3ef; margin: 28px 0; }
+
+h2.sub-title { font-size: 18px; font-weight: 700; color: #003366; margin: 28px 0 14px; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="sticky-nav">
+  <div class="nav-brand">ASPN BAC · SAP 조직구조</div>
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="showTab(0)">01 왜 조직구조인가</div>
+    <div class="nav-tab" onclick="showTab(1)">02 Company & Company Code</div>
+    <div class="nav-tab" onclick="showTab(2)">03 Plant & Sales Org</div>
+    <div class="nav-tab" onclick="showTab(3)">04 Purchasing Org</div>
+    <div class="nav-tab" onclick="showTab(4)">05 Controlling Area</div>
+    <div class="nav-tab" onclick="showTab(5)">06 Profit Center</div>
+    <div class="nav-tab" onclick="showTab(6)">07 전체 통합도 & 확인</div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">SAP ERP · Organization Structure · 신입 컨설턴트 필수 기초</div>
+  <h1>SAP 조직구조 완전 이해</h1>
+  <p class="hero-sub">SAP는 현실 세계의 기업 구조를 7개의 오브젝트로 추상화합니다. 이 오브젝트들의 역할과 상호 관계를 이해하지 못하면, 어떤 비즈니스 프로세스도 올바르게 설계할 수 없습니다.</p>
+  <div class="hero-chips">
+    <span class="hero-chip">Company</span>
+    <span class="hero-chip">Company Code</span>
+    <span class="hero-chip">Plant</span>
+    <span class="hero-chip">Sales Org</span>
+    <span class="hero-chip">Purchasing Org</span>
+    <span class="hero-chip">Controlling Area</span>
+    <span class="hero-chip">Profit Center</span>
+  </div>
+</div>
+
+<!-- ─────────────── TAB 01 ─────────────── -->
+<section class="section active" id="tab0">
+  <div class="section-title">왜 SAP는 조직을 오브젝트로 쪼개는가?</div>
+  <p class="section-lead">ERP를 처음 접하는 컨설턴트가 가장 먼저 받는 충격은 "왜 이렇게 복잡하게 설계했지?"입니다. 그 답은 하나입니다. 현실 기업의 복잡성을 그대로 반영하기 위해서입니다.</p>
+
+  <div class="callout">
+    <strong>핵심 전제:</strong> 글로벌 기업은 하나의 실체가 아닙니다. 법적 실체, 회계 단위, 물류 단위, 판매 채널, 구매 권한, 비용 집계 경계, 손익 책임 단위가 서로 다릅니다. SAP는 이 각각을 독립 오브젝트로 분리하여 어떤 조합도 표현할 수 있게 합니다.
+  </div>
+
+  <h2 class="sub-title">현실 기업 구조 vs SAP 오브젝트 매핑</h2>
+  <table class="rel-table">
+    <thead>
+      <tr><th>현실의 개념</th><th>SAP 오브젝트</th><th>모듈 연관</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>법적 법인 (Legal Entity)</td><td><span class="badge">Company</span></td><td>FI – 연결회계 (GR)</td></tr>
+      <tr><td>독립 장부 단위 (Accounting Unit)</td><td><span class="badge">Company Code</span></td><td>FI – 외부회계</td></tr>
+      <tr><td>생산·재고 물리 단위 (Logistics Site)</td><td><span class="badge">Plant</span></td><td>MM, PP, WM, SD</td></tr>
+      <tr><td>판매 채널·지역 단위 (Sales Channel)</td><td><span class="badge">Sales Org</span></td><td>SD – 수주관리</td></tr>
+      <tr><td>구매 권한 단위 (Procurement Authority)</td><td><span class="badge">Purchasing Org</span></td><td>MM – 구매관리</td></tr>
+      <tr><td>관리회계 경계 (CO Boundary)</td><td><span class="badge">Controlling Area</span></td><td>CO – 원가관리</td></tr>
+      <tr><td>손익 책임 단위 (P&L Responsibility)</td><td><span class="badge">Profit Center</span></td><td>CO-PCA (Universal Journal 기반)</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="sub-title">ASPN Group 실습 시나리오</h2>
+  <p class="section-lead" style="margin-bottom:16px;">이 모듈 전체에서 다음 픽션 그룹 구조를 공통 예제로 사용합니다.</p>
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-label">Holdings</div>
+      <h3>ASPN Holdings GmbH</h3>
+      <p>독일 등록 지주회사. 연결회계(GR) 기준점. 직접 영업/생산 없음.</p>
+    </div>
+    <div class="card">
+      <div class="card-label">Korea Subsidiary</div>
+      <h3>ASPN Korea Co., Ltd.</h3>
+      <p>한국 제조 법인. 생산 Plant 2개 (서울, 부산). 국내·수출 판매 병행.</p>
+    </div>
+    <div class="card">
+      <div class="card-label">Europe Subsidiary</div>
+      <h3>ASPN Europe GmbH</h3>
+      <p>독일 영업 법인. 생산 없음, 유럽 판매 전담. Korea로부터 STO 수령.</p>
+    </div>
+  </div>
+
+  <div class="callout correct">
+    <strong>학습 포인트:</strong> "법인"과 "조직구조 오브젝트"는 1:1이 아닙니다. Korea 하나의 법인 안에도 Plant가 2개이고, Sales Org가 별도로 존재합니다. 오브젝트를 법인 단위로 혼동하는 것이 신입 컨설턴트의 가장 흔한 실수입니다.
+  </div>
+</section>
+
+<!-- ─────────────── TAB 02 ─────────────── -->
+<section class="section" id="tab1">
+  <div class="section-title">Company & Company Code</div>
+  <p class="section-lead">SAP에서 가장 먼저 구분해야 할 개념입니다. 둘 다 "회사"처럼 들리지만, 목적과 역할이 완전히 다릅니다.</p>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-label">Company</div>
+      <h3>법적 실체 단위 <span style="font-size:11px;font-weight:400;color:#64748b;">(교육 단순화)</span></h3>
+      <p>SAP FI 엔터프라이즈 구조의 상위 조직 단위. 이 모듈에서는 <strong>교육 목적으로 "법인 개념"과 대응</strong>시켜 설명하지만, 실무에서는 Company를 사용하지 않거나 형식적으로만 유지하는 고객도 많습니다. 법적 실체의 실질 단위는 <strong>Company Code</strong>이며, 연결 단위는 GR의 <strong>Consolidation Unit</strong>입니다.</p>
+    </div>
+    <div class="card">
+      <div class="card-label">Company Code</div>
+      <h3>독립 장부 단위</h3>
+      <p>SAP FI 모듈의 핵심 단위. 독립적인 Trial Balance(잔액시산표)와 P&L을 가지며, 세무 신고·외부감사의 단위가 됩니다.</p>
+    </div>
+  </div>
+
+  <h2 class="sub-title">핵심 관계: 1 Company : N Company Code</h2>
+  <div class="callout">
+    하나의 법적 법인(Company)이 복수의 Company Code를 가질 수 있습니다. 예: 국내 법인이 <strong>본사 장부</strong>와 <strong>해외 지점 장부</strong>를 별도로 유지해야 하는 세무·규제 요건이 있을 때 Company Code 2개를 사용합니다.
+    단, 현대 S/4HANA 설계에서는 사업부 분리에 Company Code를 추가하기보다 <strong>Segment, Profit Center, Parallel Ledger</strong>로 해결하는 것이 일반적입니다. 1:N 구조는 명확한 법적·규제 요건이 있을 때 사용하는 방식으로 이해하세요.
+  </div>
+
+  <div class="flow-row">
+    <div class="flow-node">ASPN Korea<br><small style="font-weight:400;font-size:12px;">Company: KR01</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node secondary">Company Code: KR10<br><small style="font-weight:400;font-size:12px;">제조 사업부</small></div>
+    <div class="flow-arrow" style="color:#7eb8f7">+</div>
+    <div class="flow-node secondary">Company Code: KR20<br><small style="font-weight:400;font-size:12px;">무역 사업부</small></div>
+  </div>
+
+  <h2 class="sub-title">ASPN Group Company / Company Code 구성</h2>
+  <table class="rel-table">
+    <thead><tr><th>Company (법인)</th><th>Company Code</th><th>통화</th><th>회계기준</th></tr></thead>
+    <tbody>
+      <tr><td>ASPN Holdings GmbH</td><td><span class="badge">HD00</span></td><td>EUR</td><td>IFRS</td></tr>
+      <tr><td>ASPN Korea Co., Ltd.</td><td><span class="badge">KR10</span></td><td>KRW</td><td>K-IFRS</td></tr>
+      <tr><td>ASPN Europe GmbH</td><td><span class="badge">DE10</span></td><td>EUR</td><td>IFRS / HGB</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="sub-title">자주 나오는 질문 — Drill</h2>
+
+  <div class="drill" onclick="toggleDrill(this)">
+    <div class="drill-header">Company Code가 없으면 어떤 처리가 불가능한가? <span class="drill-icon">▶</span></div>
+    <div class="drill-body">FI 전표(Journal Entry) 생성이 불가합니다. 모든 회계 전표는 반드시 하나의 Company Code에 귀속됩니다. 또한 외부 재무제표(B/S, P&L), 세무 신고, 계좌 잔액 조회도 Company Code 기준으로 실행됩니다.</div>
+  </div>
+
+  <div class="drill" onclick="toggleDrill(this)">
+    <div class="drill-header">Group Reporting(GR)에서 Company와 Company Code의 관계는? <span class="drill-icon">▶</span></div>
+    <div class="drill-body">이 모듈에서는 이해를 위해 Company를 연결 대상 법인 개념으로 설명합니다. 실제 SAP Group Reporting에서는 <strong>Consolidation Unit</strong>을 기준으로 연결이 수행되며, FS Item·Consolidation Dimension 등의 구조를 통해 관리됩니다. Company Code의 잔액은 Consolidation Unit에 매핑되어 연결 패키지로 업로드됩니다. GR 상세 구조는 별도 GR 모듈에서 다룹니다.</div>
+  </div>
+
+  <div class="drill" onclick="toggleDrill(this)">
+    <div class="drill-header">Company와 Company Code를 1:1로 구성하면 안 되는가? <span class="drill-icon">▶</span></div>
+    <div class="drill-body">됩니다. 대부분의 단순 구조에서는 1:1이 가장 일반적입니다. 1:N은 사업부 분리, 세무 목적 분리 등 특별한 요건이 있을 때 사용합니다.</div>
+  </div>
+
+  <hr class="divider">
+  <div class="quiz-block">
+    <div class="quiz-q">Q. ASPN Europe GmbH는 독일에서 IFRS와 HGB 두 가지 기준으로 외부 보고를 해야 합니다. 가장 적합한 SAP 설계는?</div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="checkQuiz('q02a', this, false)">① Company 2개를 생성하여 각각 다른 회계기준에 대응한다</button>
+      <button class="quiz-opt" onclick="checkQuiz('q02a', this, true)">② Company Code는 1개로 유지하고, Parallel Ledger(병행원장)을 활용한다</button>
+      <button class="quiz-opt" onclick="checkQuiz('q02a', this, false)">③ Company Code 2개를 생성하여 각각 다른 회계기준을 적용한다</button>
+    </div>
+    <div class="quiz-feedback" id="fb-q02a"></div>
+  </div>
+</section>
+
+<!-- ─────────────── TAB 03 ─────────────── -->
+<section class="section" id="tab2">
+  <div class="section-title">Plant & Sales Organization</div>
+  <p class="section-lead">물류의 출발점은 Plant, 판매의 출발점은 Sales Org입니다. 두 오브젝트는 Company Code에 할당되지만, 서로 다른 차원에서 비즈니스를 분류합니다.</p>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-label">Plant</div>
+      <h3>물리적 물류 단위</h3>
+      <p>생산, 재고 관리, 구매 납품, 이동 관리의 기준 단위. 공장·창고·배송센터 모두 Plant로 정의될 수 있습니다. MRP, 검사로트, 원가산정의 단위이기도 합니다.</p>
+    </div>
+    <div class="card">
+      <div class="card-label">Sales Organization</div>
+      <h3>판매 채널·책임 단위</h3>
+      <p>수주(Sales Order)의 최상위 단위. 판매 조건, 가격, 고객 책임 범위를 정의합니다. Distribution Channel, Division과 함께 Sales Area를 구성합니다.</p>
+    </div>
+  </div>
+
+  <h2 class="sub-title">Plant의 할당 규칙</h2>
+  <div class="callout warn">
+    <strong>핵심 제약:</strong> Plant는 반드시 하나의 Company Code에만 할당됩니다. Plant와 Company Code의 관계는 <strong>N:1</strong>입니다. 즉, 하나의 Company Code 아래 여러 Plant가 있을 수 있지만, 하나의 Plant가 두 Company Code에 동시에 속하는 것은 불가합니다.
+  </div>
+
+  <div class="flow-row">
+    <div class="flow-node">KR10<br><small style="font-weight:400;font-size:12px;">Company Code</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node secondary">KR01 Plant<br><small>서울 공장</small></div>
+    <div class="flow-arrow" style="color:#7eb8f7">+</div>
+    <div class="flow-node secondary">KR02 Plant<br><small>부산 창고</small></div>
+  </div>
+
+  <h2 class="sub-title">Plant 공유(Sharing)가 불가능한 이유와 실무 오류 패턴</h2>
+
+  <div class="drill" onclick="toggleDrill(this)">
+    <div class="drill-header">왜 Plant는 두 Company Code에 걸칠 수 없는가? <span class="drill-icon">▶</span></div>
+    <div class="drill-body">
+      재고 이동(Goods Movement)이 발생할 때마다 SAP는 Plant에 귀속된 Company Code로 FI 전표를 자동 생성합니다. Plant가 두 Company Code에 연결된다면 어느 장부에 전기할지 결정할 수 없습니다. 즉, <strong>회계 귀속의 모호성</strong>이 설계 자체를 무효로 만듭니다.
+    </div>
+  </div>
+
+  <div class="drill" onclick="toggleDrill(this)">
+    <div class="drill-header">실무 오류 패턴: "물리적으로 같은 공장인데 두 법인이 공유하고 싶다" <span class="drill-icon">▶</span></div>
+    <div class="drill-body">
+      이 요구사항은 SAP에서 Plant 공유로 해결하지 않습니다. 올바른 설계는 두 법인 각각 별도 Plant를 생성한 뒤, 법인 간 거래를 <strong>Stock Transport Order(STO)</strong> 또는 <strong>Intercompany 프로세스</strong>로 처리하는 것입니다. 같은 창고 공간을 쓰더라도 SAP 오브젝트는 분리되어야 합니다.
+    </div>
+  </div>
+
+  <div class="drill" onclick="toggleDrill(this)">
+    <div class="drill-header">Sales Org도 Plant처럼 Company Code에 귀속되는가? <span class="drill-icon">▶</span></div>
+    <div class="drill-body">
+      네. Sales Org도 반드시 하나의 Company Code에 할당됩니다. 단, Sales Org와 Plant는 별도로 할당 관계를 정의해야 합니다. Sales Org만 있고 Plant 할당이 없으면 수주에서 납품(Delivery)으로 넘어가는 순간 오류가 납니다.
+    </div>
+  </div>
+
+  <h2 class="sub-title">ASPN Group Plant / Sales Org 구성</h2>
+  <table class="rel-table">
+    <thead><tr><th>Company Code</th><th>Plant</th><th>역할</th><th>Sales Org</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge">KR10</span></td><td>KR01</td><td>서울 제조공장</td><td rowspan="2" style="vertical-align:middle">KR10 (국내)<br>KR20 (수출)</td></tr>
+      <tr><td><span class="badge">KR10</span></td><td>KR02</td><td>부산 물류창고</td></tr>
+      <tr><td><span class="badge">DE10</span></td><td>DE01</td><td>독일 배송센터 (STO 수령)</td><td>DE10 (유럽)</td></tr>
+      <tr><td><span class="badge">HD00</span></td><td colspan="3" style="color:#64748b">— Plant 없음 (지주회사, 물류 없음) —</td></tr>
+    </tbody>
+  </table>
+
+  <hr class="divider">
+  <div class="quiz-block">
+    <div class="quiz-q">Q. ASPN Europe(DE10)는 직접 생산하지 않고 Korea(KR10)의 KR01 Plant에서 재고를 이전받아 판매합니다. 이 시나리오에서 DE01 Plant는 왜 반드시 필요한가?</div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="checkQuiz('q03a', this, false)">① Sales Org DE10을 생성하려면 같은 Company Code에 Plant가 필수이기 때문</button>
+      <button class="quiz-opt" onclick="checkQuiz('q03a', this, true)">② DE10 Company Code 귀속 재고를 관리하고, FI 전표를 DE10 장부에 생성하기 위해</button>
+      <button class="quiz-opt" onclick="checkQuiz('q03a', this, false)">③ KR01 Plant를 DE10 Company Code에도 할당할 수 없기 때문에 형식상 필요</button>
+    </div>
+    <div class="quiz-feedback" id="fb-q03a"></div>
+  </div>
+</section>
+
+<!-- ─────────────── TAB 04 ─────────────── -->
+<section class="section" id="tab3">
+  <div class="section-title">Purchasing Organization</div>
+  <p class="section-lead">구매는 SAP에서 가장 복잡한 조직 설계 옵션을 가집니다. Purchasing Org는 "누가 구매 계약을 체결하고 집행할 권한을 갖는가"를 정의합니다.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-label">중앙구매 (Central Purchasing Org)</div>
+      <h3>그룹 전체 일괄 협상</h3>
+      <p>하나의 Purchasing Org가 복수 Company Code의 구매를 대행. 협상력 집중, 볼륨 디스카운트 극대화. 단, Company Code별 책임 분리 어려움.</p>
+    </div>
+    <div class="card">
+      <div class="card-label">Company Code별 구매</div>
+      <h3>법인 독립 구매</h3>
+      <p>각 Company Code가 자체 Purchasing Org 보유. 법인 자율성과 책임 명확화. 글로벌 협상력은 분산됨.</p>
+    </div>
+    <div class="card">
+      <div class="card-label">Plant별 구매</div>
+      <h3>현장 구매 (Local Sourcing)</h3>
+      <p>특정 Plant에서만 사용하는 로컬 구매 조직. 중앙 Purchasing Org와 병행 운영 가능 (Reference Purchasing Org 활용).</p>
+    </div>
+  </div>
+
+  <h2 class="sub-title">할당 관계 및 예외 케이스</h2>
+  <div class="callout">
+    Purchasing Org는 Company Code에 할당되거나, 또는 <strong>Company Code 없이 그룹 레벨</strong>로 존재할 수 있습니다. 그룹 레벨 Purchasing Org는 여러 Company Code를 포괄하는 중앙 계약 협상에 사용됩니다.
+  </div>
+
+  <div class="drill" onclick="toggleDrill(this)">
+    <div class="drill-header">Reference Purchasing Org란 무엇인가? <span class="drill-icon">▶</span></div>
+    <div class="drill-body">
+      중앙 Purchasing Org가 협상한 <strong>계약 조건(Outline Agreement)</strong>을 Plant 단위 Purchasing Org가 참조(Reference)하여 발주하는 구조입니다. 중앙 협상 + 현장 발주 분리가 가능하여 대규모 그룹사에서 자주 사용됩니다.
+    </div>
+  </div>
+
+  <div class="drill" onclick="toggleDrill(this)">
+    <div class="drill-header">Purchasing Org 없이 구매 오더(PO)를 생성할 수 있는가? <span class="drill-icon">▶</span></div>
+    <div class="drill-body">
+      없습니다. 모든 Purchase Order(ME21N)는 반드시 Purchasing Org를 지정해야 합니다. Purchasing Org가 해당 Plant와 연결되지 않으면 PO 저장 시 오류가 발생합니다.
+    </div>
+  </div>
+
+  <h2 class="sub-title">ASPN Group 구매 구조</h2>
+  <table class="rel-table">
+    <thead><tr><th>Purchasing Org</th><th>유형</th><th>할당 Company Code</th><th>담당 Plant</th></tr></thead>
+    <tbody>
+      <tr><td>GRP0 — ASPN Group Purchasing</td><td><span class="badge gray">그룹 중앙</span></td><td>없음 (그룹 레벨)</td><td>참조용 (계약 협상)</td></tr>
+      <tr><td>KR10 — Korea Purchasing</td><td><span class="badge">Company Code 귀속</span></td><td>KR10</td><td>KR01, KR02</td></tr>
+      <tr><td>DE10 — Europe Purchasing</td><td><span class="badge">Company Code 귀속</span></td><td>DE10</td><td>DE01</td></tr>
+    </tbody>
+  </table>
+
+  <hr class="divider">
+  <div class="quiz-block">
+    <div class="quiz-q">Q. ASPN Group 전체의 원자재 구매 단가를 본사에서 협상하여 Korea와 Europe이 같은 단가로 구매하게 하려 합니다. 가장 적합한 설계는?</div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="checkQuiz('q04a', this, false)">① KR10과 DE10 두 Purchasing Org에 동일한 Info Record를 수동으로 복사한다</button>
+      <button class="quiz-opt" onclick="checkQuiz('q04a', this, true)">② GRP0 그룹 레벨 Purchasing Org로 Outline Agreement(계약)를 체결하고, KR10·DE10이 Reference Purchasing Org로 참조하여 발주한다</button>
+      <button class="quiz-opt" onclick="checkQuiz('q04a', this, false)">③ 단가 통일을 위해 Purchasing Org를 하나로 합치고 Company Code 2개에 동시 할당한다</button>
+    </div>
+    <div class="quiz-feedback" id="fb-q04a"></div>
+  </div>
+</section>
+
+<!-- ─────────────── TAB 05 ─────────────── -->
+<section class="section" id="tab4">
+  <div class="section-title">Controlling Area</div>
+  <p class="section-lead">Controlling Area는 SAP CO(Controlling) 모듈 전체의 경계선입니다. 원가 집계, 이익 분석, 내부 주문, 손익센터 모두 Controlling Area 안에서만 작동합니다.</p>
+
+  <div class="callout">
+    <strong>정의:</strong> Controlling Area는 관리회계 목적의 조직 단위입니다. 외부 재무제표와 무관하게 내부 의사결정을 위한 원가·수익 정보를 집계하는 경계를 정의합니다.
+  </div>
+
+  <h2 class="sub-title">Company Code와의 관계: 1:N</h2>
+  <div class="callout warn">
+    하나의 Controlling Area가 <strong>복수의 Company Code</strong>를 포함할 수 있습니다. 이 경우 Cross-Company-Code Controlling이 가능해져, 그룹 전체 원가를 하나의 Controlling Area에서 관리할 수 있습니다.
+  </div>
+
+  <div class="flow-row">
+    <div class="flow-node">CA-ASPN<br><small style="font-weight:400;font-size:12px;">Controlling Area</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node secondary">HD00</div>
+    <div class="flow-arrow" style="color:#7eb8f7">+</div>
+    <div class="flow-node secondary">KR10</div>
+    <div class="flow-arrow" style="color:#7eb8f7">+</div>
+    <div class="flow-node secondary">DE10</div>
+  </div>
+
+  <h2 class="sub-title">Controlling Area 설계 시 핵심 고려사항</h2>
+  <table class="rel-table">
+    <thead><tr><th>항목</th><th>1 CA : 1 CC 구조</th><th>1 CA : N CC 구조</th></tr></thead>
+    <tbody>
+      <tr><td>적합한 상황</td><td>단일 법인, 소규모 기업</td><td>다국적 그룹, 그룹 원가 통합 관리</td></tr>
+      <tr><td>통화</td><td>Company Code 통화 = CA 통화</td><td>CA 통화를 그룹 통화(예: EUR)로 별도 설정</td></tr>
+      <tr><td>Cross-CC 원가 배부</td><td>불가</td><td>가능 (CO 내부 정산)</td></tr>
+      <tr><td>복잡도</td><td>낮음</td><td>높음 (환율, 법인간 배부 기준 필요)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="drill" onclick="toggleDrill(this)">
+    <div class="drill-header">Controlling Area를 그룹 공통으로 하나만 쓰면 항상 좋은가? <span class="drill-icon">▶</span></div>
+    <div class="drill-body">
+      아닙니다. 법인마다 관리 기준(원가 배부 정책, 회계연도 구조 등)이 크게 다를 경우 단일 CA 운영 시 <strong>운영 복잡도가 증가</strong>할 수 있습니다. S/4HANA에서는 ECC 대비 CA 통합 제약이 상당 부분 완화되었으므로, 설계 전 현행 버전의 제약사항을 반드시 확인해야 합니다. 또한 국가별 규제로 원가 정보 공유가 제한된 경우 분리가 필요할 수 있습니다. ASPN 예시에서는 Korea와 Europe을 하나의 CA로 통합하되, CA 통화를 EUR로 설정하고 KRW 환율 처리를 별도 관리합니다.
+    </div>
+  </div>
+
+  <div class="drill" onclick="toggleDrill(this)">
+    <div class="drill-header">Controlling Area와 GR(Group Reporting)의 차이는? <span class="drill-icon">▶</span></div>
+    <div class="drill-body">
+      Controlling Area는 <strong>내부 관리목적</strong> 원가·수익 집계의 경계입니다. GR(Group Reporting)은 <strong>외부 공시목적</strong> 연결재무제표 작성을 위한 도구입니다. 둘은 완전히 다른 목적을 가집니다. CA 안에 어떤 CC가 있든, GR에서의 연결 범위는 Company 오브젝트 기준으로 별도 결정됩니다.
+    </div>
+  </div>
+
+  <hr class="divider">
+  <div class="quiz-block">
+    <div class="quiz-q">Q. ASPN Korea(KR10)의 서울 공장 원가를 독일 Europe(DE10) 법인의 원가센터로 배부하려 합니다. 이 처리가 가능하려면 전제 조건은?</div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="checkQuiz('q05a', this, false)">① KR10과 DE10이 동일한 Company에 속해 있어야 한다</button>
+      <button class="quiz-opt" onclick="checkQuiz('q05a', this, false)">② GR에서 두 법인이 연결 대상으로 설정되어 있어야 한다</button>
+      <button class="quiz-opt" onclick="checkQuiz('q05a', this, true)">③ KR10과 DE10이 동일한 Controlling Area에 속해 있어야 한다</button>
+    </div>
+    <div class="quiz-feedback" id="fb-q05a"></div>
+  </div>
+</section>
+
+<!-- ─────────────── TAB 06 ─────────────── -->
+<section class="section" id="tab5">
+  <div class="section-title">Profit Center</div>
+  <p class="section-lead">Profit Center는 SAP에서 손익 책임 단위를 표현합니다. FI에서 만들어진 외부 P&L을 내부 사업 단위별로 재분류하는 것이 핵심 목적입니다.</p>
+
+  <div class="callout">
+    <strong>위치:</strong> Profit Center는 <strong>Controlling Area 안에 존재</strong>합니다. Company Code를 넘어서 Controlling Area 전체를 대상으로 손익 집계가 가능합니다.
+  </div>
+
+  <h2 class="sub-title">Profit Center의 역할</h2>
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-label">내부 P&L 집계</div>
+      <h3>사업부별 손익 보고</h3>
+      <p>법인 장부(Company Code)와 별개로, 사업부·제품군·지역 등 내부 책임 단위로 P&L을 재집계합니다.</p>
+    </div>
+    <div class="card">
+      <div class="card-label">B/S 분리 (선택)</div>
+      <h3>재무상태표 분할 보기</h3>
+      <p>Profit Center를 활용하면 사업부별 가상 B/S(자산·부채) 보기도 가능합니다. SAP Document Splitting 기능과 연동됩니다.</p>
+    </div>
+    <div class="card">
+      <div class="card-label">Margin Analysis 연계</div>
+      <h3>S/4HANA 수익성 분석</h3>
+      <p>S/4HANA에서는 <strong>Universal Journal(ACDOCA)</strong> 기반으로 Profit Center Accounting이 통합됩니다. Margin Analysis(구 CO-PA)의 Profitability Segment와 Profit Center는 별개 개념이지만 동일 전표에서 함께 집계됩니다.</p>
+    </div>
+  </div>
+
+  <h2 class="sub-title">Profit Center와 Plant·Cost Center의 연결</h2>
+  <div class="callout warn">
+    <strong>핵심 연결 규칙:</strong> Plant는 직접 Profit Center에 연결되지 않습니다. 연결 경로는 <strong>Material Master → Profit Center(MRP2 탭)</strong> 또는 <strong>Cost Center → Profit Center</strong>입니다. Plant-Profit Center 직접 매핑을 가정하는 것은 설계 오류입니다.
+  </div>
+
+  <table class="rel-table">
+    <thead><tr><th>연결 경로</th><th>설명</th></tr></thead>
+    <tbody>
+      <tr><td>Material Master (MRP2 탭) → PC</td><td>재고·생산 관련 원가가 해당 PC로 귀속. 자재별 PC 지정 가능</td></tr>
+      <tr><td>Cost Center → PC</td><td>Cost Center의 Primary Posting이 PC로 통계 전기됨</td></tr>
+      <tr><td>Sales Order → PC</td><td>SD 수주에서 명시적으로 PC 지정 가능 (SD-CO 연계)</td></tr>
+      <tr><td>WBS Element → PC</td><td>PS 프로젝트 구조에서 PC 상속</td></tr>
+    </tbody>
+  </table>
+
+  <div class="drill" onclick="toggleDrill(this)">
+    <div class="drill-header">Profit Center가 없으면 어떤 문제가 생기는가? <span class="drill-icon">▶</span></div>
+    <div class="drill-body">
+      전표 저장 시 Profit Center가 결정되지 않으면 <strong>Dummy Profit Center</strong>로 자동 전기됩니다. 이는 손익 보고서에서 "미분류" 잔액으로 나타나며, 보고 품질이 크게 저하됩니다. 실무에서 Dummy PC 잔액 모니터링은 기초 품질 관리 항목입니다.
+    </div>
+  </div>
+
+  <h2 class="sub-title">ASPN Group Profit Center 구조</h2>
+  <table class="rel-table">
+    <thead><tr><th>Profit Center</th><th>소속 CA</th><th>사업 단위</th></tr></thead>
+    <tbody>
+      <tr><td>PC-KR-MFG</td><td>CA-ASPN</td><td>Korea 제조 사업부</td></tr>
+      <tr><td>PC-KR-TRD</td><td>CA-ASPN</td><td>Korea 무역 사업부</td></tr>
+      <tr><td>PC-DE-SALES</td><td>CA-ASPN</td><td>Europe 판매 사업부</td></tr>
+      <tr><td>PC-DUMMY</td><td>CA-ASPN</td><td>미분류 (더미 — 잔액 0 유지 목표)</td></tr>
+    </tbody>
+  </table>
+
+  <hr class="divider">
+  <div class="quiz-block">
+    <div class="quiz-q">Q. Korea 제조 공장(KR01 Plant)에서 생산한 완제품의 원가를 PC-KR-MFG로 귀속시키려 합니다. 가장 직접적인 설정 위치는?</div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="checkQuiz('q06a', this, false)">① Plant KR01의 조직 설정 화면에서 Profit Center를 직접 지정한다</button>
+      <button class="quiz-opt" onclick="checkQuiz('q06a', this, true)">② 해당 완제품의 Material Master MRP2 탭에서 Profit Center를 PC-KR-MFG로 지정한다</button>
+      <button class="quiz-opt" onclick="checkQuiz('q06a', this, false)">③ KR01 Plant에 연결된 Cost Center의 상위 Profit Center로 자동 상속된다</button>
+    </div>
+    <div class="quiz-feedback" id="fb-q06a"></div>
+  </div>
+</section>
+
+<!-- ─────────────── TAB 07 ─────────────── -->
+<section class="section" id="tab6">
+  <div class="section-title">전체 구조 통합도 — ASPN Group</div>
+  <p class="section-lead">지금까지 학습한 7개 오브젝트가 실제 ASPN Group 구조 안에서 어떻게 연결되는지 전체 관계도로 확인합니다.</p>
+
+  <!-- FULL DIAGRAM -->
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 900 580" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:'Noto Sans KR',sans-serif;">
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#003366"/>
+        </marker>
+        <marker id="arr-gray" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#94a3b8"/>
+        </marker>
+      </defs>
+
+      <!-- CA Header -->
+      <rect x="10" y="10" width="880" height="555" rx="6" fill="#f7f9fc" stroke="#003366" stroke-width="2"/>
+      <text x="30" y="38" font-size="13" font-weight="700" fill="#003366">Controlling Area: CA-ASPN</text>
+
+      <!-- Company ASPN Holdings -->
+      <rect x="30" y="55" width="200" height="90" rx="4" fill="#fff" stroke="#003366" stroke-width="1.5"/>
+      <rect x="30" y="55" width="200" height="24" rx="4" fill="#003366"/>
+      <text x="130" y="71" font-size="11" fill="#fff" text-anchor="middle" font-weight="600">Company: ASPN-HD</text>
+      <text x="130" y="92" font-size="12" fill="#1a2233" text-anchor="middle">ASPN Holdings GmbH</text>
+      <rect x="54" y="102" width="152" height="32" rx="3" fill="#eef3fb" stroke="#7eb8f7" stroke-width="1"/>
+      <text x="130" y="122" font-size="12" fill="#003366" text-anchor="middle" font-weight="600">CC: HD00 (EUR)</text>
+
+      <!-- Korea Company -->
+      <rect x="290" y="55" width="260" height="290" rx="4" fill="#fff" stroke="#003366" stroke-width="1.5"/>
+      <rect x="290" y="55" width="260" height="24" rx="4" fill="#003366"/>
+      <text x="420" y="71" font-size="11" fill="#fff" text-anchor="middle" font-weight="600">Company: ASPN-KR</text>
+      <text x="420" y="95" font-size="12" fill="#1a2233" text-anchor="middle">ASPN Korea Co., Ltd.</text>
+      <rect x="310" y="105" width="220" height="32" rx="3" fill="#eef3fb" stroke="#7eb8f7" stroke-width="1"/>
+      <text x="420" y="125" font-size="12" fill="#003366" text-anchor="middle" font-weight="600">CC: KR10 (KRW)</text>
+      <!-- Plants KR -->
+      <rect x="310" y="148" width="100" height="52" rx="3" fill="#f0f3f8" stroke="#dce3ef" stroke-width="1"/>
+      <text x="360" y="168" font-size="11" fill="#003366" text-anchor="middle" font-weight="700">Plant KR01</text>
+      <text x="360" y="185" font-size="10" fill="#64748b" text-anchor="middle">서울 공장</text>
+      <rect x="430" y="148" width="100" height="52" rx="3" fill="#f0f3f8" stroke="#dce3ef" stroke-width="1"/>
+      <text x="480" y="168" font-size="11" fill="#003366" text-anchor="middle" font-weight="700">Plant KR02</text>
+      <text x="480" y="185" font-size="10" fill="#64748b" text-anchor="middle">부산 창고</text>
+      <!-- Sales Org KR -->
+      <rect x="310" y="214" width="100" height="50" rx="3" fill="#fff8e1" stroke="#b45309" stroke-width="1"/>
+      <text x="360" y="233" font-size="10" fill="#b45309" text-anchor="middle" font-weight="700">Sales Org</text>
+      <text x="360" y="249" font-size="10" fill="#64748b" text-anchor="middle">KR10 국내</text>
+      <rect x="430" y="214" width="100" height="50" rx="3" fill="#fff8e1" stroke="#b45309" stroke-width="1"/>
+      <text x="480" y="233" font-size="10" fill="#b45309" text-anchor="middle" font-weight="700">Sales Org</text>
+      <text x="480" y="249" font-size="10" fill="#64748b" text-anchor="middle">KR20 수출</text>
+      <!-- Purchasing Org KR -->
+      <rect x="310" y="278" width="220" height="50" rx="3" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1"/>
+      <text x="420" y="298" font-size="11" fill="#2e7d32" text-anchor="middle" font-weight="700">Purchasing Org: KR10</text>
+      <text x="420" y="315" font-size="10" fill="#64748b" text-anchor="middle">KR01 + KR02 담당</text>
+
+      <!-- Europe Company -->
+      <rect x="610" y="55" width="265" height="220" rx="4" fill="#fff" stroke="#003366" stroke-width="1.5"/>
+      <rect x="610" y="55" width="265" height="24" rx="4" fill="#003366"/>
+      <text x="742" y="71" font-size="11" fill="#fff" text-anchor="middle" font-weight="600">Company: ASPN-DE</text>
+      <text x="742" y="95" font-size="12" fill="#1a2233" text-anchor="middle">ASPN Europe GmbH</text>
+      <rect x="630" y="105" width="225" height="32" rx="3" fill="#eef3fb" stroke="#7eb8f7" stroke-width="1"/>
+      <text x="742" y="125" font-size="12" fill="#003366" text-anchor="middle" font-weight="600">CC: DE10 (EUR)</text>
+      <rect x="650" y="148" width="185" height="52" rx="3" fill="#f0f3f8" stroke="#dce3ef" stroke-width="1"/>
+      <text x="742" y="168" font-size="11" fill="#003366" text-anchor="middle" font-weight="700">Plant DE01</text>
+      <text x="742" y="185" font-size="10" fill="#64748b" text-anchor="middle">독일 배송센터</text>
+      <!-- Sales Org DE -->
+      <rect x="650" y="214" width="185" height="50" rx="3" fill="#fff8e1" stroke="#b45309" stroke-width="1"/>
+      <text x="742" y="233" font-size="10" fill="#b45309" text-anchor="middle" font-weight="700">Sales Org: DE10</text>
+      <text x="742" y="249" font-size="10" fill="#64748b" text-anchor="middle">유럽 판매</text>
+
+      <!-- Purchasing Org DE -->
+      <rect x="650" y="278" width="185" height="50" rx="3" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1"/>
+      <text x="742" y="298" font-size="11" fill="#2e7d32" text-anchor="middle" font-weight="700">Purchasing Org: DE10</text>
+      <text x="742" y="315" font-size="10" fill="#64748b" text-anchor="middle">DE01 담당</text>
+
+      <!-- Group Purchasing Org -->
+      <rect x="350" y="370" width="220" height="60" rx="4" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.5" stroke-dasharray="5,3"/>
+      <text x="460" y="394" font-size="11" fill="#2e7d32" text-anchor="middle" font-weight="700">Purchasing Org: GRP0</text>
+      <text x="460" y="412" font-size="10" fill="#64748b" text-anchor="middle">그룹 중앙 구매 (계약 협상)</text>
+
+      <!-- Profit Centers -->
+      <rect x="30" y="460" width="840" height="90" rx="4" fill="#fff" stroke="#7eb8f7" stroke-width="1.5"/>
+      <text x="450" y="482" font-size="12" fill="#003366" text-anchor="middle" font-weight="700">Profit Centers (CA-ASPN 내)</text>
+      <rect x="50" y="490" width="170" height="48" rx="3" fill="#eef3fb" stroke="#7eb8f7"/>
+      <text x="135" y="510" font-size="11" fill="#003366" text-anchor="middle" font-weight="600">PC-KR-MFG</text>
+      <text x="135" y="527" font-size="10" fill="#64748b" text-anchor="middle">Korea 제조</text>
+      <rect x="240" y="490" width="170" height="48" rx="3" fill="#eef3fb" stroke="#7eb8f7"/>
+      <text x="325" y="510" font-size="11" fill="#003366" text-anchor="middle" font-weight="600">PC-KR-TRD</text>
+      <text x="325" y="527" font-size="10" fill="#64748b" text-anchor="middle">Korea 무역</text>
+      <rect x="430" y="490" width="170" height="48" rx="3" fill="#eef3fb" stroke="#7eb8f7"/>
+      <text x="515" y="510" font-size="11" fill="#003366" text-anchor="middle" font-weight="600">PC-DE-SALES</text>
+      <text x="515" y="527" font-size="10" fill="#64748b" text-anchor="middle">Europe 판매</text>
+      <rect x="620" y="490" width="170" height="48" rx="3" fill="#fdecea" stroke="#c0392b"/>
+      <text x="705" y="510" font-size="11" fill="#c0392b" text-anchor="middle" font-weight="600">PC-DUMMY</text>
+      <text x="705" y="527" font-size="10" fill="#64748b" text-anchor="middle">미분류 (잔액 0 목표)</text>
+
+      <!-- ARROWS -->
+      <!-- STO: KR01 → DE01 -->
+      <line x1="532" y1="172" x2="648" y2="172" stroke="#003366" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+      <text x="590" y="162" font-size="10" fill="#003366" text-anchor="middle">STO</text>
+
+      <!-- GRP0 ref arrows -->
+      <line x1="420" y1="370" x2="420" y2="330" stroke="#2e7d32" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arr-gray)"/>
+      <line x1="500" y1="370" x2="680" y2="330" stroke="#2e7d32" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arr-gray)"/>
+      <text x="460" y="365" font-size="9" fill="#2e7d32" text-anchor="middle">Reference</text>
+    </svg>
+  </div>
+
+  <h2 class="sub-title">핵심 관계 요약</h2>
+  <table class="rel-table">
+    <thead><tr><th>관계</th><th>방향</th><th>규칙</th></tr></thead>
+    <tbody>
+      <tr><td>Company → Company Code</td><td>1 : N</td><td>CC는 반드시 하나의 Company에 귀속</td></tr>
+      <tr><td>Company Code → Plant</td><td>1 : N</td><td>Plant는 반드시 하나의 CC에만 할당</td></tr>
+      <tr><td>Company Code → Sales Org</td><td>1 : N</td><td>Sales Org도 하나의 CC에만 할당</td></tr>
+      <tr><td>Controlling Area → Company Code</td><td>1 : N</td><td>Cross-CC CO 처리의 전제</td></tr>
+      <tr><td>Controlling Area → Profit Center</td><td>1 : N</td><td>PC는 CA 범위 안에서만 유효</td></tr>
+      <tr><td>Purchasing Org → Company Code</td><td>1 : 0..1</td><td>그룹 레벨 Purch. Org는 CC 없이 존재 가능</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="sub-title">학습 완료 체크리스트</h2>
+  <div class="progress-label" id="progress-label">진행: 0 / 12</div>
+  <div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+
+  <ul class="checklist" id="checklist">
+    <li><div class="check-box" onclick="toggleCheck(this)"></div><span>Company와 Company Code의 차이를 설명할 수 있다</span></li>
+    <li><div class="check-box" onclick="toggleCheck(this)"></div><span>1 Company : N Company Code 구조가 필요한 상황을 예시로 들 수 있다</span></li>
+    <li><div class="check-box" onclick="toggleCheck(this)"></div><span>Plant가 두 Company Code에 동시 할당될 수 없는 이유를 설명할 수 있다</span></li>
+    <li><div class="check-box" onclick="toggleCheck(this)"></div><span>두 법인이 물리적으로 같은 창고를 쓸 때 SAP 올바른 설계 방법을 알고 있다</span></li>
+    <li><div class="check-box" onclick="toggleCheck(this)"></div><span>Sales Org와 Plant의 할당 관계를 설명할 수 있다</span></li>
+    <li><div class="check-box" onclick="toggleCheck(this)"></div><span>중앙 구매(GRP0)와 법인별 구매 Org의 Reference 관계를 설명할 수 있다</span></li>
+    <li><div class="check-box" onclick="toggleCheck(this)"></div><span>Controlling Area가 여러 Company Code를 포함할 수 있는 조건을 설명할 수 있다</span></li>
+    <li><div class="check-box" onclick="toggleCheck(this)"></div><span>Controlling Area와 GR(Group Reporting)의 목적 차이를 말할 수 있다</span></li>
+    <li><div class="check-box" onclick="toggleCheck(this)"></div><span>Profit Center와 Plant의 연결 경로(Material Master MRP2 탭)를 알고 있다</span></li>
+    <li><div class="check-box" onclick="toggleCheck(this)"></div><span>Dummy Profit Center가 왜 위험한지 설명할 수 있다</span></li>
+    <li><div class="check-box" onclick="toggleCheck(this)"></div><span>ASPN Group의 전체 오브젝트 구성을 보지 않고 그릴 수 있다</span></li>
+    <li><div class="check-box" onclick="toggleCheck(this)"></div><span>Korea→Europe STO 발생 시 관여되는 오브젝트를 순서대로 나열할 수 있다</span></li>
+  </ul>
+
+  <!-- SCENARIO DRILL -->
+  <h2 class="sub-title">시나리오 드릴: Korea → Europe STO 처리 시 관여 오브젝트</h2>
+  <div class="callout">
+    <strong>시나리오:</strong> ASPN Korea(KR10)의 KR01 Plant에서 완제품을 ASPN Europe(DE10)의 DE01 Plant로 재고 이전합니다. 어떤 오브젝트들이 순서대로 관여되는가?
+  </div>
+
+  <div class="drill" onclick="toggleDrill(this)">
+    <div class="drill-header">정답 펼치기 <span class="drill-icon">▶</span></div>
+    <div class="drill-body">
+      <strong>① Purchasing Org DE10</strong> — STO 수령 측(Europe)이 Purchase Order를 생성<br>
+      <strong>② Plant KR01</strong> (발송) → <strong>Plant DE01</strong> (수령): 물류 이동의 양 끝단<br>
+      <strong>③ Company Code KR10 & DE10</strong> — <strong>Cross Company STO</strong>의 경우 각 CC에 IC 매출/매입 전표가 자동 생성됩니다. 동일 Company Code 내 Plant 간 이동(Intra-CC STO)은 재고 이전 전표만 생성됩니다.<br>
+      <strong>④ Company ASPN-KR & ASPN-DE</strong> — GR 연결 시 IC Elimination 대상 거래로 식별<br>
+      <strong>⑤ Profit Center PC-KR-MFG & PC-DE-SALES</strong> — 각 Plant에 연결된 Material Master PC 기준으로 원가 귀속<br>
+      <strong>⑥ Controlling Area CA-ASPN</strong> — 양 법인 간 Cross-CC 원가 흐름이 동일 CA 내에서 추적됨
+    </div>
+  </div>
+</section>
+
+<script>
+function showTab(idx) {
+  document.querySelectorAll('.section').forEach((s,i) => s.classList.toggle('active', i===idx));
+  document.querySelectorAll('.nav-tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function toggleDrill(el) {
+  el.classList.toggle('open');
+}
+
+function checkQuiz(id, el, isCorrect) {
+  const container = el.closest('.quiz-block');
+  const opts = container.querySelectorAll('.quiz-opt');
+  opts.forEach(o => { o.disabled = true; o.style.pointerEvents = 'none'; });
+  const fb = document.getElementById('fb-' + id);
+  if (isCorrect) {
+    el.classList.add('correct-ans');
+    fb.style.display = 'block';
+    fb.style.color = '#2e7d32';
+    fb.innerHTML = '✓ 정답입니다. ' + getExplanation(id, true);
+  } else {
+    el.classList.add('wrong-ans');
+    fb.style.display = 'block';
+    fb.style.color = '#c0392b';
+    fb.innerHTML = '✗ 오답입니다. ' + getExplanation(id, false);
+    // highlight correct
+    opts.forEach(o => { if (o.onclick.toString().includes('true')) o.classList.add('correct-ans'); });
+  }
+}
+
+function getExplanation(id, correct) {
+  const map = {
+    'q02a': {
+      t: 'Parallel Ledger(병행원장)는 하나의 Company Code 안에서 복수의 회계기준 장부를 동시에 유지하는 SAP 표준 기능입니다.',
+      f: 'Company나 Company Code를 기준별로 분리하면 조직구조가 비대해지고 IC 처리가 복잡해집니다.'
+    },
+    'q03a': {
+      t: 'DE01 Plant는 DE10 Company Code의 재고를 보유하고, 입출고 시 DE10 장부에 FI 전표를 생성하기 위해 반드시 필요합니다.',
+      f: 'Sales Org 생성에 Plant가 필수는 아닙니다. 핵심은 회계 귀속과 재고 관리 단위입니다.'
+    },
+    'q04a': {
+      t: 'Reference Purchasing Org 구조는 중앙 협상과 현장 발주를 분리하는 SAP 표준 설계입니다.',
+      f: '수동 복사는 유지보수 부담이 크고, Purchasing Org를 합치면 Company Code 귀속 원칙에 충돌합니다.'
+    },
+    'q05a': {
+      t: 'Cross-Company-Code CO 원가 배부는 두 CC가 동일 Controlling Area에 있을 때만 가능합니다.',
+      f: 'GR 연결 범위나 Company 소속은 CO 원가 배부의 전제 조건이 아닙니다.'
+    },
+    'q06a': {
+      t: 'Material Master의 MRP2 탭에서 Profit Center를 지정하는 것이 재고·생산 원가를 해당 PC로 귀속시키는 가장 직접적인 경로입니다.',
+      f: 'Plant에는 PC를 직접 지정하는 필드가 없습니다.'
+    }
+  };
+  return correct ? (map[id]?.t || '') : (map[id]?.f || '');
+}
+
+function toggleCheck(el) {
+  el.classList.toggle('checked');
+  el.textContent = el.classList.contains('checked') ? '✓' : '';
+  updateProgress();
+}
+
+function updateProgress() {
+  const total = document.querySelectorAll('#checklist .check-box').length;
+  const done = document.querySelectorAll('#checklist .check-box.checked').length;
+  document.getElementById('progress-label').textContent = `진행: ${done} / ${total}`;
+  document.getElementById('progress-bar').style.width = (done/total*100) + '%';
+}
+</script>
+</body>
+</html>
