@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAP CO Allocation 완전 이해</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:    #003366;
+    --navy-mid:#004080;
+    --navy-lt: #E8EEF5;
+    --navy-rule:#C0CDD8;
+    --ink:     #1A1A2E;
+    --body:    #333333;
+    --muted:   #6B7280;
+    --white:   #FFFFFF;
+    --bg:      #F7F9FC;
+    --border:  #DDE3EA;
+    --tag-bg:  #EBF0F7;
+    --green:   #1A6640;
+    --green-lt:#E6F2EA;
+    --amber:   #7A4F00;
+    --amber-lt:#FFF3DC;
+    --red:     #7A1A1A;
+    --red-lt:  #FAEAEA;
+    --mono: 'JetBrains Mono', 'Noto Sans KR', monospace;
+    --sans: 'Noto Sans KR', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--body);
+    background: var(--bg);
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    background: var(--navy);
+    color: var(--white);
+    padding: 56px 48px 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  .site-header::after {
+    content: '';
+    position: absolute;
+    right: -60px; bottom: -60px;
+    width: 320px; height: 320px;
+    border: 48px solid rgba(255,255,255,0.06);
+    border-radius: 50%;
+  }
+  .header-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 16px;
+  }
+  .header-title {
+    font-size: clamp(24px, 3.5vw, 38px);
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+  .header-sub {
+    font-size: 15px;
+    color: rgba(255,255,255,0.65);
+    font-weight: 300;
+    max-width: 520px;
+  }
+  .header-meta {
+    display: flex;
+    gap: 24px;
+    margin-top: 32px;
+    flex-wrap: wrap;
+  }
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.60);
+    font-family: var(--mono);
+  }
+  .meta-dot { width: 6px; height: 6px; background: rgba(255,255,255,0.35); border-radius: 50%; }
+
+  /* ── NAV ── */
+  .toc-bar {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 0 48px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .toc-inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+  }
+  .toc-item {
+    display: inline-block;
+    padding: 14px 18px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .toc-item:hover { color: var(--navy); border-color: var(--navy); }
+
+  /* ── LAYOUT ── */
+  .page-wrap { max-width: 960px; margin: 0 auto; padding: 0 32px 80px; }
+
+  /* ── CHAPTER SECTION ── */
+  .chapter {
+    margin-top: 72px;
+    scroll-margin-top: 56px;
+  }
+  .chapter-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--navy);
+  }
+  .chapter-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--white);
+    background: var(--navy);
+    padding: 4px 10px;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+  .chapter-titles { flex: 1; }
+  .chapter-action-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.35;
+    margin-bottom: 4px;
+  }
+  .chapter-sub {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  /* ── SECTION ── */
+  .section { margin-bottom: 40px; }
+  .section-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title::before {
+    content: '';
+    width: 3px;
+    height: 16px;
+    background: var(--navy);
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  /* ── BODY TEXT ── */
+  p { color: var(--body); line-height: 1.75; margin-bottom: 12px; }
+  p:last-child { margin-bottom: 0; }
+
+  /* ── KEY MESSAGE BOX ── */
+  .key-msg {
+    background: var(--navy);
+    color: var(--white);
+    padding: 28px 32px;
+    margin: 32px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .key-msg::before {
+    content: '"';
+    position: absolute;
+    top: -8px; left: 20px;
+    font-size: 100px;
+    color: rgba(255,255,255,0.08);
+    font-family: Georgia, serif;
+    line-height: 1;
+  }
+  .key-msg-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.50);
+    margin-bottom: 10px;
+  }
+  .key-msg-text {
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--white);
+  }
+  .key-msg-desc {
+    font-size: 13px;
+    color: rgba(255,255,255,0.70);
+    margin-top: 10px;
+    line-height: 1.6;
+  }
+
+  /* ── INFO BOX ── */
+  .info-box {
+    border-left: 3px solid var(--navy);
+    background: var(--navy-lt);
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+
+  /* ── FLOW DIAGRAM ── */
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: wrap;
+    margin: 20px 0;
+  }
+  .flow-node {
+    background: var(--white);
+    border: 1px solid var(--navy);
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--navy);
+    text-align: center;
+    min-width: 100px;
+  }
+  .flow-node.active {
+    background: var(--navy);
+    color: var(--white);
+  }
+  .flow-arrow {
+    width: 28px;
+    height: 1px;
+    background: var(--navy-rule);
+    position: relative;
+    flex-shrink: 0;
+  }
+  .flow-arrow::after {
+    content: '';
+    position: absolute;
+    right: -1px; top: -4px;
+    width: 0; height: 0;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    border-left: 7px solid var(--navy-rule);
+  }
+  .flow-vert {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    margin: 20px 0;
+  }
+  .flow-vert-item {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+  }
+  .flow-vert-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 32px;
+    flex-shrink: 0;
+  }
+  .flow-step-num {
+    width: 28px;
+    height: 28px;
+    background: var(--navy);
+    color: var(--white);
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .flow-vert-line {
+    width: 1px;
+    flex: 1;
+    background: var(--navy-rule);
+    margin: 0 auto;
+    min-height: 20px;
+  }
+  .flow-vert-content {
+    flex: 1;
+    padding: 4px 0 24px 16px;
+  }
+  .flow-vert-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+  .flow-vert-desc {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .flow-tcode {
+    font-family: var(--mono);
+    font-size: 11px;
+    background: var(--tag-bg);
+    color: var(--navy);
+    padding: 2px 7px;
+    margin-left: 8px;
+    font-weight: 600;
+  }
+
+  /* ── TABLE ── */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 16px 0;
+  }
+  .data-table th {
+    background: var(--navy);
+    color: var(--white);
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+  }
+  .data-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    color: var(--body);
+  }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:nth-child(even) td { background: var(--bg); }
+  .data-table td.strong { font-weight: 600; color: var(--navy); }
+
+  /* ── COMPARISON GRID ── */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin: 20px 0;
+  }
+  .compare-cell {
+    background: var(--white);
+    padding: 20px;
+  }
+  .compare-cell.header-cell {
+    background: var(--navy);
+    color: var(--white);
+  }
+  .compare-label {
+    font-size: 11px;
+    font-family: var(--mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.60);
+    margin-bottom: 6px;
+  }
+  .compare-val {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--white);
+  }
+  .compare-cell .c-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+    font-family: var(--mono);
+  }
+  .compare-cell .c-val {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+  .compare-cell .c-desc { font-size: 12px; color: var(--muted); }
+
+  /* ── TAG / BADGE ── */
+  .badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    letter-spacing: 0.04em;
+  }
+  .badge-navy { background: var(--navy); color: var(--white); }
+  .badge-outline { border: 1px solid var(--navy); color: var(--navy); background: var(--white); }
+  .badge-green { background: var(--green-lt); color: var(--green); }
+  .badge-amber { background: var(--amber-lt); color: var(--amber); }
+  .badge-red { background: var(--red-lt); color: var(--red); }
+
+  /* ── CASE CARD ── */
+  .case-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+    margin: 20px 0;
+  }
+  .case-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    padding: 24px;
+  }
+  .case-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+  .case-num {
+    font-family: var(--mono);
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--navy-rule);
+    line-height: 1;
+  }
+  .case-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 12px;
+  }
+  .case-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .case-row:last-child { border-bottom: none; }
+  .case-row-key { color: var(--muted); }
+  .case-row-val { font-weight: 500; color: var(--body); text-align: right; }
+
+  /* ── CHECKLIST ── */
+  .checklist { list-style: none; margin: 16px 0; }
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .check-box {
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid var(--navy-rule);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* ── TCODE TABLE ── */
+  .tcode-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .tcode-item {
+    background: var(--white);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+  }
+  .tcode-code {
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+  .tcode-desc { font-size: 12px; color: var(--muted); }
+
+  /* ── SUMMARY BAND ── */
+  .summary-band {
+    background: var(--navy-lt);
+    border: 1px solid var(--navy-rule);
+    padding: 24px 28px;
+    margin: 24px 0;
+  }
+  .summary-band-title {
+    font-size: 12px;
+    font-family: var(--mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin-bottom: 14px;
+  }
+  .summary-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .summary-chip {
+    background: var(--white);
+    border: 1px solid var(--navy-rule);
+    padding: 6px 14px;
+    font-size: 12px;
+    color: var(--navy);
+    font-weight: 500;
+  }
+
+  /* ── DIVIDER ── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+
+  /* ── FOOTER ── */
+  .site-footer {
+    background: var(--navy);
+    color: rgba(255,255,255,0.50);
+    text-align: center;
+    padding: 28px;
+    font-size: 12px;
+    font-family: var(--mono);
+    letter-spacing: 0.06em;
+    margin-top: 80px;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .site-header { padding: 36px 24px 32px; }
+    .page-wrap { padding: 0 20px 60px; }
+    .toc-bar { padding: 0 20px; }
+    .chapter-header { gap: 12px; }
+    .flow { flex-direction: column; align-items: flex-start; }
+    .flow-arrow { transform: rotate(90deg); margin: 4px 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-eyebrow">SAP CO Controlling · Education Series</div>
+  <h1 class="header-title">SAP CO Allocation 완전 이해<br>원가는 어떻게 흐르는가</h1>
+  <p class="header-sub">IT 담당자와 관리회계 담당자를 위한 실무 중심 교육자료</p>
+  <div class="header-meta">
+    <span class="meta-item"><span class="meta-dot"></span>대상: IT + 비즈니스 혼합</span>
+    <span class="meta-item"><span class="meta-dot"></span>범위: ECC / S/4HANA 공통</span>
+    <span class="meta-item"><span class="meta-dot"></span>Chapter 0 – 9 + 부록</span>
+  </div>
+</header>
+
+<!-- TOC -->
+<nav class="toc-bar">
+  <div class="toc-inner">
+    <a class="toc-item" href="#ch0">Ch.0 Opening</a>
+    <a class="toc-item" href="#ch1">Ch.1 핵심 개념</a>
+    <a class="toc-item" href="#ch2">Ch.2 Activity Allocation</a>
+    <a class="toc-item" href="#ch3">Ch.3 Distribution</a>
+    <a class="toc-item" href="#ch4">Ch.4 Assessment</a>
+    <a class="toc-item" href="#ch5">Ch.5 기타 기법</a>
+    <a class="toc-item" href="#ch6">Ch.6 Period-End Closing</a>
+    <a class="toc-item" href="#ch7">Ch.7 설계 사례</a>
+    <a class="toc-item" href="#ch8">Ch.8 비즈니스 관점</a>
+    <a class="toc-item" href="#ch9">Ch.9 요약</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+<!-- ═══════════════════════════════ CH 0 ═══════════════════════════════ -->
+<section class="chapter" id="ch0">
+  <div class="chapter-header">
+    <span class="chapter-num">CH.00</span>
+    <div class="chapter-titles">
+      <div class="chapter-action-title">Allocation 없이는 원가 책임도 없다 — 왜 이 개념을 알아야 하는가</div>
+      <div class="chapter-sub">Opening · 학습 목표 설정</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">CO가 하는 일: 원가의 4단계 흐름</div>
+    <div class="flow">
+      <div class="flow-node">① 비용 발생<br><small style="font-size:11px;color:#6B7280">FI 전표</small></div>
+      <div class="flow-arrow"></div>
+      <div class="flow-node">② 원가 집계<br><small style="font-size:11px;color:#6B7280">Cost Center</small></div>
+      <div class="flow-arrow"></div>
+      <div class="flow-node active">③ 원가 배부<br><small style="font-size:11px;color:rgba(255,255,255,0.65)">Allocation</small></div>
+      <div class="flow-arrow"></div>
+      <div class="flow-node">④ 수익성 분석<br><small style="font-size:11px;color:#6B7280">COPA / PA</small></div>
+    </div>
+    <p>SAP CO에서 Allocation은 ③ 단계를 담당합니다. 비용은 FI에서 발생하지만, 그 비용이 <strong>어느 부서, 어느 제품, 어느 수익 세그먼트에 귀속되는지</strong>를 결정하는 것이 Allocation입니다.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Allocation이 없다면 무슨 일이 생기는가</div>
+    <table class="data-table">
+      <thead><tr><th>상황</th><th>문제</th><th>결과</th></tr></thead>
+      <tbody>
+        <tr><td>IT 운영비가 IT 코스트센터에만 쌓임</td><td>사업부별 IT 사용 비용 불명확</td><td>원가 왜곡, 부서 간 무임승차</td></tr>
+        <tr><td>공장 유틸리티 비용 미배부</td><td>제품별 제조원가 산출 불가</td><td>잘못된 가격 결정, 손익 왜곡</td></tr>
+        <tr><td>본사 공통비 집계만 됨</td><td>수익성 분석 시 공통비 제외</td><td>사업부 손익이 과대 계상됨</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="key-msg">
+    <div class="key-msg-label">핵심 메시지 · Key Concept</div>
+    <div class="key-msg-text">"원가는 발생하는 것이 아니라 이동한다"</div>
+    <div class="key-msg-desc">Allocation은 새로운 비용을 만드는 기능이 아닙니다. 이미 발생한 비용의 <strong style="color:#fff">책임과 귀속을 재정의</strong>하는 과정입니다.<br>이 관점을 이해하면 Activity Allocation, Distribution, Assessment가 모두 하나의 원리로 연결됩니다.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">이 자료의 학습 목표 3가지</div>
+    <div class="flow-vert">
+      <div class="flow-vert-item">
+        <div class="flow-vert-left"><div class="flow-step-num">1</div><div class="flow-vert-line"></div></div>
+        <div class="flow-vert-content"><div class="flow-vert-title">Allocation 기법의 구조적 차이를 설명할 수 있다</div><div class="flow-vert-desc">Distribution / Assessment / Activity Allocation의 목적, 대상, 결과 차이를 구분</div></div>
+      </div>
+      <div class="flow-vert-item">
+        <div class="flow-vert-left"><div class="flow-step-num">2</div><div class="flow-vert-line"></div></div>
+        <div class="flow-vert-content"><div class="flow-vert-title">월마감 시 올바른 실행 순서를 안다</div><div class="flow-vert-desc">Period-End Closing 내 Allocation 실행 순서와 오류 대응 방법 습득</div></div>
+      </div>
+      <div class="flow-vert-item">
+        <div class="flow-vert-left"><div class="flow-step-num">3</div></div>
+        <div class="flow-vert-content"><div class="flow-vert-title">현장 사례를 보고 적절한 기법을 선택할 수 있다</div><div class="flow-vert-desc">IT 비용, 공장 유틸리티, 공유서비스센터 등 실제 시나리오에서 기법 선택 판단력 확보</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ CH 1 ═══════════════════════════════ -->
+<section class="chapter" id="ch1">
+  <div class="chapter-header">
+    <span class="chapter-num">CH.01</span>
+    <div class="chapter-titles">
+      <div class="chapter-action-title">Allocation을 이해하려면 원가요소의 구분부터 시작해야 한다</div>
+      <div class="chapter-sub">핵심 개념 · Primary / Secondary Cost Element · Allocation vs. Settlement</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Primary vs. Secondary Cost Element</div>
+    <p>SAP CO에서 모든 비용은 <strong>원가요소(Cost Element)</strong>를 통해 기록됩니다. 원가요소는 두 가지로 나뉩니다.</p>
+    <table class="data-table">
+      <thead><tr><th>구분</th><th>Primary Cost Element</th><th>Secondary Cost Element</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">정의</td><td>FI 계정과 1:1 매핑되는 실제 발생 비용</td><td>CO 내부 배부 목적으로만 사용되는 가상 원가요소</td></tr>
+        <tr><td class="strong">예시</td><td>급여, 임차료, 감가상각비</td><td>Assessment용 원가요소 (9xxxx 번대)</td></tr>
+        <tr><td class="strong">FI 연결</td><td>있음 (G/L Account 존재)</td><td>없음 (CO 전용)</td></tr>
+        <tr><td class="strong">사용 기능</td><td>모든 CO 기능</td><td>Assessment, Indirect Activity Alloc.</td></tr>
+      </tbody>
+    </table>
+    <div class="info-box">
+      <strong>왜 중요한가?</strong> Assessment는 Sender의 비용을 Secondary Cost Element로 <em>전환</em>하여 Receiver에 전달합니다. 이 과정에서 원래 비용 항목(급여, 임차료 등)은 사라지고 배부 전용 코드로 대체됩니다. Distribution은 반대로 Primary Cost Element를 <em>그대로 유지</em>합니다.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Allocation의 3요소: Sender · Receiver · Tracing Factor</div>
+    <div class="compare-grid" style="grid-template-columns:repeat(3,1fr);">
+      <div class="compare-cell header-cell"><div class="compare-label">요소 1</div><div class="compare-val">Sender</div></div>
+      <div class="compare-cell header-cell"><div class="compare-label">요소 2</div><div class="compare-val">Receiver</div></div>
+      <div class="compare-cell header-cell"><div class="compare-label">요소 3</div><div class="compare-val">Tracing Factor</div></div>
+      <div class="compare-cell"><div class="c-label">역할</div><div class="c-val">비용을 보내는 주체</div><div class="c-desc">Cost Center, Order, WBS</div></div>
+      <div class="compare-cell"><div class="c-label">역할</div><div class="c-val">비용을 받는 주체</div><div class="c-desc">Cost Center, Profit Center, 제품</div></div>
+      <div class="compare-cell"><div class="c-label">역할</div><div class="c-val">배부 기준</div><div class="c-desc">사용자 수, 기계시간, SKF, 매출 비중</div></div>
+    </div>
+    <p>Sender에서 Credit이 발생하고, Receiver에서 Debit이 발생합니다. 총 원가 합계는 변하지 않으며, 귀속 위치만 이동합니다.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Allocation vs. Settlement — 가장 많이 헷갈리는 개념</div>
+    <div class="info-box" style="border-color:#C0392B;background:#FAEAEA;margin-bottom:16px;">
+      <strong>실무 Q&A:</strong> "왜 KO88 안 쓰고 KSU5 쓰나요?" — 프로젝트 현장에서 가장 자주 나오는 질문입니다.
+    </div>
+    <table class="data-table">
+      <thead><tr><th>구분</th><th>Allocation</th><th>Settlement</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">목적</td><td>비용의 책임 귀속 재정의 (배부)</td><td>최종 정산 — 잔액을 0으로 청산</td></tr>
+        <tr><td class="strong">Sender 유형</td><td>Cost Center (운영 중인 계정)</td><td>Internal Order / WBS / Asset 등</td></tr>
+        <tr><td class="strong">반복성</td><td>매 회계기간 반복 실행</td><td>오더 종료 또는 기간 말 1회</td></tr>
+        <tr><td class="strong">잔액 처리</td><td>Sender 잔액이 일부 남을 수 있음</td><td>Sender 잔액이 완전히 0이 됨</td></tr>
+        <tr><td class="strong">대표 T-Code</td><td>KSU5, KSV5, KSC5</td><td>KO88, CJ88</td></tr>
+        <tr><td class="strong">결과 흐름</td><td>CC → CC, CC → PC</td><td>Order → AUC → FA, Order → CC</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ CH 2 ═══════════════════════════════ -->
+<section class="chapter" id="ch2">
+  <div class="chapter-header">
+    <span class="chapter-num">CH.02</span>
+    <div class="chapter-titles">
+      <div class="chapter-action-title">Activity Allocation은 가격 계산과 배부 실행, 두 단계로 나뉜다</div>
+      <div class="chapter-sub">Activity Allocation · Activity Price Calculation vs. Allocation 실행 분리</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Activity Type이란 무엇인가</div>
+    <p>Activity Type은 Cost Center가 제공하는 <strong>서비스의 단위</strong>입니다. 시간(기계시간, 작업시간), 횟수, 면적 등 다양한 형태로 정의됩니다. Activity Allocation은 이 단위를 기준으로 원가를 배부합니다.</p>
+    <table class="data-table">
+      <thead><tr><th>Activity Type 예시</th><th>Sender CC</th><th>단위</th><th>Receiver</th></tr></thead>
+      <tbody>
+        <tr><td>기계 작동시간 (MACH)</td><td>생산 설비 CC</td><td>시간 (H)</td><td>제조 오더</td></tr>
+        <tr><td>인력 투입시간 (LABOR)</td><td>공정 CC</td><td>시간 (H)</td><td>제조 오더</td></tr>
+        <tr><td>IT 서비스 제공 (ITSVC)</td><td>IT CC</td><td>건수</td><td>사업부 CC</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">단계 1 — Activity Price Calculation (가격 결정)</div>
+    <div class="info-box">
+      <strong>핵심 오해 정정:</strong> KSC5는 가격을 계산하지 않습니다. 가격은 반드시 <span class="badge badge-navy" style="font-family:'JetBrains Mono','Noto Sans KR',monospace;">KSII / KSPI</span>에서 먼저 결정되어야 합니다.
+    </div>
+    <div class="flow-vert">
+      <div class="flow-vert-item">
+        <div class="flow-vert-left"><div class="flow-step-num">1</div><div class="flow-vert-line"></div></div>
+        <div class="flow-vert-content">
+          <div class="flow-vert-title">비용 계획 입력 <span class="flow-tcode">KP06</span></div>
+          <div class="flow-vert-desc">Cost Center별 계획 비용 입력 (인건비, 감가상각 등)</div>
+        </div>
+      </div>
+      <div class="flow-vert-item">
+        <div class="flow-vert-left"><div class="flow-step-num">2</div><div class="flow-vert-line"></div></div>
+        <div class="flow-vert-content">
+          <div class="flow-vert-title">Activity 수량 계획 <span class="flow-tcode">KP26</span></div>
+          <div class="flow-vert-desc">Activity Type별 공급/소비 수량 계획 입력</div>
+        </div>
+      </div>
+      <div class="flow-vert-item">
+        <div class="flow-vert-left"><div class="flow-step-num">3</div><div class="flow-vert-line"></div></div>
+        <div class="flow-vert-content">
+          <div class="flow-vert-title">Activity Price 계산 <span class="flow-tcode">KSPI (계획) / KSII (실적)</span></div>
+          <div class="flow-vert-desc">총 계획비용 ÷ 계획 수량 = Activity Price 자동 산출<br><em style="font-size:12px;color:#6B7280">예: 기계 CC 연간 비용 12억 ÷ 연간 기계시간 10,000H = 120,000원/H</em></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">단계 2 — Activity Allocation 실행 (배부)</div>
+    <div class="flow-vert">
+      <div class="flow-vert-item">
+        <div class="flow-vert-left"><div class="flow-step-num">4</div><div class="flow-vert-line"></div></div>
+        <div class="flow-vert-content">
+          <div class="flow-vert-title">실적 Activity 수량 확인 <span class="flow-tcode">KB21N (직접 입력)</span></div>
+          <div class="flow-vert-desc">실제 사용한 기계시간 등을 수동 또는 시스템 연계로 입력</div>
+        </div>
+      </div>
+      <div class="flow-vert-item">
+        <div class="flow-vert-left"><div class="flow-step-num">5</div></div>
+        <div class="flow-vert-content">
+          <div class="flow-vert-title">Indirect Activity Allocation 실행 <span class="flow-tcode">KSC5</span></div>
+          <div class="flow-vert-desc">Activity Price × 실적 수량 = 배부 금액 자동 계산 후 Receiver에 전달<br><em style="font-size:12px;color:#6B7280">Sender CC에 Credit, Receiver (오더/CC)에 Debit 발생</em></div>
+        </div>
+      </div>
+    </div>
+
+    <table class="data-table" style="margin-top:20px;">
+      <thead><tr><th>구분</th><th>계획 (Plan)</th><th>실적 (Actual)</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">가격 계산</td><td>KSPI</td><td>KSII (기간 말 실행)</td></tr>
+        <tr><td class="strong">수량 입력</td><td>KP26</td><td>KB21N</td></tr>
+        <tr><td class="strong">배부 실행</td><td>KSC5 (버전 0)</td><td>KSC5 (버전 0, Actual)</td></tr>
+        <tr><td class="strong">결과 확인</td><td>S_ALR_87013611</td><td>KSB1</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ CH 3 ═══════════════════════════════ -->
+<section class="chapter" id="ch3">
+  <div class="chapter-header">
+    <span class="chapter-num">CH.03</span>
+    <div class="chapter-titles">
+      <div class="chapter-action-title">Distribution은 원가 항목을 그대로 유지하며 비용의 원천 추적을 가능하게 한다</div>
+      <div class="chapter-sub">Distribution · Primary Cost Element 유지 · KSV1 / KSV5</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Distribution의 핵심 특징</div>
+    <p>Distribution은 Sender Cost Center의 비용을 <strong>Primary Cost Element를 그대로 유지</strong>하면서 Receiver로 이동시킵니다. Receiver 입장에서 배부받은 비용이 '급여인지, 임차료인지'를 계속 볼 수 있습니다.</p>
+    <div class="compare-grid" style="grid-template-columns:1fr 1fr;">
+      <div class="compare-cell header-cell"><div class="compare-label">Distribution</div><div class="compare-val">원가 항목 유지</div></div>
+      <div class="compare-cell header-cell"><div class="compare-label">Assessment</div><div class="compare-val">원가 항목 통합</div></div>
+      <div class="compare-cell">
+        <div class="c-label">Receiver 화면에 보이는 것</div>
+        <div class="c-val">급여 50만 / 임차료 20만 / ...</div>
+        <div class="c-desc">원가 발생 원천이 투명하게 보임</div>
+      </div>
+      <div class="compare-cell">
+        <div class="c-label">Receiver 화면에 보이는 것</div>
+        <div class="c-val">배부 원가요소 1건 (9xxxx)</div>
+        <div class="c-desc">원가 발생 원천은 숨겨짐, 단순화</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">언제 Distribution을 선택하는가</div>
+    <table class="data-table">
+      <thead><tr><th>선택 기준</th><th>Distribution 사용</th><th>Assessment 사용</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">원가 추적 요건</td><td>원가 항목별 추적 필요 (감사, 규정)</td><td>단순 배부, 원가 내역 불필요</td></tr>
+        <tr><td class="strong">Receiver 복잡도</td><td>Receiver가 소수, 명확한 비율 존재</td><td>Receiver가 다수, 통합 배부 선호</td></tr>
+        <tr><td class="strong">리포팅 목적</td><td>부서별 상세 원가 내역 리포팅</td><td>관리회계 요약 리포팅</td></tr>
+        <tr><td class="strong">운영 편의</td><td>Secondary CE 설정 불필요</td><td>Secondary CE 사전 설정 필요</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Distribution Cycle 구성</div>
+    <div class="flow-vert">
+      <div class="flow-vert-item">
+        <div class="flow-vert-left"><div class="flow-step-num">1</div><div class="flow-vert-line"></div></div>
+        <div class="flow-vert-content"><div class="flow-vert-title">Cycle 생성 <span class="flow-tcode">KSV1</span></div><div class="flow-vert-desc">Cycle 이름, 유효기간, Sender/Receiver 그룹 정의</div></div>
+      </div>
+      <div class="flow-vert-item">
+        <div class="flow-vert-left"><div class="flow-step-num">2</div><div class="flow-vert-line"></div></div>
+        <div class="flow-vert-content"><div class="flow-vert-title">Segment 설정</div><div class="flow-vert-desc">Sender Rule(비율/금액/실적), Receiver Rule(고정 비율/SKF), Tracing Factor 지정</div></div>
+      </div>
+      <div class="flow-vert-item">
+        <div class="flow-vert-left"><div class="flow-step-num">3</div></div>
+        <div class="flow-vert-content"><div class="flow-vert-title">실행 <span class="flow-tcode">KSV5</span></div><div class="flow-vert-desc">회계기간 지정 후 테스트 실행(Test Run) → 검증 → 본 실행</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ CH 4 ═══════════════════════════════ -->
+<section class="chapter" id="ch4">
+  <div class="chapter-header">
+    <span class="chapter-num">CH.04</span>
+    <div class="chapter-titles">
+      <div class="chapter-action-title">Assessment는 간접비를 Secondary Cost Element로 통합하여 단순하고 효율적으로 배부한다</div>
+      <div class="chapter-sub">Assessment · SKF · KSU1 / KSU5</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Assessment의 작동 원리</div>
+    <div class="flow">
+      <div class="flow-node">Sender CC<br><small style="font-size:11px;">급여+임차료+감가</small></div>
+      <div class="flow-arrow"></div>
+      <div class="flow-node active">Secondary CE<br><small style="font-size:11px;color:rgba(255,255,255,0.7)">9xxxx (통합)</small></div>
+      <div class="flow-arrow"></div>
+      <div class="flow-node">Receiver CC A<br><small style="font-size:11px;">40%</small></div>
+    </div>
+    <div class="flow" style="margin-top:0;">
+      <div style="width:100px;"></div>
+      <div style="width:28px;"></div>
+      <div style="width:120px;"></div>
+      <div class="flow-arrow"></div>
+      <div class="flow-node">Receiver CC B<br><small style="font-size:11px;">35%</small></div>
+    </div>
+    <p style="margin-top:12px;">Assessment는 Sender의 여러 Primary Cost Element를 <strong>단 하나의 Secondary Cost Element</strong>로 묶어 배부합니다. 리포팅은 단순해지지만, Receiver 입장에서 원가 발생 원천을 볼 수 없습니다.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Tracing Factor: 배부 기준의 3가지 유형</div>
+    <table class="data-table">
+      <thead><tr><th>유형</th><th>설명</th><th>예시</th><th>적합 상황</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">Fixed Percentage</td><td>사전 합의된 고정 비율</td><td>A사업부 40%, B사업부 60%</td><td>단순, 협의 기반 배부</td></tr>
+        <tr><td class="strong">Variable Portion</td><td>실적 기반 동적 비율</td><td>실제 발생 원가 비중</td><td>실적 연동 배부</td></tr>
+        <tr><td class="strong">Statistical Key Figure (SKF)</td><td>통계 수치 기반 배부</td><td>직원 수, 면적(㎡), 전화 회선 수</td><td>서비스 사용량 기반 배부</td></tr>
+      </tbody>
+    </table>
+    <div class="info-box">
+      <strong>SKF(Statistical Key Figure)</strong>는 별도로 수량을 등록해야 합니다. T-Code <strong>KB31N</strong>으로 기간별 수량을 입력하면 Assessment Cycle에서 배부 비율로 자동 계산됩니다.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Assessment Cycle 설정 및 실행</div>
+    <table class="data-table">
+      <thead><tr><th>단계</th><th>T-Code</th><th>작업 내용</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">Cycle 생성/수정</td><td><span class="badge badge-navy" style="font-family:'JetBrains Mono','Noto Sans KR',monospace;">KSU1</span></td><td>Cycle명, 유효기간, Segment별 Sender/Receiver/Tracing Factor 정의</td></tr>
+        <tr><td class="strong">SKF 수량 입력</td><td><span class="badge badge-navy" style="font-family:'JetBrains Mono','Noto Sans KR',monospace;">KB31N</span></td><td>기간별 통계 수치 입력 (직원 수, 면적 등)</td></tr>
+        <tr><td class="strong">Cycle 실행</td><td><span class="badge badge-navy" style="font-family:'JetBrains Mono','Noto Sans KR',monospace;">KSU5</span></td><td>회계기간 지정 → Test Run → 결과 검증 → 본 실행</td></tr>
+        <tr><td class="strong">결과 확인</td><td><span class="badge badge-navy" style="font-family:'JetBrains Mono','Noto Sans KR',monospace;">KSB1</span></td><td>CC별 전표 명세 확인, Secondary CE 배부 내역 검토</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ CH 5 ═══════════════════════════════ -->
+<section class="chapter" id="ch5">
+  <div class="chapter-header">
+    <span class="chapter-num">CH.05</span>
+    <div class="chapter-titles">
+      <div class="chapter-action-title">Top-Down Distribution과 Reposting은 특수 시나리오를 위한 보조 기법이다</div>
+      <div class="chapter-sub">기타 Allocation 기법 · 사용 빈도 및 적용 판단 기준</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">기법별 현업 사용 빈도</div>
+    <table class="data-table">
+      <thead><tr><th>기법</th><th>현업 빈도</th><th>주요 시나리오</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">Assessment</td><td><span class="badge badge-navy" style="font-family:'JetBrains Mono','Noto Sans KR',monospace;">★★★★★</span></td><td>간접비 배부 전반</td></tr>
+        <tr><td class="strong">Activity Allocation</td><td><span class="badge badge-navy" style="font-family:'JetBrains Mono','Noto Sans KR',monospace;">★★★★★</span></td><td>제조, 서비스 원가</td></tr>
+        <tr><td class="strong">Distribution</td><td><span class="badge badge-navy" style="font-family:'JetBrains Mono','Noto Sans KR',monospace;">★★★★☆</span></td><td>직접비 재배분</td></tr>
+        <tr><td class="strong">Top-Down Distribution</td><td><span class="badge badge-outline" style="font-family:'JetBrains Mono','Noto Sans KR',monospace;">★★★☆☆</span></td><td>계획 배부, PCA 시나리오</td></tr>
+        <tr><td class="strong">Reposting</td><td><span class="badge badge-outline" style="font-family:'JetBrains Mono','Noto Sans KR',monospace;">★★☆☆☆</span></td><td>오류 정정, 단순 재전기</td></tr>
+        <tr><td class="strong">Template Allocation</td><td><span class="badge badge-amber" style="font-family:'JetBrains Mono','Noto Sans KR',monospace;">★☆☆☆☆</span></td><td>조건부·수식 기반 (부록 참조)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Top-Down Distribution — 하향식 계획 배부</div>
+    <p>Top-Down Distribution은 상위 계층(본사, 법인)의 비용을 <strong>매출 비중, 직원 수 등 Driver 기반</strong>으로 하위 단위에 배부합니다. 주로 <strong>Profit Center Accounting(PCA)</strong>과 계획(Planning) 시나리오에서 활용됩니다.</p>
+    <div class="flow-vert">
+      <div class="flow-vert-item">
+        <div class="flow-vert-left"><div class="flow-step-num"></div><div class="flow-vert-line"></div></div>
+        <div class="flow-vert-content"><div class="flow-vert-title">본사 마케팅 비용 100억</div><div class="flow-vert-desc">Sender: 본사 마케팅 Profit Center</div></div>
+      </div>
+      <div class="flow-vert-item">
+        <div class="flow-vert-left"><div class="flow-step-num"></div><div class="flow-vert-line"></div></div>
+        <div class="flow-vert-content"><div class="flow-vert-title">Driver: 국가별 매출 비중</div><div class="flow-vert-desc">한국 40% / 미국 30% / 일본 30%</div></div>
+      </div>
+      <div class="flow-vert-item">
+        <div class="flow-vert-left"><div class="flow-step-num"></div></div>
+        <div class="flow-vert-content"><div class="flow-vert-title">결과 배부</div><div class="flow-vert-desc">한국 PC: 40억 / 미국 PC: 30억 / 일본 PC: 30억</div></div>
+      </div>
+    </div>
+    <div class="info-box">
+      <strong>SAC Planning 연결 포인트:</strong> SAC Planning의 "Driver-Based Allocation" 기능은 이 개념을 클라우드 계획 환경으로 확장한 것입니다. S/4HANA + SAC 환경에서는 동일한 Driver 로직이 두 레이어에서 연동 가능합니다.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Reposting — 오류 정정을 위한 단순 재전기</div>
+    <table class="data-table">
+      <thead><tr><th>구분</th><th>내용</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">목적</td><td>잘못 집계된 비용을 올바른 CO 객체로 이동</td></tr>
+        <tr><td class="strong">특징</td><td>Primary CE 유지, FI 전표 없이 CO 내부만 이동</td></tr>
+        <tr><td class="strong">T-Code</td><td>KB61 (수동 재전기), KB11N (직접 활동 수량)</td></tr>
+        <tr><td class="strong">주의</td><td>정기 배부 기능이 아닌 예외 처리 용도. 반복 사용 시 Cycle 설계 검토 필요</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ CH 6 ═══════════════════════════════ -->
+<section class="chapter" id="ch6">
+  <div class="chapter-header">
+    <span class="chapter-num">CH.06</span>
+    <div class="chapter-titles">
+      <div class="chapter-action-title">월마감 시 Allocation은 정해진 순서대로 실행해야 하며, 순서 오류는 원가 왜곡으로 직결된다</div>
+      <div class="chapter-sub">Period-End Closing · 실행 순서 · 오류 유형 · Margin Analysis 연계</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Period-End Closing 전체 흐름</div>
+    <div class="flow-vert">
+      <div class="flow-vert-item">
+        <div class="flow-vert-left"><div class="flow-step-num">①</div><div class="flow-vert-line"></div></div>
+        <div class="flow-vert-content">
+          <div class="flow-vert-title">Activity Price Calculation <span class="flow-tcode">KSII</span></div>
+          <div class="flow-vert-desc">실적 기준 Activity Price 재계산. 이후 모든 배부의 단가 기준이 확정됨</div>
+        </div>
+      </div>
+      <div class="flow-vert-item">
+        <div class="flow-vert-left"><div class="flow-step-num">②</div><div class="flow-vert-line"></div></div>
+        <div class="flow-vert-content">
+          <div class="flow-vert-title">Activity Allocation <span class="flow-tcode">KSC5</span></div>
+          <div class="flow-vert-desc">Activity Price × 실적 수량으로 Receiver에 원가 배부. 제조 오더에 직접 투입</div>
+        </div>
+      </div>
+      <div class="flow-vert-item">
+        <div class="flow-vert-left"><div class="flow-step-num">③</div><div class="flow-vert-line"></div></div>
+        <div class="flow-vert-content">
+          <div class="flow-vert-title">Distribution <span class="flow-tcode">KSV5</span></div>
+          <div class="flow-vert-desc">Primary CE 유지 직접비 재배분. Activity Allocation 이후 잔여 직접비 처리</div>
+        </div>
+      </div>
+      <div class="flow-vert-item">
+        <div class="flow-vert-left"><div class="flow-step-num">④</div><div class="flow-vert-line"></div></div>
+        <div class="flow-vert-content">
+          <div class="flow-vert-title">Assessment <span class="flow-tcode">KSU5</span></div>
+          <div class="flow-vert-desc">간접비 일괄 배부. 여러 Cycle이 있을 경우 Cycle 간 의존성 순서 주의</div>
+        </div>
+      </div>
+      <div class="flow-vert-item">
+        <div class="flow-vert-left"><div class="flow-step-num">⑤</div><div class="flow-vert-line"></div></div>
+        <div class="flow-vert-content">
+          <div class="flow-vert-title">Settlement <span class="flow-tcode">KO88 / CJ88</span></div>
+          <div class="flow-vert-desc">Internal Order / WBS 잔액 정산. AUC, 고정자산, CC 등으로 최종 이동</div>
+        </div>
+      </div>
+      <div class="flow-vert-item">
+        <div class="flow-vert-left"><div class="flow-step-num">⑥</div></div>
+        <div class="flow-vert-content">
+          <div class="flow-vert-title">수익성 분석(Margin Analysis) 반영</div>
+          <div class="flow-vert-desc">CO 결과가 수익성 분석으로 전달됨<br><span style="font-size:12px;color:#C0392B;">※ Account-Based COPA / Costing-Based COPA / Universal Journal 구조에 따라 전달 방식 상이 — 구성 환경 확인 필요</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">순서 오류 시 발생하는 문제</div>
+    <table class="data-table">
+      <thead><tr><th>오류 상황</th><th>발생 문제</th><th>조치</th></tr></thead>
+      <tbody>
+        <tr><td>KSII 이전에 KSC5 실행</td><td>이전 기간 Activity Price로 배부 → 실적 원가 왜곡</td><td>KSC5 역실행(Reverse) 후 KSII 재실행, KSC5 재실행</td></tr>
+        <tr><td>Assessment Cycle 간 순서 역전</td><td>A Cycle 결과가 B Cycle Sender에 미포함</td><td>Cycle 순번(Sequence) 재정비, 재실행</td></tr>
+        <tr><td>SKF 미입력 후 KSU5 실행</td><td>No Receiver 오류 — 배부 미실행</td><td>KB31N으로 SKF 입력 후 재실행</td></tr>
+        <tr><td>Settlement 전 마감</td><td>Order 잔액이 CC에 미이동 → 원가 누락</td><td>KO88 실행 후 마감 재처리</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">주요 오류 메시지 대응</div>
+    <table class="data-table">
+      <thead><tr><th>오류 유형</th><th>원인</th><th>해결 방법</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">No Receiver Found</td><td>Receiver CC 미존재 or SKF 미입력</td><td>Receiver 설정 확인 / KB31N SKF 입력</td></tr>
+        <tr><td class="strong">Sender has no Costs</td><td>해당 기간 Sender 잔액 0</td><td>오류 아님 (경고) — 실제 비용 발생 여부 확인</td></tr>
+        <tr><td class="strong">Cycle not Found</td><td>Cycle 유효기간 불일치</td><td>KSU1에서 유효기간 연장 후 재실행</td></tr>
+        <tr><td class="strong">Period Already Closed</td><td>마감된 기간에 재실행 시도</td><td>OKP1으로 기간 재오픈 후 처리</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ CH 7 ═══════════════════════════════ -->
+<section class="chapter" id="ch7">
+  <div class="chapter-header">
+    <span class="chapter-num">CH.07</span>
+    <div class="chapter-titles">
+      <div class="chapter-action-title">동일한 원가 상황도 목적에 따라 적용 기법이 달라진다 — 3가지 사례로 확인한다</div>
+      <div class="chapter-sub">실제 기업 설계 사례 · Assessment / Activity Allocation / Distribution 기법 분산</div>
+    </div>
+  </div>
+
+  <div class="info-box" style="margin-bottom:24px;">
+    각 사례는 동일하게 "Cost Center → Cost Center" 배부이지만, <strong>목적과 투명성 요건에 따라 서로 다른 기법</strong>을 사용합니다. 이것이 기법 선택의 핵심입니다.
+  </div>
+
+  <div class="case-grid">
+    <div class="case-card">
+      <div class="case-card-top">
+        <span class="case-num">01</span>
+        <span class="badge badge-navy" style="font-family:'JetBrains Mono','Noto Sans KR',monospace;">Assessment</span>
+      </div>
+      <div class="case-title">IT 운영 조직 비용 배부</div>
+      <div class="case-row"><span class="case-row-key">Sender</span><span class="case-row-val">IT Cost Center</span></div>
+      <div class="case-row"><span class="case-row-key">Receiver</span><span class="case-row-val">사업부 Cost Center</span></div>
+      <div class="case-row"><span class="case-row-key">Driver (Tracing Factor)</span><span class="case-row-val">사용자 수 (SKF)</span></div>
+      <div class="case-row"><span class="case-row-key">기법 선택 이유</span><span class="case-row-val">원가 항목 세분화 불필요, 단순 배부</span></div>
+      <div class="case-row"><span class="case-row-key">T-Code</span><span class="case-row-val">KSU1 / KSU5 / KB31N</span></div>
+    </div>
+
+    <div class="case-card">
+      <div class="case-card-top">
+        <span class="case-num">02</span>
+        <span class="badge badge-navy" style="font-family:'JetBrains Mono','Noto Sans KR',monospace;">Activity Allocation</span>
+      </div>
+      <div class="case-title">공장 유틸리티 비용 배부</div>
+      <div class="case-row"><span class="case-row-key">Sender</span><span class="case-row-val">유틸리티 Cost Center</span></div>
+      <div class="case-row"><span class="case-row-key">Receiver</span><span class="case-row-val">생산 Cost Center / 제조 오더</span></div>
+      <div class="case-row"><span class="case-row-key">Driver</span><span class="case-row-val">기계시간 (Activity Type)</span></div>
+      <div class="case-row"><span class="case-row-key">기법 선택 이유</span><span class="case-row-val">실제 사용량 기반 정확한 원가 배부 필요</span></div>
+      <div class="case-row"><span class="case-row-key">T-Code</span><span class="case-row-val">KSPI / KSC5 / KB21N</span></div>
+    </div>
+
+    <div class="case-card">
+      <div class="case-card-top">
+        <span class="case-num">03</span>
+        <span class="badge badge-navy" style="font-family:'JetBrains Mono','Noto Sans KR',monospace;">Distribution</span>
+      </div>
+      <div class="case-title">공유서비스센터(SSC) 비용 배부</div>
+      <div class="case-row"><span class="case-row-key">Sender</span><span class="case-row-val">SSC Cost Center</span></div>
+      <div class="case-row"><span class="case-row-key">Receiver</span><span class="case-row-val">전사 Cost Center</span></div>
+      <div class="case-row"><span class="case-row-key">Driver</span><span class="case-row-val">직원 수 (SKF)</span></div>
+      <div class="case-row"><span class="case-row-key">기법 선택 이유</span><span class="case-row-val">원가 항목별 내역 투명성 유지 (감사 요건)</span></div>
+      <div class="case-row"><span class="case-row-key">T-Code</span><span class="case-row-val">KSV1 / KSV5 / KB31N</span></div>
+    </div>
+  </div>
+
+  <div class="section" style="margin-top:32px;">
+    <div class="section-title">기법 선택 Decision Framework</div>
+    <table class="data-table">
+      <thead><tr><th>판단 질문</th><th>Yes → 권장 기법</th><th>No → 대안</th></tr></thead>
+      <tbody>
+        <tr><td>실제 사용량(수량)을 측정할 수 있는가?</td><td>Activity Allocation</td><td>Assessment 또는 Distribution 검토</td></tr>
+        <tr><td>Receiver가 원가 항목 세부 내역을 봐야 하는가?</td><td>Distribution</td><td>Assessment</td></tr>
+        <tr><td>배부 단순화가 우선이고 통합 보고가 목적인가?</td><td>Assessment</td><td>Distribution</td></tr>
+        <tr><td>계획 단계의 하향식 시뮬레이션이 목적인가?</td><td>Top-Down Distribution</td><td>Assessment Cycle (계획 버전)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ CH 8 ═══════════════════════════════ -->
+<section class="chapter" id="ch8">
+  <div class="chapter-header">
+    <span class="chapter-num">CH.08</span>
+    <div class="chapter-titles">
+      <div class="chapter-action-title">Allocation 설계는 기술 결정이 아니라 경영 철학의 반영이다</div>
+      <div class="chapter-sub">비즈니스 관점 · 손익 영향 · 부서 갈등 · 설계 원칙</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">배부 결과가 손익에 미치는 영향</div>
+    <p>Allocation은 전사 총 비용을 변경하지 않습니다. 그러나 <strong>어떤 사업부, 어떤 제품, 어떤 고객 세그먼트가 비용을 부담하느냐</strong>를 결정하므로 손익 구조에 직접 영향을 미칩니다.</p>
+    <table class="data-table">
+      <thead><tr><th>시나리오</th><th>Allocation 설계</th><th>경영적 결과</th></tr></thead>
+      <tbody>
+        <tr><td>IT 비용을 매출 규모로 배부</td><td>대형 사업부가 더 많이 부담</td><td>중소 사업부 수익성 과대 계상 위험</td></tr>
+        <tr><td>IT 비용을 사용자 수로 배부</td><td>실사용 비례 배부</td><td>절약 인센티브 발생, 부서 행동 변화</td></tr>
+        <tr><td>공장 비용 미배부 (임시 보류)</td><td>제품 원가 과소 계상</td><td>가격 결정 오류, 마진 왜곡</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">배부기준 선택이 부서 갈등이 되는 이유</div>
+    <p>Tracing Factor(배부기준)는 단순한 기술 설정이 아닙니다. "누가 얼마를 부담하는가"를 결정하기 때문에 <strong>사업부 KPI와 성과 평가에 직결</strong>됩니다. 컨설팅 현장에서 Allocation 설계 시 비기술적 이해관계자(CFO, 사업부장)가 반드시 참여해야 하는 이유입니다.</p>
+    <div class="info-box">
+      실무 팁: 배부기준은 "측정 가능하고, 배부 받는 부서가 통제 가능한 지표"를 우선합니다. 통제 불가능한 기준은 부서 불만과 데이터 신뢰성 문제를 야기합니다.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">좋은 Allocation 설계의 3원칙</div>
+    <div class="compare-grid" style="grid-template-columns:repeat(3,1fr);">
+      <div class="compare-cell header-cell"><div class="compare-label">원칙 1</div><div class="compare-val">인과관계 (Causality)</div></div>
+      <div class="compare-cell header-cell"><div class="compare-label">원칙 2</div><div class="compare-val">측정 가능성 (Measurability)</div></div>
+      <div class="compare-cell header-cell"><div class="compare-label">원칙 3</div><div class="compare-val">수용 가능성 (Acceptability)</div></div>
+      <div class="compare-cell"><div class="c-desc">배부기준과 비용 발생 간에 논리적 인과관계가 있어야 함. 매출로 IT비 배부 시 인과관계 약함</div></div>
+      <div class="compare-cell"><div class="c-desc">배부기준이 실제로 수집·검증 가능해야 함. 추정치 기반 배부는 신뢰성 저하</div></div>
+      <div class="compare-cell"><div class="c-desc">배부받는 부서가 기준의 공정성을 납득해야 함. 이해관계자 사전 협의가 핵심</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ CH 9 ═══════════════════════════════ -->
+<section class="chapter" id="ch9">
+  <div class="chapter-header">
+    <span class="chapter-num">CH.09</span>
+    <div class="chapter-titles">
+      <div class="chapter-action-title">핵심 개념 요약 및 실무 체크리스트 — 설계 전 반드시 확인하라</div>
+      <div class="chapter-sub">요약 · Decision Tree · 실무 체크리스트 · T-Code 전체 목록</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">기법 비교 1-Page 요약</div>
+    <table class="data-table">
+      <thead><tr><th>구분</th><th>Activity Allocation</th><th>Distribution</th><th>Assessment</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">배부 단위</td><td>수량 × 단가</td><td>금액 (비율/SKF)</td><td>금액 (비율/SKF)</td></tr>
+        <tr><td class="strong">Cost Element</td><td>Secondary CE</td><td>Primary CE 유지</td><td>Secondary CE</td></tr>
+        <tr><td class="strong">원가 투명성</td><td>중간</td><td>높음</td><td>낮음</td></tr>
+        <tr><td class="strong">설정 복잡도</td><td>높음</td><td>중간</td><td>중간</td></tr>
+        <tr><td class="strong">주요 Sender</td><td>서비스 제공 CC</td><td>공통 비용 CC</td><td>간접비 CC</td></tr>
+        <tr><td class="strong">Cycle 필요</td><td>불필요 (Activity Type)</td><td>필요 (KSV1)</td><td>필요 (KSU1)</td></tr>
+        <tr><td class="strong">대표 T-Code</td><td>KSII, KSC5</td><td>KSV1, KSV5</td><td>KSU1, KSU5</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">실무 체크리스트 — Allocation 설계 전 확인 사항</div>
+    <ul class="checklist">
+      <li><span class="check-box"></span><span>배부 대상 Cost Center가 확정되었는가? (Sender / Receiver 목록)</span></li>
+      <li><span class="check-box"></span><span>각 배부에 적합한 기법(Assessment / Distribution / Activity)을 결정했는가?</span></li>
+      <li><span class="check-box"></span><span>Secondary Cost Element가 사전 생성되어 있는가? (Assessment 사용 시)</span></li>
+      <li><span class="check-box"></span><span>Activity Type과 Activity Price 계산 방식이 확정되었는가?</span></li>
+      <li><span class="check-box"></span><span>SKF 수치를 수집하는 프로세스가 있는가? (담당자, 주기, 입력 방법)</span></li>
+      <li><span class="check-box"></span><span>Cycle 간 실행 순서(Sequence)가 정의되었는가?</span></li>
+      <li><span class="check-box"></span><span>배부기준(Tracing Factor)에 대한 사업부 이해관계자 동의가 완료되었는가?</span></li>
+      <li><span class="check-box"></span><span>Period-End Closing 담당자와 실행 순서가 공유되었는가?</span></li>
+      <li><span class="check-box"></span><span>Test Run 결과를 검증하는 절차가 있는가?</span></li>
+      <li><span class="check-box"></span><span>Allocation 결과가 Margin Analysis에 올바르게 반영되는지 확인했는가?</span></li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <div class="section-title">T-Code 전체 목록</div>
+    <div class="tcode-grid">
+      <div class="tcode-item"><div class="tcode-code">KP06</div><div class="tcode-desc">원가 계획 입력</div></div>
+      <div class="tcode-item"><div class="tcode-code">KP26</div><div class="tcode-desc">Activity 수량 계획</div></div>
+      <div class="tcode-item"><div class="tcode-code">KSPI</div><div class="tcode-desc">Activity Price 계산 (계획)</div></div>
+      <div class="tcode-item"><div class="tcode-code">KSII</div><div class="tcode-desc">Activity Price 계산 (실적)</div></div>
+      <div class="tcode-item"><div class="tcode-code">KB21N</div><div class="tcode-desc">Activity 수량 직접 입력</div></div>
+      <div class="tcode-item"><div class="tcode-code">KSC5</div><div class="tcode-desc">Indirect Activity Allocation 실행</div></div>
+      <div class="tcode-item"><div class="tcode-code">KSV1</div><div class="tcode-desc">Distribution Cycle 생성</div></div>
+      <div class="tcode-item"><div class="tcode-code">KSV5</div><div class="tcode-desc">Distribution 실행</div></div>
+      <div class="tcode-item"><div class="tcode-code">KSU1</div><div class="tcode-desc">Assessment Cycle 생성</div></div>
+      <div class="tcode-item"><div class="tcode-code">KSU5</div><div class="tcode-desc">Assessment 실행</div></div>
+      <div class="tcode-item"><div class="tcode-code">KB31N</div><div class="tcode-desc">SKF 수량 입력</div></div>
+      <div class="tcode-item"><div class="tcode-code">KO88</div><div class="tcode-desc">Internal Order Settlement</div></div>
+      <div class="tcode-item"><div class="tcode-code">CJ88</div><div class="tcode-desc">WBS Settlement</div></div>
+      <div class="tcode-item"><div class="tcode-code">KSB1</div><div class="tcode-desc">CC 전표 명세 조회</div></div>
+      <div class="tcode-item"><div class="tcode-code">KB61</div><div class="tcode-desc">Reposting (수동 재전기)</div></div>
+      <div class="tcode-item"><div class="tcode-code">OKP1</div><div class="tcode-desc">회계기간 오픈/클로즈</div></div>
+    </div>
+  </div>
+
+  <div class="summary-band">
+    <div class="summary-band-title">핵심 메시지 최종 정리</div>
+    <div class="summary-row">
+      <span class="summary-chip">원가는 발생이 아닌 이동</span>
+      <span class="summary-chip">Sender Credit / Receiver Debit</span>
+      <span class="summary-chip">기법 선택 = 투명성 vs. 단순성</span>
+      <span class="summary-chip">순서 오류 = 원가 왜곡</span>
+      <span class="summary-chip">배부기준 = 경영 철학</span>
+    </div>
+  </div>
+</section>
+
+<!-- APPENDIX -->
+<hr class="divider">
+<section class="chapter" id="appendix" style="margin-top:40px;">
+  <div class="chapter-header">
+    <span class="chapter-num">부록</span>
+    <div class="chapter-titles">
+      <div class="chapter-action-title">Template Allocation — 고급 기법 (심화 선택 학습)</div>
+      <div class="chapter-sub">ECC / S/4HANA · 조건부 수식 기반 배부 · 적용 판단 기준</div>
+    </div>
+  </div>
+  <div class="section">
+    <p>Template Allocation은 배부 수식과 조건을 사전 정의하여 복잡한 다단계 배부를 자동화하는 고급 기능입니다. ECC 시절부터 존재했으나 실무 사용 빈도가 매우 낮으며 <strong>(★☆☆☆☆)</strong>, S/4HANA 전환 이후에도 마이너 기능으로 분류됩니다.</p>
+    <table class="data-table" style="margin-top:16px;">
+      <thead><tr><th>적용 검토 기준</th><th>내용</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">사용 고려 상황</td><td>배부 기준이 수식 또는 조건 분기로만 표현 가능한 경우</td></tr>
+        <tr><td class="strong">사용 비권장 상황</td><td>Assessment/Distribution으로 충분히 처리 가능한 경우 (대부분)</td></tr>
+        <tr><td class="strong">전제 조건</td><td>CO-OM 설정 전문 지식 필요, 유지보수 복잡도 높음</td></tr>
+        <tr><td class="strong">대안 검토</td><td>S/4HANA + BTP 환경에서는 커스텀 로직으로 대체 가능</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+</div><!-- end page-wrap -->
+
+<footer class="site-footer">
+  SAP CO Allocation Education Series &nbsp;·&nbsp; ASPN BAC사업부 &nbsp;·&nbsp; ECC / S/4HANA 공통 적용
+</footer>
+
+</body>
+</html>
