@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 3. Depreciation Configuration</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root{
+  --navy:#003366;
+  --navy-light:#e8eef5;
+  --bg:#f0f3f8;
+  --card-bg:#ffffff;
+  --border:#d6dde8;
+  --text:#1a1a1a;
+  --text-sub:#5a6473;
+  --warn-bg:#fff4e5;
+  --warn-border:#e0a132;
+  --correct-bg:#e8f5ea;
+  --correct-border:#2e8b4f;
+  --wrong-bg:#fbe9e9;
+  --wrong-border:#c0392b;
+}
+
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{overflow-x:hidden;}
+body{
+  font-family:'Noto Sans KR', sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  font-size:15px;
+  line-height:1.7;
+  word-break:keep-all;
+  overflow-wrap:break-word;
+}
+h1,h2,h3,.serif{font-family:'DM Serif Display', 'Noto Sans KR', serif;}
+code, .mono{font-family:'JetBrains Mono','Noto Sans KR',monospace;}
+
+header{
+  background:var(--navy);
+  color:#fff;
+  padding:36px 5vw 28px;
+}
+header .eyebrow{
+  font-family:'JetBrains Mono','Noto Sans KR',monospace;
+  font-size:13px;
+  letter-spacing:.08em;
+  opacity:.75;
+  margin-bottom:8px;
+}
+header h1{font-size:42px; font-weight:400; line-height:1.25;}
+header p{margin-top:10px; font-size:15px; opacity:.85; max-width:760px;}
+
+nav.tabs{
+  position:sticky; top:0; z-index:100;
+  background:#fff;
+  border-bottom:2px solid var(--navy);
+  display:flex;
+  overflow-x:auto;
+  padding:0 5vw;
+}
+nav.tabs button{
+  flex:0 0 auto;
+  background:none; border:none; cursor:pointer;
+  padding:16px 18px;
+  font-family:'Noto Sans KR', sans-serif;
+  font-size:14px; font-weight:500;
+  color:var(--text-sub);
+  border-bottom:3px solid transparent;
+  white-space:nowrap;
+  transition:.15s;
+}
+nav.tabs button:hover{color:var(--navy);}
+nav.tabs button.active{
+  color:var(--navy); font-weight:700;
+  border-bottom:3px solid var(--navy);
+}
+
+main{max-width:980px; margin:0 auto; padding:40px 5vw 100px;}
+section.panel{display:none;}
+section.panel.active{display:block; animation:fadeIn .25s ease;}
+@keyframes fadeIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+.section-title{
+  font-size:30px; font-weight:400;
+  color:var(--navy);
+  margin-bottom:6px;
+  display:flex; align-items:center; gap:10px;
+}
+.section-num{
+  font-family:'JetBrains Mono', monospace;
+  font-size:14px; background:var(--navy); color:#fff;
+  padding:3px 9px; border-radius:3px;
+}
+.subtitle{color:var(--text-sub); font-size:15px; margin-bottom:28px;}
+
+.card{
+  background:var(--card-bg);
+  border:1px solid var(--border);
+  border-left:4px solid var(--navy);
+  border-radius:6px;
+  padding:22px 24px;
+  margin-bottom:20px;
+}
+.card h3{font-size:16px; font-weight:700; color:var(--navy); margin-bottom:10px; font-family:'Noto Sans KR';}
+
+.callout{
+  border-radius:6px;
+  padding:18px 20px;
+  margin:18px 0;
+  font-size:14px;
+  border-left:4px solid;
+}
+.callout.navy{background:var(--navy-light); border-color:var(--navy);}
+.callout.warn{background:var(--warn-bg); border-color:var(--warn-border);}
+.callout.correct{background:var(--correct-bg); border-color:var(--correct-border);}
+.callout.wrong{background:var(--wrong-bg); border-color:var(--wrong-border);}
+.callout .label{font-weight:700; font-size:13px; margin-bottom:6px; display:block;}
+
+.flow{
+  display:flex; align-items:center; gap:0;
+  flex-wrap:wrap;
+  margin:24px 0;
+}
+.flow-box{
+  background:#fff; border:2px solid var(--navy); border-radius:6px;
+  padding:14px 18px; text-align:center; font-weight:700; color:var(--navy);
+  font-size:14px; min-width:140px;
+}
+.flow-box small{display:block; font-weight:400; color:var(--text-sub); font-size:12px; margin-top:4px;}
+.flow-arrow{
+  font-size:20px; color:var(--navy); padding:0 10px; font-weight:700;
+}
+
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+.grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
+@media(max-width:700px){.grid2,.grid3{grid-template-columns:1fr;}}
+
+table{width:100%; border-collapse:collapse; margin:18px 0; font-size:14px;}
+th,td{border:1px solid var(--border); padding:10px 12px; text-align:left;}
+th{background:var(--navy); color:#fff; font-weight:700; font-size:13px;}
+tr:nth-child(even){background:#f8f9fb;}
+
+.tree{margin:24px 0;}
+.tree-node{
+  border:1px solid var(--border); border-radius:6px; background:#fff;
+  padding:12px 16px; margin-bottom:4px; position:relative;
+}
+.tree-node .lvl{
+  font-family:'JetBrains Mono', monospace; font-size:11px;
+  color:#fff; background:var(--navy); padding:2px 8px; border-radius:3px; margin-right:8px;
+}
+.tree-node.l1{margin-left:0; border-left:4px solid var(--navy);}
+.tree-node.l2{margin-left:30px; border-left:4px solid #6699cc;}
+.tree-node.l3{margin-left:60px; border-left:4px solid #99bbdd;}
+.tree-node.l4{margin-left:90px; border-left:4px solid #cce0f0;}
+
+.drill{
+  background:#fff; border:1px solid var(--border); border-radius:6px;
+  margin:14px 0; overflow:hidden;
+}
+.drill-head{
+  padding:14px 18px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;
+  font-weight:700; color:var(--navy); background:var(--navy-light);
+}
+.drill-head .chev{transition:.2s; font-size:13px;}
+.drill.open .chev{transform:rotate(90deg);}
+.drill-body{display:none; padding:18px; font-size:14px;}
+.drill.open .drill-body{display:block;}
+
+.matrix{
+  display:grid; grid-template-columns:140px repeat(3,1fr);
+  border:1px solid var(--border); border-radius:6px; overflow:hidden; margin:22px 0;
+}
+.matrix > div{padding:12px 14px; border-bottom:1px solid var(--border); border-right:1px solid var(--border); font-size:13px;}
+.matrix > div:nth-child(4n+1){background:var(--navy); color:#fff; font-weight:700;}
+.matrix .head{background:var(--navy); color:#fff; font-weight:700; text-align:center;}
+.matrix .asset-id{font-weight:700; color:var(--navy);}
+
+.quiz-q{background:#fff; border:1px solid var(--border); border-radius:6px; padding:20px; margin-bottom:16px;}
+.quiz-q .qtext{font-weight:700; margin-bottom:12px;}
+.quiz-opt{
+  display:block; width:100%; text-align:left; background:#f8f9fb; border:1px solid var(--border);
+  border-radius:5px; padding:10px 14px; margin-bottom:8px; cursor:pointer; font-size:14px;
+  font-family:'Noto Sans KR'; color:var(--text);
+}
+.quiz-opt:hover{border-color:var(--navy);}
+.quiz-opt.correct{background:var(--correct-bg); border-color:var(--correct-border); font-weight:700;}
+.quiz-opt.wrong{background:var(--wrong-bg); border-color:var(--wrong-border);}
+.quiz-fb{margin-top:10px; font-size:13px; padding:10px 12px; border-radius:5px; display:none;}
+.quiz-fb.show{display:block;}
+
+.checklist{list-style:none; margin:16px 0;}
+.checklist li{
+  display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-bottom:1px solid var(--border);
+  font-size:14px;
+}
+.checklist li::before{content:"☐"; color:var(--navy); font-size:16px;}
+
+footer{
+  background:var(--navy); color:#fff; padding:30px 5vw; text-align:center; font-size:13px; opacity:.85;
+}
+
+.pagenav{display:flex; justify-content:space-between; margin-top:50px; padding-top:24px; border-top:1px solid var(--border);}
+.pagenav button{
+  background:var(--navy); color:#fff; border:none; padding:12px 22px; border-radius:5px;
+  font-family:'Noto Sans KR'; font-weight:700; cursor:pointer; font-size:14px;
+}
+.pagenav button:disabled{opacity:.3; cursor:not-allowed;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">ASPN BAC EDUCATION · SAP ASSET ACCOUNTING SERIES · MODULE 3 / 6</div>
+  <h1>Depreciation Configuration</h1>
+  <p>Module 2에서 "감가상각액 = Key + Useful Life + Period Control"이라는 공식만 짚었다면,
+  이 모듈에서는 각 요소를 실제로 설정할 때 발생하는 판단 지점과, Area별 설정 차이가 만들어내는
+  전형적인 금액 차이 패턴을 다룹니다.</p>
+</header>
+
+<nav class="tabs" id="tabs"></nav>
+
+<main id="main"></main>
+
+<footer>ASPN BAC · Business Advisory Consulting · SAP Education Portal</footer>
+
+<script>
+const sections = [
+{
+  id:'depkey',
+  title:'1) Depreciation Key',
+  html:`
+    <div class="section-title"><span class="section-num">3.1</span>Depreciation Key</div>
+    <div class="subtitle">상각방법·상각률·계산 공식을 하나로 묶은 규칙 코드입니다.</div>
+
+    <div class="card">
+      <h3>구성 요소</h3>
+      <p>Depreciation Key는 단순히 "정액법" 같은 이름표가 아니라, 그 안에 상각 계산방식(Calculation Method),
+      상각률 테이블, 잔존가액 처리 방식, 최대 내용연수 등을 묶어놓은 규칙 패키지입니다. 자산 마스터에는
+      이 Key의 코드만 지정되며, 실제 계산 로직은 Key 정의 안에 캡슐화되어 있습니다.</p>
+    </div>
+
+    <table>
+      <tr><th>Key 예시</th><th>방법</th><th>특징</th></tr>
+      <tr><td>LINR</td><td>정액법 (잔존가액 없음)</td><td>매년 동일 금액 상각, 가장 일반적</td></tr>
+      <tr><td>LINS</td><td>정액법 (잔존가액 있음)</td><td>잔존가액을 차감한 금액을 균등 상각</td></tr>
+      <tr><td>Z030</td><td>정률법 (상각률 30% 예시)</td><td>기초 장부가 × 상각률, 초기 상각액이 큼 — 세무 Area에서 빈번히 사용</td></tr>
+      <tr><td>Z001</td><td>커스텀(생산량비례법)</td><td>표준 Key로 구현 안 될 경우 사용자 정의로 생성</td></tr>
+    </table>
+
+    <div class="callout warn">
+      <span class="label">실무 함정</span>
+      정률법은 SAP 표준 Key가 한국 세법상 정률법 공식과 정확히 일치하지 않는 경우가 있어,
+      세무 Area(예: Area 15)에 적용할 때는 반드시 <b>실제 세법 상각률표와 대조 검증</b>이 필요합니다.
+      "표준 Key니까 맞겠지"라고 가정하고 넘어가는 것이 가장 흔한 실수입니다.
+    </div>
+  `
+},
+{
+  id:'usefullife',
+  title:'2) Useful Life',
+  html:`
+    <div class="section-title"><span class="section-num">3.2</span>Useful Life (내용연수)</div>
+    <div class="subtitle">상각 기간을 결정하는 또 하나의 축 — Depreciation Key와 결합해 실제 상각액을 만듭니다.</div>
+
+    <div class="card">
+      <h3>설정 위치의 우선순위</h3>
+      <p>내용연수는 보통 Asset Class 단계에서 기본값(Default)이 설정되고, 개별 Asset Master에서
+      이를 덮어쓸(Override) 수 있습니다. 동일 Asset Class(예: 기계장치)라도 특정 설비의 실제 사용 패턴이
+      다르면 마스터 단계에서 개별 조정하는 것이 정상적인 흐름입니다.</p>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h3>회계상 내용연수 (Area 01/32)</h3>
+        <p style="font-size:14px;">자산의 경제적 효익이 유지될 것으로 예상되는 기간. 실제 사용계획, 기술 진부화
+        속도 등을 반영하여 추정하며, 매 결산기마다 재검토 대상입니다.</p>
+      </div>
+      <div class="card">
+        <h3>세법상 내용연수 (Area 15)</h3>
+        <p style="font-size:14px;">법인세법 시행규칙의 기준내용연수표를 따르며, 회계상 추정치와 무관하게
+        법정 범위 내에서 신고합니다. 회계상 내용연수와 자주 차이가 발생하는 지점입니다.</p>
+      </div>
+    </div>
+
+    <div class="callout navy">
+      <span class="label">Module 1 연계</span>
+      이 차이가 바로 Module 1에서 다룬 "Area별로 감가상각방법·내용연수가 다를 수 있다"는 설계 원칙이
+      실제 숫자로 구현되는 지점입니다. 동일 자산이라도 Area 01과 Area 15의 연간 상각액이 처음부터 달라집니다.
+    </div>
+  `
+},
+{
+  id:'periodcontrol',
+  title:'3) Period Control',
+  html:`
+    <div class="section-title"><span class="section-num">3.3</span>Period Control</div>
+    <div class="subtitle">자산이 "월 중간에" 취득되거나 폐기될 때, 상각을 어느 시점부터 어디까지 인식할지 결정합니다.</div>
+
+    <div class="card">
+      <h3>왜 필요한가</h3>
+      <p>자산은 매달 1일에 딱 맞춰 취득되지 않습니다. 예를 들어 6월 15일에 취득한 설비를 6월분 상각에
+      포함할지, 7월부터 상각을 시작할지는 회사 정책에 따라 달라지며, 이 규칙을 Period Control이 관리합니다.</p>
+    </div>
+
+    <table>
+      <tr><th>Period Control 규칙</th><th>의미</th><th>예시</th></tr>
+      <tr><td>최초연도 월할 (Pro Rata)</td><td>취득일이 속한 월부터 일할 또는 월할로 상각 개시</td><td>6/15 취득 → 6월분부터 비례 상각</td></tr>
+      <tr><td>당기 전체월 인식</td><td>취득월 전체를 상각 대상월로 인식</td><td>6/15 취득 → 6월 1개월분 전액 인식</td></tr>
+      <tr><td>익월 개시</td><td>취득월 다음 달부터 상각 개시</td><td>6/15 취득 → 7월분부터 상각</td></tr>
+    </table>
+
+    <div class="callout warn">
+      <span class="label">실무 함정</span>
+      Period Control 규칙은 <b>취득(Acquisition)과 폐기(Retirement)에 각각 별도로 설정</b>됩니다.
+      취득 규칙만 확인하고 폐기 규칙을 동일하다고 가정하면, 자산을 연도 중간에 처분했을 때 상각액이
+      예상과 다르게 산출되는 오류가 자주 발생합니다.
+    </div>
+  `
+},
+{
+  id:'multigaap',
+  title:'4) Multi-GAAP 처리',
+  html:`
+    <div class="section-title"><span class="section-num">3.4</span>Multi-GAAP 처리 — Area 간 금액 차이의 전형적 패턴</div>
+    <div class="subtitle">지금까지 다룬 3개 요소가 결합되어 만드는 실제 금액 차이 사례입니다.</div>
+
+    <div class="matrix">
+      <div class="head">구분</div><div class="head">Area 01 (Book)</div><div class="head">Area 32 (IFRS)</div><div class="head">Area 15 (Tax)</div>
+      <div class="asset-id">Depreciation Key</div>
+      <div>LINR (정액법)</div>
+      <div>LINR (정액법)</div>
+      <div>Z030 (정률법 30%)</div>
+      <div class="asset-id">Useful Life</div>
+      <div>10년</div>
+      <div>8년</div>
+      <div>5년(법정)</div>
+      <div class="asset-id">1차년도 상각액<br><span style="font-weight:400; color:var(--text-sub);">(취득가 5억 가정, 예시 금액)</span></div>
+      <div>50,000,000</div>
+      <div>62,500,000</div>
+      <div>150,000,000<br><span style="font-size:11px; color:var(--text-sub);">(기초장부가 5억 × 30%, 정률법 특성상 초기 상각액 큼)</span></div>
+    </div>
+
+    <div class="callout correct">
+      <span class="label">교육 메시지</span>
+      세 Area의 1차년도 상각액이 3배 가까이 차이 나는 것은 오류가 아니라, <b>방법(Key)·내용연수(Useful Life)가
+      서로 다른 목적을 위해 의도적으로 다르게 설계되었기 때문</b>입니다. 이 차이 자체가 세무조정(Tax-Book 차이)의
+      출발점이 되며, Area 15와 Area 01의 차이가 누적되어 이연법인세 인식의 기초 자료가 됩니다.
+    </div>
+
+    <div class="drill" onclick="this.classList.toggle('open')">
+      <div class="drill-head"><span>심화 — 이 차이가 결산에 어떻게 활용되는가</span><span class="chev">▶</span></div>
+      <div class="drill-body">
+        <p>Area 01(Book)과 Area 15(Tax)의 상각액 차이는 매년 누적되어, 법인세 계산 시 <b>세무조정 유보(또는
+        손금산입)</b>의 기초 데이터로 활용됩니다. Area 32(IFRS)는 별도로 그룹 연결 결산 보고서 작성에 활용되며,
+        이 세 Area의 결과는 각각 독립적으로 Asset Explorer에서 조회할 수 있습니다 — Asset Explorer 활용법은
+        Module 5(Period-End Closing)에서 다룹니다.</p>
+      </div>
+    </div>
+
+    <ul class="checklist">
+      <li>Depreciation Key는 상각방법·상각률·잔존가액 처리를 묶은 규칙 패키지다</li>
+      <li>표준 Depreciation Key가 실제 세법 상각률표와 일치하는지 반드시 검증해야 한다</li>
+      <li>Useful Life는 Asset Class 기본값을 Asset Master에서 개별 조정할 수 있다</li>
+      <li>Period Control은 취득과 폐기에 각각 별도로 설정되며, 둘 다 확인해야 한다</li>
+      <li>Area별 상각액 차이는 오류가 아니라 의도된 설계이며, 세무조정의 기초 자료가 된다</li>
+    </ul>
+  `
+},
+{
+  id:'quiz',
+  title:'Check Your Understanding',
+  html:`
+    <div class="section-title"><span class="section-num">3.5</span>이해도 점검</div>
+    <div class="subtitle">Module 3 핵심 개념 3문항입니다.</div>
+
+    <div class="quiz-q">
+      <div class="qtext">Q1. 세무 Area(Area 15)에 표준 정률법 Depreciation Key를 적용하기 전 반드시 해야 할 것은?</div>
+      <button class="quiz-opt" data-correct="false" onclick="checkQuiz(this)">표준 Key이므로 별도 검증 없이 바로 적용한다</button>
+      <button class="quiz-opt" data-correct="true" onclick="checkQuiz(this)">실제 법인세법 상각률표와 계산 결과를 대조 검증한다</button>
+      <button class="quiz-opt" data-correct="false" onclick="checkQuiz(this)">Area 01과 동일한 Key를 사용하도록 변경한다</button>
+      <div class="quiz-fb"></div>
+    </div>
+
+    <div class="quiz-q">
+      <div class="qtext">Q2. Period Control 설정에 대한 설명으로 옳은 것은?</div>
+      <button class="quiz-opt" data-correct="false" onclick="checkQuiz(this)">취득과 폐기는 항상 동일한 규칙이 자동 적용된다</button>
+      <button class="quiz-opt" data-correct="true" onclick="checkQuiz(this)">취득과 폐기 각각에 별도의 Period Control 규칙이 설정되어야 한다</button>
+      <button class="quiz-opt" data-correct="false" onclick="checkQuiz(this)">Period Control은 Depreciation Key와 무관하게 작동하지 않는다</button>
+      <div class="quiz-fb"></div>
+    </div>
+
+    <div class="quiz-q">
+      <div class="qtext">Q3. Area 01과 Area 15의 상각액이 크게 차이 나는 경우, 가장 적절한 해석은?</div>
+      <button class="quiz-opt" data-correct="false" onclick="checkQuiz(this)">시스템 설정 오류이므로 즉시 두 Area를 통일해야 한다</button>
+      <button class="quiz-opt" data-correct="true" onclick="checkQuiz(this)">방법·내용연수가 서로 다른 목적으로 의도된 설계이며, 세무조정의 기초 자료가 된다</button>
+      <button class="quiz-opt" data-correct="false" onclick="checkQuiz(this)">Area 32(IFRS)가 항상 Area 01보다 우선한다는 의미다</button>
+      <div class="quiz-fb"></div>
+    </div>
+  `
+}
+];
+
+function checkQuiz(btn, label){
+  const group = btn.parentElement.querySelectorAll('.quiz-opt');
+  const fb = btn.parentElement.querySelector('.quiz-fb');
+  group.forEach(b=>{
+    b.disabled = true;
+    if(b.dataset.correct === 'true'){ b.classList.add('correct'); }
+  });
+  if(btn.dataset.correct === 'false'){ btn.classList.add('wrong'); }
+  fb.classList.add('show');
+  fb.style.background = 'var(--correct-bg)';
+  fb.innerHTML = btn.dataset.correct === 'true'
+    ? '정답입니다.'
+    : '오답입니다. 정답이 위에 초록색으로 표시되어 있습니다.';
+}
+
+const tabsEl = document.getElementById('tabs');
+const mainEl = document.getElementById('main');
+
+sections.forEach((s,i)=>{
+  const b = document.createElement('button');
+  b.textContent = s.title;
+  b.onclick = ()=>showSection(i);
+  b.id = 'tabbtn-'+i;
+  tabsEl.appendChild(b);
+
+  const sec = document.createElement('section');
+  sec.className = 'panel';
+  sec.id = 'panel-'+i;
+  sec.innerHTML = s.html + `
+    <div class="pagenav">
+      <button onclick="showSection(${i-1})" ${i===0?'disabled':''}>← 이전</button>
+      <button onclick="showSection(${i+1})" ${i===sections.length-1?'disabled':''}>다음 →</button>
+    </div>`;
+  mainEl.appendChild(sec);
+});
+
+function showSection(i){
+  if(i<0 || i>=sections.length) return;
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+i).classList.add('active');
+  document.getElementById('tabbtn-'+i).classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+showSection(0);
+</script>
+</body>
+</html>

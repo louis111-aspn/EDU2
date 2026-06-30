@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 2. Asset Lifecycle</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root{
+  --navy:#003366;
+  --navy-light:#e8eef5;
+  --bg:#f0f3f8;
+  --card-bg:#ffffff;
+  --border:#d6dde8;
+  --text:#1a1a1a;
+  --text-sub:#5a6473;
+  --warn-bg:#fff4e5;
+  --warn-border:#e0a132;
+  --correct-bg:#e8f5ea;
+  --correct-border:#2e8b4f;
+  --wrong-bg:#fbe9e9;
+  --wrong-border:#c0392b;
+}
+
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{overflow-x:hidden;}
+body{
+  font-family:'Noto Sans KR', sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  font-size:15px;
+  line-height:1.7;
+  word-break:keep-all;
+  overflow-wrap:break-word;
+}
+h1,h2,h3,.serif{font-family:'DM Serif Display', 'Noto Sans KR', serif;}
+code, .mono{font-family:'JetBrains Mono','Noto Sans KR',monospace;}
+
+header{
+  background:var(--navy);
+  color:#fff;
+  padding:36px 5vw 28px;
+}
+header .eyebrow{
+  font-family:'JetBrains Mono','Noto Sans KR',monospace;
+  font-size:13px;
+  letter-spacing:.08em;
+  opacity:.75;
+  margin-bottom:8px;
+}
+header h1{font-size:42px; font-weight:400; line-height:1.25;}
+header p{margin-top:10px; font-size:15px; opacity:.85; max-width:760px;}
+
+nav.tabs{
+  position:sticky; top:0; z-index:100;
+  background:#fff;
+  border-bottom:2px solid var(--navy);
+  display:flex;
+  overflow-x:auto;
+  padding:0 5vw;
+}
+nav.tabs button{
+  flex:0 0 auto;
+  background:none; border:none; cursor:pointer;
+  padding:16px 18px;
+  font-family:'Noto Sans KR', sans-serif;
+  font-size:14px; font-weight:500;
+  color:var(--text-sub);
+  border-bottom:3px solid transparent;
+  white-space:nowrap;
+  transition:.15s;
+}
+nav.tabs button:hover{color:var(--navy);}
+nav.tabs button.active{
+  color:var(--navy); font-weight:700;
+  border-bottom:3px solid var(--navy);
+}
+
+main{max-width:980px; margin:0 auto; padding:40px 5vw 100px;}
+section.panel{display:none;}
+section.panel.active{display:block; animation:fadeIn .25s ease;}
+@keyframes fadeIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+.section-title{
+  font-size:30px; font-weight:400;
+  color:var(--navy);
+  margin-bottom:6px;
+  display:flex; align-items:center; gap:10px;
+}
+.section-num{
+  font-family:'JetBrains Mono', monospace;
+  font-size:14px; background:var(--navy); color:#fff;
+  padding:3px 9px; border-radius:3px;
+}
+.subtitle{color:var(--text-sub); font-size:15px; margin-bottom:28px;}
+
+.card{
+  background:var(--card-bg);
+  border:1px solid var(--border);
+  border-left:4px solid var(--navy);
+  border-radius:6px;
+  padding:22px 24px;
+  margin-bottom:20px;
+}
+.card h3{font-size:16px; font-weight:700; color:var(--navy); margin-bottom:10px; font-family:'Noto Sans KR';}
+
+.callout{
+  border-radius:6px;
+  padding:18px 20px;
+  margin:18px 0;
+  font-size:14px;
+  border-left:4px solid;
+}
+.callout.navy{background:var(--navy-light); border-color:var(--navy);}
+.callout.warn{background:var(--warn-bg); border-color:var(--warn-border);}
+.callout.correct{background:var(--correct-bg); border-color:var(--correct-border);}
+.callout.wrong{background:var(--wrong-bg); border-color:var(--wrong-border);}
+.callout .label{font-weight:700; font-size:13px; margin-bottom:6px; display:block;}
+
+.flow{
+  display:flex; align-items:center; gap:0;
+  flex-wrap:wrap;
+  margin:24px 0;
+}
+.flow-box{
+  background:#fff; border:2px solid var(--navy); border-radius:6px;
+  padding:14px 18px; text-align:center; font-weight:700; color:var(--navy);
+  font-size:14px; min-width:140px;
+}
+.flow-box small{display:block; font-weight:400; color:var(--text-sub); font-size:12px; margin-top:4px;}
+.flow-arrow{
+  font-size:20px; color:var(--navy); padding:0 10px; font-weight:700;
+}
+
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+.grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
+@media(max-width:700px){.grid2,.grid3{grid-template-columns:1fr;}}
+
+table{width:100%; border-collapse:collapse; margin:18px 0; font-size:14px;}
+th,td{border:1px solid var(--border); padding:10px 12px; text-align:left;}
+th{background:var(--navy); color:#fff; font-weight:700; font-size:13px;}
+tr:nth-child(even){background:#f8f9fb;}
+
+.tree{margin:24px 0;}
+.tree-node{
+  border:1px solid var(--border); border-radius:6px; background:#fff;
+  padding:12px 16px; margin-bottom:4px; position:relative;
+}
+.tree-node .lvl{
+  font-family:'JetBrains Mono', monospace; font-size:11px;
+  color:#fff; background:var(--navy); padding:2px 8px; border-radius:3px; margin-right:8px;
+}
+.tree-node.l1{margin-left:0; border-left:4px solid var(--navy);}
+.tree-node.l2{margin-left:30px; border-left:4px solid #6699cc;}
+.tree-node.l3{margin-left:60px; border-left:4px solid #99bbdd;}
+.tree-node.l4{margin-left:90px; border-left:4px solid #cce0f0;}
+
+.drill{
+  background:#fff; border:1px solid var(--border); border-radius:6px;
+  margin:14px 0; overflow:hidden;
+}
+.drill-head{
+  padding:14px 18px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;
+  font-weight:700; color:var(--navy); background:var(--navy-light);
+}
+.drill-head .chev{transition:.2s; font-size:13px;}
+.drill.open .chev{transform:rotate(90deg);}
+.drill-body{display:none; padding:18px; font-size:14px;}
+.drill.open .drill-body{display:block;}
+
+.matrix{
+  display:grid; grid-template-columns:140px repeat(3,1fr);
+  border:1px solid var(--border); border-radius:6px; overflow:hidden; margin:22px 0;
+}
+.matrix > div{padding:12px 14px; border-bottom:1px solid var(--border); border-right:1px solid var(--border); font-size:13px;}
+.matrix > div:nth-child(4n+1){background:var(--navy); color:#fff; font-weight:700;}
+.matrix .head{background:var(--navy); color:#fff; font-weight:700; text-align:center;}
+.matrix .asset-id{font-weight:700; color:var(--navy);}
+
+.quiz-q{background:#fff; border:1px solid var(--border); border-radius:6px; padding:20px; margin-bottom:16px;}
+.quiz-q .qtext{font-weight:700; margin-bottom:12px;}
+.quiz-opt{
+  display:block; width:100%; text-align:left; background:#f8f9fb; border:1px solid var(--border);
+  border-radius:5px; padding:10px 14px; margin-bottom:8px; cursor:pointer; font-size:14px;
+  font-family:'Noto Sans KR'; color:var(--text);
+}
+.quiz-opt:hover{border-color:var(--navy);}
+.quiz-opt.correct{background:var(--correct-bg); border-color:var(--correct-border); font-weight:700;}
+.quiz-opt.wrong{background:var(--wrong-bg); border-color:var(--wrong-border);}
+.quiz-fb{margin-top:10px; font-size:13px; padding:10px 12px; border-radius:5px; display:none;}
+.quiz-fb.show{display:block;}
+
+.checklist{list-style:none; margin:16px 0;}
+.checklist li{
+  display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-bottom:1px solid var(--border);
+  font-size:14px;
+}
+.checklist li::before{content:"☐"; color:var(--navy); font-size:16px;}
+
+footer{
+  background:var(--navy); color:#fff; padding:30px 5vw; text-align:center; font-size:13px; opacity:.85;
+}
+
+.pagenav{display:flex; justify-content:space-between; margin-top:50px; padding-top:24px; border-top:1px solid var(--border);}
+.pagenav button{
+  background:var(--navy); color:#fff; border:none; padding:12px 22px; border-radius:5px;
+  font-family:'Noto Sans KR'; font-weight:700; cursor:pointer; font-size:14px;
+}
+.pagenav button:disabled{opacity:.3; cursor:not-allowed;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">ASPN BAC EDUCATION · SAP ASSET ACCOUNTING SERIES · MODULE 2 / 6</div>
+  <h1>Asset Lifecycle</h1>
+  <p>자산은 한 번의 전표로 끝나지 않습니다. 취득부터 폐기까지 자산이 거쳐 가는 5단계 생애주기를 따라가며,
+  각 단계에서 SAP가 어떤 거래유형(Transaction Type)으로 이를 구분하는지, 그리고 실무에서 가장 자주 틀리는
+  판단 지점이 어디인지를 살펴봅니다.</p>
+</header>
+
+<nav class="tabs" id="tabs"></nav>
+
+<main id="main"></main>
+
+<footer>ASPN BAC · Business Advisory Consulting · SAP Education Portal</footer>
+
+<script>
+const sections = [
+{
+  id:'overview',
+  title:'생애주기 개관',
+  html:`
+    <div class="section-title"><span class="section-num">2.1</span>Asset Lifecycle 5단계</div>
+    <div class="subtitle">SAP AA는 각 단계를 Transaction Type으로 구분하여 어떤 거래가 자산가치에 어떤 영향을 미쳤는지 추적합니다.</div>
+
+    <div class="flow">
+      <div class="flow-box">취득<small>Acquisition</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">자본적 지출<small>Subsequent Acquisition</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">이전<small>Transfer</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">감가상각<small>Depreciation</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">폐기<small>Retirement</small></div>
+    </div>
+
+    <div class="card">
+      <h3>왜 단계별 거래유형 구분이 중요한가</h3>
+      <p>Asset Explorer에서 자산 1건의 이력을 조회하면, 취득가가 어떻게 누적되었고 어느 시점에 자본적 지출이
+      반영되었는지가 Transaction Type별로 구분되어 표시됩니다. 이 구분이 정확해야 Module 5(Period-End Closing)에서
+      다루는 Asset Explorer 분석과 결산 보고서가 의미를 가집니다.</p>
+    </div>
+
+    <div class="callout navy">
+      <span class="label">학습 포인트</span>
+      각 단계는 독립된 사건이 아니라, Depreciation Area별로 동시에 반영되는 연속된 흐름입니다.
+      Module 1에서 다룬 Multi-GAAP 구조(Area 01/32/15)는 이 5단계 전체에 걸쳐 동일하게 적용됩니다.
+    </div>
+  `
+},
+{
+  id:'acquisition',
+  title:'1) 취득',
+  html:`
+    <div class="section-title"><span class="section-num">2.2</span>취득 (Acquisition)</div>
+    <div class="subtitle">자산 마스터 생성과 최초 취득가 인식이 함께 이루어지는 단계입니다.</div>
+
+    <div class="grid2">
+      <div class="card">
+        <h3>취득 경로 ① — 구매(외부 취득)</h3>
+        <p style="font-size:14px;">구매발주(PO) → 입고 → 송장검증(MIRO)을 거쳐 자동으로 자산 취득가가 반영되는 경로입니다.
+        대부분의 설비·비품 취득이 이 경로를 따릅니다.</p>
+      </div>
+      <div class="card">
+        <h3>취득 경로 ② — 자가건설(AuC)</h3>
+        <p style="font-size:14px;">건설 중인 자산(Asset under Construction)으로 우선 등록한 뒤, 완공 시점에
+        정식 자산으로 결산이전(Settlement)하는 경로입니다. 공장 신축, 설비 자가제작 등에 사용됩니다.</p>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <span class="label">실무 함정</span>
+      AuC(건설중인자산)는 원칙적으로 <b>감가상각을 시작하지 않습니다</b>. 완공 후 본 자산으로 결산이전된 시점부터
+      감가상각이 개시되며, 이 시점 판단(자산을 실제 사용 가능 상태로 본 시점)이 늦어지면 비용 인식 시점도 함께 왜곡됩니다.
+    </div>
+
+    <div class="card">
+      <h3>Area별 취득가 반영</h3>
+      <p style="font-size:14px;">Module 1에서 다룬 대로, 최초 취득가는 일반적으로 모든 Depreciation Area에
+      동시에 동일하게 반영되며 출발합니다. 이후 단계(자본적 지출, 재평가 등)에서 Area별 차이가 발생할 수 있습니다.</p>
+    </div>
+  `
+},
+{
+  id:'capex',
+  title:'2) 자본적 지출',
+  html:`
+    <div class="section-title"><span class="section-num">2.3</span>자본적 지출 (Subsequent Acquisition)</div>
+    <div class="subtitle">취득 이후 추가 지출이 발생했을 때, 비용 처리할지 자산가치에 더할지의 판단 단계입니다.</div>
+
+    <div class="card">
+      <h3>판단 기준</h3>
+      <table>
+        <tr><th>구분</th><th>자본적 지출</th><th>수익적 지출(비용)</th></tr>
+        <tr><td>효과</td><td>자산의 내용연수를 연장하거나 가치를 실질적으로 증가시킴</td><td>원상회복, 단순 유지보수</td></tr>
+        <tr><td>예시</td><td>설비 성능 개선을 위한 주요 부품 교체</td><td>정기 점검, 소모품 교체</td></tr>
+        <tr><td>SAP 처리</td><td>기존 자산에 Sub-number 또는 동일 자산에 추가 취득가로 반영</td><td>비용 계정으로 직접 전표 처리</td></tr>
+      </table>
+    </div>
+
+    <div class="callout warn">
+      <span class="label">실무 함정</span>
+      이 판단을 잘못하면 두 가지 방향 모두 문제가 됩니다. 비용을 자본화하면 당기 비용이 과소계상되고,
+      반대로 자본적 지출을 비용 처리하면 자산가치가 과소계상됩니다. 또한 <b>회계기준 차이로 인해 동일 지출의
+      자본화 여부 판단 자체가 달라질 수 있으며</b>, 그 결과 Area별로 서로 다른 회계처리(한 Area에서는 자본화,
+      다른 Area에서는 비용 처리)가 발생하는 경우도 있습니다.
+    </div>
+
+    <div class="card">
+      <h3>Sub-number 활용</h3>
+      <p style="font-size:14px;">자본적 지출을 원자산과 구분해 추적하고 싶을 때 Sub-number(예: K100-30001-1)를
+      부여합니다. 이렇게 하면 원자산과 추가 지출분의 감가상각을 각각 다른 내용연수로 관리할 수 있습니다 —
+      예를 들어 원설비는 잔여 내용연수 3년, 신규 교체 부품은 5년으로 별도 적용 가능합니다.</p>
+    </div>
+  `
+},
+{
+  id:'transfer',
+  title:'3) 이전',
+  html:`
+    <div class="section-title"><span class="section-num">2.4</span>이전 (Transfer)</div>
+    <div class="subtitle">자산이 부서·법인·자산클래스를 이동할 때 가치와 이력을 어떻게 연속시킬지 다루는 단계입니다.</div>
+
+    <div class="grid2">
+      <div class="card">
+        <h3>법인 내 이전 (Intra-company)</h3>
+        <p style="font-size:14px;">동일 Company Code 내에서 책임부서, Cost Center, 위치 등이 변경되는 경우입니다.
+        취득가와 감가상각 누계액이 그대로 신규 자산번호(또는 동일 자산번호의 마스터 정보)로 이전됩니다.</p>
+      </div>
+      <div class="card">
+        <h3>법인 간 이전 (Inter-company)</h3>
+        <p style="font-size:14px;">ASPN Korea에서 ASPN Korea Manufacturing으로 설비를 이전하는 경우처럼 Company Code가
+        달라지면, 양 법인 간 매각·매입에 준하는 회계처리가 필요할 수 있고, 그룹 연결 시점에는 미실현손익 제거 대상이 됩니다.</p>
+      </div>
+    </div>
+
+    <div class="callout navy">
+      <span class="label">연결회계 연계</span>
+      법인 간 자산 이전은 ASPN Holdings 연결결산 시 Group Reporting의 IC(Intercompany) Elimination 대상이
+      될 수 있습니다 — 기존 GR 교육에서 다룬 내부거래 제거 원리가 자산 이전에도 동일하게 적용됩니다.
+    </div>
+  `
+},
+{
+  id:'depr',
+  title:'4) 감가상각',
+  html:`
+    <div class="section-title"><span class="section-num">2.5</span>감가상각 (Depreciation)</div>
+    <div class="subtitle">자산 생애주기 중 가장 빈번하게 반복되는 단계 — 상세 설정은 Module 3에서 다룹니다.</div>
+
+    <div class="card">
+      <h3>이 단계에서 미리 알아야 할 것</h3>
+      <p style="font-size:14px;">감가상각은 보통 월 1회 일괄 실행(Depreciation Run, AFAB)되며, 모든 Depreciation Area에
+      대해 동시에 계산됩니다. 계산된 금액은 자산별로 미리 결정된 Depreciation Key(상각방법), Useful Life(내용연수),
+      Period Control(상각 개시·종료 시점 규칙)에 따라 산출됩니다.</p>
+    </div>
+
+    <div class="flow">
+      <div class="flow-box">Depreciation Key<small>상각방법 결정</small></div>
+      <div class="flow-arrow">+</div>
+      <div class="flow-box">Useful Life<small>내용연수</small></div>
+      <div class="flow-arrow">+</div>
+      <div class="flow-box">Period Control<small>개시·종료 규칙</small></div>
+      <div class="flow-arrow">=</div>
+      <div class="flow-box">월별 상각액<small>Area별 산출</small></div>
+    </div>
+
+    <div class="callout warn">
+      <span class="label">Module 3 예고</span>
+      이 3가지 요소(Key·Useful Life·Period Control)의 조합 방식과, Area별로 이 조합이 다를 때 발생하는
+      금액 차이 패턴은 Module 3 Depreciation Configuration에서 상세히 다룹니다.
+    </div>
+  `
+},
+{
+  id:'retire',
+  title:'5) 폐기',
+  html:`
+    <div class="section-title"><span class="section-num">2.6</span>폐기 (Retirement)</div>
+    <div class="subtitle">자산이 생애주기를 마치는 단계 — 매각/폐기 시 처분손익이 Area별로 다르게 계산될 수 있습니다.</div>
+
+    <div class="grid2">
+      <div class="card">
+        <h3>매각 (Sale)</h3>
+        <p style="font-size:14px;">대가를 받고 자산을 처분하는 경우입니다. 처분손익 = 매각대금 − 장부가(Net Book Value).
+        장부가가 Area마다 다르므로, <b>처분손익도 Area마다 다르게 계산</b>됩니다.</p>
+      </div>
+      <div class="card">
+        <h3>폐기 (Scrapping)</h3>
+        <p style="font-size:14px;">대가 없이 자산을 폐기하는 경우입니다. 잔존 장부가 전액이 처분손실로 인식되며,
+        역시 Area별 장부가 차이만큼 손실 인식액도 Area별로 달라집니다.</p>
+      </div>
+    </div>
+
+    <div class="callout correct">
+      <span class="label">정리 — Module 1~2 연결 포인트</span>
+      취득 시 동일하게 출발한 자산가치가, 자본적 지출·감가상각방법 차이·이전 등을 거치며 Area별로
+      점차 달라지고, 결국 폐기 시점의 처분손익까지 Area별로 다르게 귀결됩니다. 이것이 Multi-GAAP 환경에서
+      "왜 자산 1건의 손익이 회계기준마다 다르게 보고되는가"에 대한 구조적 답입니다.
+    </div>
+
+    <ul class="checklist">
+      <li>취득은 구매와 AuC(자가건설) 두 가지 경로가 있으며, AuC는 완공 전까지 감가상각하지 않는다</li>
+      <li>자본적 지출 여부는 Area별로 자본화 기준이 달라 동일 지출도 Area마다 다르게 처리될 수 있다</li>
+      <li>법인 간 이전은 연결결산 시 IC Elimination 대상이 될 수 있다</li>
+      <li>감가상각은 Key·Useful Life·Period Control의 조합으로 결정된다 (Module 3에서 상세)</li>
+      <li>처분손익은 매각대금과 Area별 장부가의 차이이므로 Area마다 금액이 달라진다</li>
+    </ul>
+  `
+},
+{
+  id:'quiz',
+  title:'Check Your Understanding',
+  html:`
+    <div class="section-title"><span class="section-num">2.7</span>이해도 점검</div>
+    <div class="subtitle">Module 2 핵심 개념 3문항입니다.</div>
+
+    <div class="quiz-q">
+      <div class="qtext">Q1. AuC(건설중인자산)에 대한 설명으로 옳은 것은?</div>
+      <button class="quiz-opt" data-correct="false" onclick="checkQuiz(this)">취득과 동시에 감가상각이 시작된다</button>
+      <button class="quiz-opt" data-correct="true" onclick="checkQuiz(this)">완공 후 본 자산으로 결산이전(Settlement)된 시점부터 감가상각이 개시된다</button>
+      <button class="quiz-opt" data-correct="false" onclick="checkQuiz(this)">AuC는 Depreciation Area를 적용받지 않는다</button>
+      <div class="quiz-fb"></div>
+    </div>
+
+    <div class="quiz-q">
+      <div class="qtext">Q2. 자본적 지출과 수익적 지출의 구분이 Multi-GAAP 환경에서 중요한 이유는?</div>
+      <button class="quiz-opt" data-correct="false" onclick="checkQuiz(this)">모든 Area에서 자본화 기준이 항상 동일하기 때문이다</button>
+      <button class="quiz-opt" data-correct="true" onclick="checkQuiz(this)">Area별 자본화 기준 금액이 달라 동일 지출도 Area마다 다르게 처리될 수 있기 때문이다</button>
+      <button class="quiz-opt" data-correct="false" onclick="checkQuiz(this)">자본적 지출은 항상 비용으로 처리해야 하기 때문이다</button>
+      <div class="quiz-fb"></div>
+    </div>
+
+    <div class="quiz-q">
+      <div class="qtext">Q3. 자산 처분손익이 Depreciation Area마다 다르게 계산되는 이유는?</div>
+      <button class="quiz-opt" data-correct="false" onclick="checkQuiz(this)">매각대금이 Area마다 다르게 책정되기 때문이다</button>
+      <button class="quiz-opt" data-correct="true" onclick="checkQuiz(this)">장부가(Net Book Value)가 Area별 상각방법·내용연수 차이로 인해 서로 다르기 때문이다</button>
+      <button class="quiz-opt" data-correct="false" onclick="checkQuiz(this)">처분손익은 Area와 무관하게 항상 동일하게 계산된다</button>
+      <div class="quiz-fb"></div>
+    </div>
+  `
+}
+];
+
+function checkQuiz(btn, label){
+  const group = btn.parentElement.querySelectorAll('.quiz-opt');
+  const fb = btn.parentElement.querySelector('.quiz-fb');
+  group.forEach(b=>{
+    b.disabled = true;
+    if(b.dataset.correct === 'true'){ b.classList.add('correct'); }
+  });
+  if(btn.dataset.correct === 'false'){ btn.classList.add('wrong'); }
+  fb.classList.add('show');
+  fb.style.background = 'var(--correct-bg)';
+  fb.innerHTML = btn.dataset.correct === 'true'
+    ? '정답입니다.'
+    : '오답입니다. 정답이 위에 초록색으로 표시되어 있습니다.';
+}
+
+const tabsEl = document.getElementById('tabs');
+const mainEl = document.getElementById('main');
+
+sections.forEach((s,i)=>{
+  const b = document.createElement('button');
+  b.textContent = s.title;
+  b.onclick = ()=>showSection(i);
+  b.id = 'tabbtn-'+i;
+  tabsEl.appendChild(b);
+
+  const sec = document.createElement('section');
+  sec.className = 'panel';
+  sec.id = 'panel-'+i;
+  sec.innerHTML = s.html + `
+    <div class="pagenav">
+      <button onclick="showSection(${i-1})" ${i===0?'disabled':''}>← 이전</button>
+      <button onclick="showSection(${i+1})" ${i===sections.length-1?'disabled':''}>다음 →</button>
+    </div>`;
+  mainEl.appendChild(sec);
+});
+
+function showSection(i){
+  if(i<0 || i>=sections.length) return;
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+i).classList.add('active');
+  document.getElementById('tabbtn-'+i).classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+showSection(0);
+</script>
+</body>
+</html>
