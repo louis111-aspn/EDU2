@@ -351,7 +351,7 @@ const sections = [
       <tr><td>Asset Class</td><td>3000(기계장치) 등 자산 유형별</td><td>3900(ROU Asset 전용)</td></tr>
       <tr><td>취득가 출처</td><td>구매/AuC를 통한 직접 취득</td><td>Lease Accounting에서 산출된 결과값 인계</td></tr>
       <tr><td>감가상각 기간</td><td>경제적 내용연수</td><td>리스기간(또는 자산 내용연수 중 짧은 기간)</td></tr>
-      <tr><td>Depreciation Area</td><td>Area 01/32/15 모두 적용</td><td>회계 Area(01/32)만 적용, Tax Area는 별도 세무처리 필요</td></tr>
+      <tr><td>Depreciation Area</td><td>Area 01/32/15 모두 적용</td><td>회계정책 및 국가별 세무요건에 따라 구성이 달라짐(Tax Area 포함 여부도 기업별 상이)</td></tr>
     </table>
 
     <div class="callout warn">
@@ -402,7 +402,7 @@ const sections = [
       <table>
         <tr><th>유형</th><th>예시</th><th>AA 영향</th></tr>
         <tr><td>리스기간 연장</td><td>3년 계약을 5년으로 재계약</td><td>Lease Liability 재측정 결과를 받아 ROU Asset 장부가 조정, 잔여 감가상각기간 재산정</td></tr>
-        <tr><td>리스 범위 축소</td><td>임차 면적 일부 반납</td><td>축소 비율만큼 ROU Asset 일부 처분으로 처리</td></tr>
+        <tr><td>리스 범위 축소</td><td>임차 면적 일부 반납</td><td>Lease Accounting에서 산출된 조정 결과(부분 종료/변경 유형에 따라 처리 방식 상이)를 AA에 반영</td></tr>
         <tr><td>리스료 재조정</td><td>물가연동 조항에 따른 임차료 변경</td><td>Lease Liability 재측정, ROU Asset 장부가 조정(처분손익 미발생)</td></tr>
       </table>
     </div>
