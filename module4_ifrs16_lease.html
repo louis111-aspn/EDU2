@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 4. IFRS 16 Lease Accounting</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root{
+  --navy:#003366;
+  --navy-light:#e8eef5;
+  --bg:#f0f3f8;
+  --card-bg:#ffffff;
+  --border:#d6dde8;
+  --text:#1a1a1a;
+  --text-sub:#5a6473;
+  --warn-bg:#fff4e5;
+  --warn-border:#e0a132;
+  --correct-bg:#e8f5ea;
+  --correct-border:#2e8b4f;
+  --wrong-bg:#fbe9e9;
+  --wrong-border:#c0392b;
+}
+
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{overflow-x:hidden;}
+body{
+  font-family:'Noto Sans KR', sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  font-size:15px;
+  line-height:1.7;
+  word-break:keep-all;
+  overflow-wrap:break-word;
+}
+h1,h2,h3,.serif{font-family:'DM Serif Display', 'Noto Sans KR', serif;}
+code, .mono{font-family:'JetBrains Mono','Noto Sans KR',monospace;}
+
+header{
+  background:var(--navy);
+  color:#fff;
+  padding:36px 5vw 28px;
+}
+header .eyebrow{
+  font-family:'JetBrains Mono','Noto Sans KR',monospace;
+  font-size:13px;
+  letter-spacing:.08em;
+  opacity:.75;
+  margin-bottom:8px;
+}
+header h1{font-size:42px; font-weight:400; line-height:1.25;}
+header p{margin-top:10px; font-size:15px; opacity:.85; max-width:760px;}
+
+nav.tabs{
+  position:sticky; top:0; z-index:100;
+  background:#fff;
+  border-bottom:2px solid var(--navy);
+  display:flex;
+  overflow-x:auto;
+  padding:0 5vw;
+}
+nav.tabs button{
+  flex:0 0 auto;
+  background:none; border:none; cursor:pointer;
+  padding:16px 18px;
+  font-family:'Noto Sans KR', sans-serif;
+  font-size:14px; font-weight:500;
+  color:var(--text-sub);
+  border-bottom:3px solid transparent;
+  white-space:nowrap;
+  transition:.15s;
+}
+nav.tabs button:hover{color:var(--navy);}
+nav.tabs button.active{
+  color:var(--navy); font-weight:700;
+  border-bottom:3px solid var(--navy);
+}
+
+main{max-width:980px; margin:0 auto; padding:40px 5vw 100px;}
+section.panel{display:none;}
+section.panel.active{display:block; animation:fadeIn .25s ease;}
+@keyframes fadeIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+.section-title{
+  font-size:30px; font-weight:400;
+  color:var(--navy);
+  margin-bottom:6px;
+  display:flex; align-items:center; gap:10px;
+}
+.section-num{
+  font-family:'JetBrains Mono', monospace;
+  font-size:14px; background:var(--navy); color:#fff;
+  padding:3px 9px; border-radius:3px;
+}
+.subtitle{color:var(--text-sub); font-size:15px; margin-bottom:28px;}
+
+.card{
+  background:var(--card-bg);
+  border:1px solid var(--border);
+  border-left:4px solid var(--navy);
+  border-radius:6px;
+  padding:22px 24px;
+  margin-bottom:20px;
+}
+.card h3{font-size:16px; font-weight:700; color:var(--navy); margin-bottom:10px; font-family:'Noto Sans KR';}
+
+.callout{
+  border-radius:6px;
+  padding:18px 20px;
+  margin:18px 0;
+  font-size:14px;
+  border-left:4px solid;
+}
+.callout.navy{background:var(--navy-light); border-color:var(--navy);}
+.callout.warn{background:var(--warn-bg); border-color:var(--warn-border);}
+.callout.correct{background:var(--correct-bg); border-color:var(--correct-border);}
+.callout.wrong{background:var(--wrong-bg); border-color:var(--wrong-border);}
+.callout .label{font-weight:700; font-size:13px; margin-bottom:6px; display:block;}
+
+.flow{
+  display:flex; align-items:center; gap:0;
+  flex-wrap:wrap;
+  margin:24px 0;
+}
+.flow-box{
+  background:#fff; border:2px solid var(--navy); border-radius:6px;
+  padding:14px 18px; text-align:center; font-weight:700; color:var(--navy);
+  font-size:14px; min-width:140px;
+}
+.flow-box small{display:block; font-weight:400; color:var(--text-sub); font-size:12px; margin-top:4px;}
+.flow-arrow{
+  font-size:20px; color:var(--navy); padding:0 10px; font-weight:700;
+}
+
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+.grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
+@media(max-width:700px){.grid2,.grid3{grid-template-columns:1fr;}}
+
+table{width:100%; border-collapse:collapse; margin:18px 0; font-size:14px;}
+th,td{border:1px solid var(--border); padding:10px 12px; text-align:left;}
+th{background:var(--navy); color:#fff; font-weight:700; font-size:13px;}
+tr:nth-child(even){background:#f8f9fb;}
+
+.tree{margin:24px 0;}
+.tree-node{
+  border:1px solid var(--border); border-radius:6px; background:#fff;
+  padding:12px 16px; margin-bottom:4px; position:relative;
+}
+.tree-node .lvl{
+  font-family:'JetBrains Mono', monospace; font-size:11px;
+  color:#fff; background:var(--navy); padding:2px 8px; border-radius:3px; margin-right:8px;
+}
+.tree-node.l1{margin-left:0; border-left:4px solid var(--navy);}
+.tree-node.l2{margin-left:30px; border-left:4px solid #6699cc;}
+.tree-node.l3{margin-left:60px; border-left:4px solid #99bbdd;}
+.tree-node.l4{margin-left:90px; border-left:4px solid #cce0f0;}
+
+.drill{
+  background:#fff; border:1px solid var(--border); border-radius:6px;
+  margin:14px 0; overflow:hidden;
+}
+.drill-head{
+  padding:14px 18px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;
+  font-weight:700; color:var(--navy); background:var(--navy-light);
+}
+.drill-head .chev{transition:.2s; font-size:13px;}
+.drill.open .chev{transform:rotate(90deg);}
+.drill-body{display:none; padding:18px; font-size:14px;}
+.drill.open .drill-body{display:block;}
+
+.matrix{
+  display:grid; grid-template-columns:140px repeat(3,1fr);
+  border:1px solid var(--border); border-radius:6px; overflow:hidden; margin:22px 0;
+}
+.matrix > div{padding:12px 14px; border-bottom:1px solid var(--border); border-right:1px solid var(--border); font-size:13px;}
+.matrix > div:nth-child(4n+1){background:var(--navy); color:#fff; font-weight:700;}
+.matrix .head{background:var(--navy); color:#fff; font-weight:700; text-align:center;}
+.matrix .asset-id{font-weight:700; color:var(--navy);}
+
+.quiz-q{background:#fff; border:1px solid var(--border); border-radius:6px; padding:20px; margin-bottom:16px;}
+.quiz-q .qtext{font-weight:700; margin-bottom:12px;}
+.quiz-opt{
+  display:block; width:100%; text-align:left; background:#f8f9fb; border:1px solid var(--border);
+  border-radius:5px; padding:10px 14px; margin-bottom:8px; cursor:pointer; font-size:14px;
+  font-family:'Noto Sans KR'; color:var(--text);
+}
+.quiz-opt:hover{border-color:var(--navy);}
+.quiz-opt.correct{background:var(--correct-bg); border-color:var(--correct-border); font-weight:700;}
+.quiz-opt.wrong{background:var(--wrong-bg); border-color:var(--wrong-border);}
+.quiz-fb{margin-top:10px; font-size:13px; padding:10px 12px; border-radius:5px; display:none;}
+.quiz-fb.show{display:block;}
+
+.checklist{list-style:none; margin:16px 0;}
+.checklist li{
+  display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-bottom:1px solid var(--border);
+  font-size:14px;
+}
+.checklist li::before{content:"☐"; color:var(--navy); font-size:16px;}
+
+footer{
+  background:var(--navy); color:#fff; padding:30px 5vw; text-align:center; font-size:13px; opacity:.85;
+}
+
+.pagenav{display:flex; justify-content:space-between; margin-top:50px; padding-top:24px; border-top:1px solid var(--border);}
+.pagenav button{
+  background:var(--navy); color:#fff; border:none; padding:12px 22px; border-radius:5px;
+  font-family:'Noto Sans KR'; font-weight:700; cursor:pointer; font-size:14px;
+}
+.pagenav button:disabled{opacity:.3; cursor:not-allowed;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">ASPN BAC EDUCATION · SAP ASSET ACCOUNTING SERIES · MODULE 4 / 6</div>
+  <h1>IFRS 16 Lease Accounting</h1>
+  <p>IFRS 16은 AA가 수행하는 기준이 아니라, <b>Lease Contract → Lease Accounting → ROU Asset</b>의 흐름을 거쳐
+  AA로 넘어오는 "결과"입니다. 이 모듈에서는 AA가 그 결과를 어떻게 받아 관리·감가상각하는지에 초점을 맞추며,
+  Lease Liability의 현재가치 계산 같은 리스 회계 자체의 영역은 다루지 않습니다.</p>
+</header>
+
+<nav class="tabs" id="tabs"></nav>
+
+<main id="main"></main>
+
+<footer>ASPN BAC · Business Advisory Consulting · SAP Education Portal</footer>
+
+<script>
+const sections = [
+{
+  id:'overview',
+  title:'전체 흐름',
+  html:`
+    <div class="section-title"><span class="section-num">4.1</span>SAP에서 IFRS 16을 구현하는 방법</div>
+    <div class="subtitle">AA는 이 흐름의 마지막 단계만 담당합니다 — 어디까지가 AA의 책임 범위인지 먼저 명확히 합니다.</div>
+
+    <div class="flow">
+      <div class="flow-box">Lease Contract<small>리스 계약 체결</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">Lease Accounting<small>SAP Lease Accounting 또는 외부 솔루션</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">ROU Asset 생성<small>+ Lease Liability</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">AA 감가상각<small>이 모듈의 범위</small></div>
+    </div>
+
+    <div class="callout navy">
+      <span class="label">범위 정의</span>
+      Lease Liability의 현재가치(PV) 계산, 할인율 산정, 지급 스케줄 설계는 <b>Lease Accounting 영역</b>이며
+      이번 AA 교육의 범위가 아닙니다. AA 관점에서는 "Lease Liability가 계산되어 오고, 그 결과 ROU Asset이
+      생성되며, AA는 이 ROU Asset의 감가상각을 담당한다"는 사실까지만 정확히 이해하면 충분합니다.
+    </div>
+
+    <div class="card">
+      <h3>왜 이 구분이 중요한가</h3>
+      <p>AA 담당자가 Lease Liability 계산 로직까지 책임지려 하면 역할 경계가 모호해지고, 실제 프로젝트에서는
+      Lease Accounting 담당(또는 외부 솔루션 벤더)과 AA 담당의 책임 소재 분쟁으로 이어지기 쉽습니다.
+      AA의 책임은 <b>ROU Asset이 생성된 이후</b>부터 시작됩니다.</p>
+    </div>
+  `
+},
+{
+  id:'identify',
+  title:'1) Lease 식별',
+  html:`
+    <div class="section-title"><span class="section-num">4.2</span>Lease 식별 (Identified Asset)</div>
+    <div class="subtitle">계약이 IFRS 16 적용 대상인지 판단하는 첫 관문 — 결과(ROU Asset 생성 여부)를 좌우합니다.</div>
+
+    <div class="card">
+      <h3>판단 기준 (개념 수준)</h3>
+      <p>계약에 특정되어 식별 가능한 자산이 있고, 계약기간 동안 그 자산의 사용으로부터 발생하는 경제적 효익의
+      대부분을 통제하며, 사용 방식을 지시할 권리가 있다면 리스로 식별됩니다. 단순 서비스 계약(예: 정기 청소
+      용역)은 특정 자산의 사용 통제권이 없으므로 리스가 아닙니다.</p>
+    </div>
+
+    <div class="grid2">
+      <div class="card" style="border-left-color:#2e8b4f;">
+        <h3>리스로 식별되는 경우</h3>
+        <p style="font-size:14px;">공장 건물 임차(특정 건물 지정, 사용기간 동안 독점 사용), 영업용 차량 리스(특정 차량 배정, 사용처 결정권 보유)</p>
+      </div>
+      <div class="card" style="border-left-color:#c0392b;">
+        <h3>리스로 식별되지 않는 경우</h3>
+        <p style="font-size:14px;">콜센터 아웃소싱 용역(특정 좌석이 아닌 서비스 결과물 제공), 클라우드 컴퓨팅 서비스 중 자산 특정 없이 처리용량만 제공받는 경우</p>
+      </div>
+    </div>
+
+    <div class="drill" onclick="this.classList.toggle('open')">
+      <div class="drill-head"><span>심화 — ASPN Tech 클라우드 데이터센터 장기임차 케이스</span><span class="chev">▶</span></div>
+      <div class="drill-body">
+        <p>ASPN Tech가 클라우드 사업자와 5년 장기 계약을 맺고 특정 데이터센터의 전용 서버랙(Rack) 구역을
+        배정받아 독점적으로 사용하며, 사용 방식(어떤 워크로드를 올릴지)을 ASPN Tech가 직접 결정한다면
+        <b>Identified Asset 요건을 충족</b>하여 리스로 식별될 가능성이 높습니다.</p>
+        <p style="margin-top:10px;">반면 동일 계약이라도 클라우드 사업자가 임의로 서버를 재배치할 권리(Substitution Right)를
+        실질적으로 보유하고 있고, ASPN Tech는 단순히 컴퓨팅 처리 결과만 제공받는 구조라면, 특정 자산에 대한
+        사용 통제권이 없어 <b>리스로 식별되지 않을 가능성</b>이 큽니다. 이처럼 같은 "클라우드 데이터센터"라는
+        표현이라도 계약 조건에 따라 결론이 달라지므로, 일반화된 사례로 학습하기보다 계약서의 구체적 조항을
+        확인하는 판단 훈련 사례로 활용하는 것이 적절합니다.</p>
+      </div>
+    </div>
+  `
+},
+{
+  id:'initial',
+  title:'2) 최초 인식',
+  html:`
+    <div class="section-title"><span class="section-num">4.3</span>최초 인식 (Initial Measurement)</div>
+    <div class="subtitle">계산 과정이 아니라 "AA가 무엇을 받아서 시작하는가"에 초점을 맞춥니다.</div>
+
+    <div class="card">
+      <h3>AA가 전달받는 것</h3>
+      <p>Lease Accounting 영역에서 산출이 완료되면, AA는 다음 두 가지를 전달받습니다.</p>
+      <table>
+        <tr><th>항목</th><th>의미</th><th>AA의 역할</th></tr>
+        <tr><td>Lease Liability</td><td>잔여 리스료의 현재가치(이미 계산 완료된 결과값)</td><td>부채 항목이므로 AA 관리 대상 아님(FI/Lease Accounting 영역)</td></tr>
+        <tr><td>ROU Asset 취득가</td><td>Lease Liability + 선급리스료 등 부대비용 (계산 완료된 결과값)</td><td>이 금액을 Asset Master 취득가로 등록하고 감가상각 시작</td></tr>
+      </table>
+    </div>
+
+    <div class="callout warn">
+      <span class="label">교육 범위 안내</span>
+      Lease Liability 계산에 사용되는 할인율(증분차입이자율 등), PV 계산식, 지급 스케줄 산정 방식은
+      이 교육의 범위 밖입니다. AA 담당자 입장에서는 "그 금액이 어떻게 계산되었는가"보다
+      "그 금액을 받아 ROU Asset을 어떻게 등록하고 관리하는가"가 핵심 역할입니다.
+    </div>
+
+    <div class="callout navy">
+      <span class="label">심화 — RE-FX 연동 시</span>
+      부동산관리(RE-FX) 모듈을 사용하는 경우, 리스 계약 조건이 RE-FX에 등록되면 ROU Asset이 AA에
+      자동 생성되도록 연동할 수 있습니다. 다만 대부분의 고객은 RE-FX를 사용하지 않으며, S/4HANA 환경에서도
+      RE-FX 도입률이 높지 않으므로, 이 교육에서는 본문이 아닌 참고 사항으로만 다룹니다.
+    </div>
+  `
+},
+{
+  id:'aamanage',
+  title:'3) AA의 ROU 관리',
+  html:`
+    <div class="section-title"><span class="section-num">4.4</span>AA에서 ROU Asset을 관리하는 방법</div>
+    <div class="subtitle">Module 1에서 미리 분리해 둔 별도 Asset Class가 여기서 실제로 사용됩니다.</div>
+
+    <div class="card">
+      <h3>별도 Asset Class로 관리하는 이유</h3>
+      <p>Module 1에서 다룬 Asset Class 3900(ROU Asset)처럼, 리스 자산은 일반 유형자산과 동일한 Asset Master
+      구조를 사용하되 <b>별도 Asset Class로 분리</b>하여 관리합니다. 이렇게 하면 재무제표 주석 공시(리스 관련
+      ROU Asset 별도 표시 요구)와 내부 리스 자산 현황 추적이 모두 일반 유형자산과 섞이지 않고 명확해집니다.</p>
+    </div>
+
+    <table>
+      <tr><th>구분</th><th>일반 유형자산</th><th>ROU Asset</th></tr>
+      <tr><td>Asset Class</td><td>3000(기계장치) 등 자산 유형별</td><td>3900(ROU Asset 전용)</td></tr>
+      <tr><td>취득가 출처</td><td>구매/AuC를 통한 직접 취득</td><td>Lease Accounting에서 산출된 결과값 인계</td></tr>
+      <tr><td>감가상각 기간</td><td>경제적 내용연수</td><td>리스기간(또는 자산 내용연수 중 짧은 기간)</td></tr>
+      <tr><td>Depreciation Area</td><td>Area 01/32/15 모두 적용</td><td>회계 Area(01/32)만 적용, Tax Area는 별도 세무처리 필요</td></tr>
+    </table>
+
+    <div class="callout warn">
+      <span class="label">실무 함정</span>
+      ROU Asset을 일반 Asset Class에 섞어서 등록하면, 결산 시 리스 관련 주석 공시 데이터를 별도로
+      추출하기 위해 매번 수작업 필터링이 필요해집니다. 프로젝트 초기 설계 단계에서 Asset Class를
+      분리하지 않으면 이후 데이터 정합성 작업에 큰 부담이 됩니다.
+    </div>
+  `
+},
+{
+  id:'subsequent',
+  title:'4) 후속측정',
+  html:`
+    <div class="section-title"><span class="section-num">4.5</span>후속측정 — 감가상각과 이자비용의 분리 인식</div>
+    <div class="subtitle">ROU Asset과 Lease Liability는 같은 거래에서 출발했지만, 이후 완전히 분리되어 인식됩니다.</div>
+
+    <div class="grid2">
+      <div class="card">
+        <h3>ROU Asset (AA 담당)</h3>
+        <p style="font-size:14px;">일반 유형자산과 동일하게 정액법으로 감가상각합니다. 매월 Depreciation Run을 통해
+        비용으로 인식되며, Module 3에서 다룬 Depreciation Key·Useful Life·Period Control 구조가 동일하게 적용됩니다.</p>
+      </div>
+      <div class="card">
+        <h3>Lease Liability (FI/Lease Accounting 담당)</h3>
+        <p style="font-size:14px;">매 기간 유효이자율법에 따라 이자비용이 인식되고, 리스료 지급액 중 이자 상당액과
+        원금 상환액이 구분되어 부채 잔액이 점차 감소합니다. 이 계산은 AA가 아닌 Lease Accounting/FI 영역입니다.</p>
+      </div>
+    </div>
+
+    <div class="callout correct">
+      <span class="label">핵심 메시지</span>
+      손익계산서에는 "감가상각비(ROU Asset, AA가 산출)"와 "이자비용(Lease Liability, FI가 산출)"이
+      <b>별도 계정으로 분리되어 표시</b>됩니다. AA 담당자는 감가상각비 산출까지만 책임지며, 이자비용 계산
+      로직을 AA에서 구현하려는 시도는 역할 범위를 벗어난 설계입니다.
+    </div>
+  `
+},
+{
+  id:'modification',
+  title:'5) Lease Modification',
+  html:`
+    <div class="section-title"><span class="section-num">4.6</span>Lease Modification — 계약 변경 시 ROU Asset 조정</div>
+    <div class="subtitle">리스기간 연장, 리스료 재조정 등 계약 변경이 발생했을 때 AA가 받는 영향을 다룹니다.</div>
+
+    <div class="card">
+      <h3>전형적인 Modification 유형</h3>
+      <table>
+        <tr><th>유형</th><th>예시</th><th>AA 영향</th></tr>
+        <tr><td>리스기간 연장</td><td>3년 계약을 5년으로 재계약</td><td>Lease Liability 재측정 결과를 받아 ROU Asset 장부가 조정, 잔여 감가상각기간 재산정</td></tr>
+        <tr><td>리스 범위 축소</td><td>임차 면적 일부 반납</td><td>축소 비율만큼 ROU Asset 일부 처분으로 처리</td></tr>
+        <tr><td>리스료 재조정</td><td>물가연동 조항에 따른 임차료 변경</td><td>Lease Liability 재측정, ROU Asset 장부가 조정(처분손익 미발생)</td></tr>
+      </table>
+    </div>
+
+    <div class="callout navy">
+      <span class="label">AA 관점 요약</span>
+      Modification이 발생하면 Lease Accounting 영역에서 재측정된 Lease Liability·ROU Asset 조정 금액이
+      다시 AA로 인계됩니다. AA는 이 조정 금액을 자산 마스터에 반영하고, 그 시점 이후의 잔여 감가상각
+      스케줄을 다시 계산하는 역할을 담당합니다 — 계산 로직 자체는 여전히 Lease Accounting 영역의 책임입니다.
+    </div>
+  `
+},
+{
+  id:'exemption',
+  title:'6) 단기·소액 리스',
+  html:`
+    <div class="section-title"><span class="section-num">4.7</span>단기리스·소액자산 면제</div>
+    <div class="subtitle">ROU Asset을 아예 인식하지 않아도 되는 두 가지 예외입니다.</div>
+
+    <div class="grid2">
+      <div class="card">
+        <h3>단기리스 (Short-term Lease)</h3>
+        <p style="font-size:14px;">리스 개시일 기준 리스기간이 <b>12개월 이하</b>이고 매수선택권이 없는 경우,
+        ROU Asset과 Lease Liability를 인식하지 않고 리스료를 기간에 걸쳐 비용으로 직접 인식할 수 있습니다.</p>
+      </div>
+      <div class="card">
+        <h3>소액자산 리스 (Low-value Asset)</h3>
+        <p style="font-size:14px;">기초자산이 신품 기준 소액(예: 노트북, 사무용 비품 등)인 경우, 리스기간과
+        무관하게 ROU Asset 인식을 면제하고 비용으로 직접 처리할 수 있습니다.</p>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <span class="label">실무 함정</span>
+      두 면제 요건은 <b>선택적 적용(Accounting Policy Choice)</b>이며, 회사가 정책으로 채택해야 적용됩니다.
+      또한 단기리스 면제는 자산 유형(Class of Underlying Asset) 단위로 일관되게 적용해야 하므로,
+      특정 계약만 임의로 면제 적용하는 것은 허용되지 않습니다.
+    </div>
+  `
+},
+{
+  id:'ifrs18note',
+  title:'IFRS 16 vs 18',
+  html:`
+    <div class="section-title"><span class="section-num">4.8</span>Note — IFRS 16과 IFRS 18은 다른 기준입니다</div>
+    <div class="subtitle">교육생들이 가장 자주 혼동하는 지점을 한 슬라이드로 정리합니다.</div>
+
+    <div class="grid2">
+      <div class="card" style="border-left-color:#003366;">
+        <h3>IFRS 16</h3>
+        <p style="font-size:14px;"><b>리스(Lease)</b> 회계기준. 리스이용자의 ROU Asset·Lease Liability
+        인식을 다룹니다. 이번 모듈 전체의 주제입니다.</p>
+      </div>
+      <div class="card" style="border-left-color:#6699cc;">
+        <h3>IFRS 18</h3>
+        <p style="font-size:14px;"><b>재무제표 표시(Financial Statement Presentation)</b> 기준. 손익계산서
+        구조(영업/투자/재무 손익 구분), 경영진 정의 성과지표(MPM) 공시 등을 다룹니다. 리스와 무관합니다.</p>
+      </div>
+    </div>
+
+    <div class="callout correct">
+      <span class="label">정리</span>
+      "16"과 "18"은 숫자가 비슷할 뿐 완전히 다른 주제입니다. 리스 회계 이슈를 다룰 때는 IFRS 16,
+      손익계산서 표시 구조 변경 이슈를 다룰 때는 IFRS 18을 참조해야 합니다.
+    </div>
+  `
+},
+{
+  id:'casestudy',
+  title:'케이스 스터디',
+  html:`
+    <div class="section-title"><span class="section-num">4.9</span>실무 판단 케이스 스터디</div>
+    <div class="subtitle">ASPN Group 시나리오로 지금까지 배운 판단 기준을 적용해 봅니다.</div>
+
+    <div class="grid3">
+      <div class="card">
+        <h3>공장 건물 임차</h3>
+        <p style="font-size:13px;">ASPN Korea Manufacturing이 10년 계약으로 특정 공장 건물을 독점 임차.
+        매수선택권 없음, 12개월 초과.</p>
+        <p style="font-size:13px; color:var(--navy); font-weight:700; margin-top:8px;">→ ROU Asset 인식 (일반 리스)</p>
+      </div>
+      <div class="card">
+        <h3>사무실 임차</h3>
+        <p style="font-size:13px;">ASPN Tech가 서울 사무실을 18개월 계약으로 임차. 특정 층을 독점 사용,
+        매수선택권 없음.</p>
+        <p style="font-size:13px; color:var(--navy); font-weight:700; margin-top:8px;">→ ROU Asset 인식 (일반 리스)</p>
+      </div>
+      <div class="card">
+        <h3>영업용 차량 리스</h3>
+        <p style="font-size:13px;">ASPN Korea가 영업사원용 차량 10대를 3년 운용리스 계약. 특정 차량번호 배정,
+        사용처 결정권 보유.</p>
+        <p style="font-size:13px; color:var(--navy); font-weight:700; margin-top:8px;">→ ROU Asset 인식 (일반 리스)</p>
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-top:6px;">
+      <div class="card">
+        <h3>단기리스 사례</h3>
+        <p style="font-size:13px;">ASPN Holdings가 워크숍 행사장을 6개월 계약으로 임차, 매수선택권 없음.</p>
+        <p style="font-size:13px; color:var(--navy); font-weight:700; margin-top:8px;">→ 단기리스 면제 가능 (정책 채택 시 ROU Asset 미인식)</p>
+      </div>
+      <div class="card">
+        <h3>소액리스 사례</h3>
+        <p style="font-size:13px;">ASPN Europe이 사무용 복합기를 신품가 소액 기준으로 리스 계약.</p>
+        <p style="font-size:13px; color:var(--navy); font-weight:700; margin-top:8px;">→ 소액자산 면제 가능 (리스기간과 무관)</p>
+      </div>
+    </div>
+
+    <ul class="checklist">
+      <li>AA는 IFRS 16을 수행하는 모듈이 아니라, ROU Asset의 감가상각을 담당하는 모듈이다</li>
+      <li>Lease 식별은 Identified Asset과 사용 통제권 기준으로 판단하며, 계약 조건에 따라 결론이 달라진다</li>
+      <li>Lease Liability와 ROU Asset 금액은 AA가 계산하지 않고 Lease Accounting에서 인계받는다</li>
+      <li>ROU Asset은 별도 Asset Class로 분리 관리하여 일반 유형자산과 섞이지 않게 한다</li>
+      <li>감가상각비(AA)와 이자비용(FI)은 손익계산서에서 별도 계정으로 분리 표시된다</li>
+      <li>단기리스·소액자산 면제는 선택적 정책이며, 자산 유형 단위로 일관 적용해야 한다</li>
+    </ul>
+  `
+},
+{
+  id:'quiz',
+  title:'Check Your Understanding',
+  html:`
+    <div class="section-title"><span class="section-num">4.10</span>이해도 점검</div>
+    <div class="subtitle">Module 4 핵심 개념 4문항입니다.</div>
+
+    <div class="quiz-q">
+      <div class="qtext">Q1. SAP에서 IFRS 16 구현 시 AA의 역할 범위로 가장 정확한 것은?</div>
+      <button class="quiz-opt" data-correct="false" onclick="checkQuiz(this)">Lease Liability의 현재가치 계산까지 AA가 직접 수행한다</button>
+      <button class="quiz-opt" data-correct="true" onclick="checkQuiz(this)">Lease Accounting에서 산출된 ROU Asset 결과값을 받아 감가상각을 담당한다</button>
+      <button class="quiz-opt" data-correct="false" onclick="checkQuiz(this)">AA는 IFRS 16 전체 프로세스를 독립적으로 수행하는 모듈이다</button>
+      <div class="quiz-fb"></div>
+    </div>
+
+    <div class="quiz-q">
+      <div class="qtext">Q2. ROU Asset을 별도 Asset Class로 분리 관리하는 주된 이유는?</div>
+      <button class="quiz-opt" data-correct="false" onclick="checkQuiz(this)">시스템 성능을 높이기 위해서다</button>
+      <button class="quiz-opt" data-correct="true" onclick="checkQuiz(this)">재무제표 주석 공시와 리스 자산 현황 추적을 일반 유형자산과 분리하기 위해서다</button>
+      <button class="quiz-opt" data-correct="false" onclick="checkQuiz(this)">RE-FX 모듈 사용이 필수이기 때문이다</button>
+      <div class="quiz-fb"></div>
+    </div>
+
+    <div class="quiz-q">
+      <div class="qtext">Q3. 손익계산서에서 ROU Asset 관련 비용 표시로 옳은 것은?</div>
+      <button class="quiz-opt" data-correct="false" onclick="checkQuiz(this)">감가상각비와 이자비용을 하나의 리스비용 계정으로 통합 표시한다</button>
+      <button class="quiz-opt" data-correct="true" onclick="checkQuiz(this)">감가상각비(AA)와 이자비용(FI)을 별도 계정으로 분리 표시한다</button>
+      <button class="quiz-opt" data-correct="false" onclick="checkQuiz(this)">리스료 지급액 전체를 비용으로 일괄 인식한다</button>
+      <div class="quiz-fb"></div>
+    </div>
+
+    <div class="quiz-q">
+      <div class="qtext">Q4. 단기리스 면제 적용에 대한 설명으로 옳은 것은?</div>
+      <button class="quiz-opt" data-correct="false" onclick="checkQuiz(this)">모든 리스 계약에 자동으로 적용되는 강제 규정이다</button>
+      <button class="quiz-opt" data-correct="true" onclick="checkQuiz(this)">회사가 정책으로 채택해야 하며, 자산 유형 단위로 일관 적용해야 한다</button>
+      <button class="quiz-opt" data-correct="false" onclick="checkQuiz(this)">12개월 이하이면 매수선택권 유무와 관계없이 항상 적용된다</button>
+      <div class="quiz-fb"></div>
+    </div>
+  `
+}
+];
+
+function checkQuiz(btn, label){
+  const group = btn.parentElement.querySelectorAll('.quiz-opt');
+  const fb = btn.parentElement.querySelector('.quiz-fb');
+  group.forEach(b=>{
+    b.disabled = true;
+    if(b.dataset.correct === 'true'){ b.classList.add('correct'); }
+  });
+  if(btn.dataset.correct === 'false'){ btn.classList.add('wrong'); }
+  fb.classList.add('show');
+  fb.style.background = 'var(--correct-bg)';
+  fb.innerHTML = btn.dataset.correct === 'true'
+    ? '정답입니다.'
+    : '오답입니다. 정답이 위에 초록색으로 표시되어 있습니다.';
+}
+
+const tabsEl = document.getElementById('tabs');
+const mainEl = document.getElementById('main');
+
+sections.forEach((s,i)=>{
+  const b = document.createElement('button');
+  b.textContent = s.title;
+  b.onclick = ()=>showSection(i);
+  b.id = 'tabbtn-'+i;
+  tabsEl.appendChild(b);
+
+  const sec = document.createElement('section');
+  sec.className = 'panel';
+  sec.id = 'panel-'+i;
+  sec.innerHTML = s.html + `
+    <div class="pagenav">
+      <button onclick="showSection(${i-1})" ${i===0?'disabled':''}>← 이전</button>
+      <button onclick="showSection(${i+1})" ${i===sections.length-1?'disabled':''}>다음 →</button>
+    </div>`;
+  mainEl.appendChild(sec);
+});
+
+function showSection(i){
+  if(i<0 || i>=sections.length) return;
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+i).classList.add('active');
+  document.getElementById('tabbtn-'+i).classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+showSection(0);
+</script>
+</body>
+</html>
