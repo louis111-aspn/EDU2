@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 6. Case Study</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root{
+  --navy:#003366;
+  --navy-light:#e8eef5;
+  --bg:#f0f3f8;
+  --card-bg:#ffffff;
+  --border:#d6dde8;
+  --text:#1a1a1a;
+  --text-sub:#5a6473;
+  --warn-bg:#fff4e5;
+  --warn-border:#e0a132;
+  --correct-bg:#e8f5ea;
+  --correct-border:#2e8b4f;
+  --wrong-bg:#fbe9e9;
+  --wrong-border:#c0392b;
+}
+
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{overflow-x:hidden;}
+body{
+  font-family:'Noto Sans KR', sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  font-size:15px;
+  line-height:1.7;
+  word-break:keep-all;
+  overflow-wrap:break-word;
+}
+h1,h2,h3,.serif{font-family:'DM Serif Display', 'Noto Sans KR', serif;}
+code, .mono{font-family:'JetBrains Mono','Noto Sans KR',monospace;}
+
+header{
+  background:var(--navy);
+  color:#fff;
+  padding:36px 5vw 28px;
+}
+header .eyebrow{
+  font-family:'JetBrains Mono','Noto Sans KR',monospace;
+  font-size:13px;
+  letter-spacing:.08em;
+  opacity:.75;
+  margin-bottom:8px;
+}
+header h1{font-size:42px; font-weight:400; line-height:1.25;}
+header p{margin-top:10px; font-size:15px; opacity:.85; max-width:760px;}
+
+nav.tabs{
+  position:sticky; top:0; z-index:100;
+  background:#fff;
+  border-bottom:2px solid var(--navy);
+  display:flex;
+  overflow-x:auto;
+  padding:0 5vw;
+}
+nav.tabs button{
+  flex:0 0 auto;
+  background:none; border:none; cursor:pointer;
+  padding:16px 18px;
+  font-family:'Noto Sans KR', sans-serif;
+  font-size:14px; font-weight:500;
+  color:var(--text-sub);
+  border-bottom:3px solid transparent;
+  white-space:nowrap;
+  transition:.15s;
+}
+nav.tabs button:hover{color:var(--navy);}
+nav.tabs button.active{
+  color:var(--navy); font-weight:700;
+  border-bottom:3px solid var(--navy);
+}
+
+main{max-width:980px; margin:0 auto; padding:40px 5vw 100px;}
+section.panel{display:none;}
+section.panel.active{display:block; animation:fadeIn .25s ease;}
+@keyframes fadeIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+.section-title{
+  font-size:30px; font-weight:400;
+  color:var(--navy);
+  margin-bottom:6px;
+  display:flex; align-items:center; gap:10px;
+}
+.section-num{
+  font-family:'JetBrains Mono', monospace;
+  font-size:14px; background:var(--navy); color:#fff;
+  padding:3px 9px; border-radius:3px;
+}
+.subtitle{color:var(--text-sub); font-size:15px; margin-bottom:28px;}
+
+.card{
+  background:var(--card-bg);
+  border:1px solid var(--border);
+  border-left:4px solid var(--navy);
+  border-radius:6px;
+  padding:22px 24px;
+  margin-bottom:20px;
+}
+.card h3{font-size:16px; font-weight:700; color:var(--navy); margin-bottom:10px; font-family:'Noto Sans KR';}
+
+.callout{
+  border-radius:6px;
+  padding:18px 20px;
+  margin:18px 0;
+  font-size:14px;
+  border-left:4px solid;
+}
+.callout.navy{background:var(--navy-light); border-color:var(--navy);}
+.callout.warn{background:var(--warn-bg); border-color:var(--warn-border);}
+.callout.correct{background:var(--correct-bg); border-color:var(--correct-border);}
+.callout.wrong{background:var(--wrong-bg); border-color:var(--wrong-border);}
+.callout .label{font-weight:700; font-size:13px; margin-bottom:6px; display:block;}
+
+.flow{
+  display:flex; align-items:center; gap:0;
+  flex-wrap:wrap;
+  margin:24px 0;
+}
+.flow-box{
+  background:#fff; border:2px solid var(--navy); border-radius:6px;
+  padding:14px 18px; text-align:center; font-weight:700; color:var(--navy);
+  font-size:14px; min-width:140px;
+}
+.flow-box small{display:block; font-weight:400; color:var(--text-sub); font-size:12px; margin-top:4px;}
+.flow-arrow{
+  font-size:20px; color:var(--navy); padding:0 10px; font-weight:700;
+}
+
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+.grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
+@media(max-width:700px){.grid2,.grid3{grid-template-columns:1fr;}}
+
+table{width:100%; border-collapse:collapse; margin:18px 0; font-size:14px;}
+th,td{border:1px solid var(--border); padding:10px 12px; text-align:left;}
+th{background:var(--navy); color:#fff; font-weight:700; font-size:13px;}
+tr:nth-child(even){background:#f8f9fb;}
+
+.tree{margin:24px 0;}
+.tree-node{
+  border:1px solid var(--border); border-radius:6px; background:#fff;
+  padding:12px 16px; margin-bottom:4px; position:relative;
+}
+.tree-node .lvl{
+  font-family:'JetBrains Mono', monospace; font-size:11px;
+  color:#fff; background:var(--navy); padding:2px 8px; border-radius:3px; margin-right:8px;
+}
+.tree-node.l1{margin-left:0; border-left:4px solid var(--navy);}
+.tree-node.l2{margin-left:30px; border-left:4px solid #6699cc;}
+.tree-node.l3{margin-left:60px; border-left:4px solid #99bbdd;}
+.tree-node.l4{margin-left:90px; border-left:4px solid #cce0f0;}
+
+.drill{
+  background:#fff; border:1px solid var(--border); border-radius:6px;
+  margin:14px 0; overflow:hidden;
+}
+.drill-head{
+  padding:14px 18px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;
+  font-weight:700; color:var(--navy); background:var(--navy-light);
+}
+.drill-head .chev{transition:.2s; font-size:13px;}
+.drill.open .chev{transform:rotate(90deg);}
+.drill-body{display:none; padding:18px; font-size:14px;}
+.drill.open .drill-body{display:block;}
+
+.matrix{
+  display:grid; grid-template-columns:140px repeat(3,1fr);
+  border:1px solid var(--border); border-radius:6px; overflow:hidden; margin:22px 0;
+}
+.matrix > div{padding:12px 14px; border-bottom:1px solid var(--border); border-right:1px solid var(--border); font-size:13px;}
+.matrix > div:nth-child(4n+1){background:var(--navy); color:#fff; font-weight:700;}
+.matrix .head{background:var(--navy); color:#fff; font-weight:700; text-align:center;}
+.matrix .asset-id{font-weight:700; color:var(--navy);}
+
+.quiz-q{background:#fff; border:1px solid var(--border); border-radius:6px; padding:20px; margin-bottom:16px;}
+.quiz-q .qtext{font-weight:700; margin-bottom:12px;}
+.quiz-opt{
+  display:block; width:100%; text-align:left; background:#f8f9fb; border:1px solid var(--border);
+  border-radius:5px; padding:10px 14px; margin-bottom:8px; cursor:pointer; font-size:14px;
+  font-family:'Noto Sans KR'; color:var(--text);
+}
+.quiz-opt:hover{border-color:var(--navy);}
+.quiz-opt.correct{background:var(--correct-bg); border-color:var(--correct-border); font-weight:700;}
+.quiz-opt.wrong{background:var(--wrong-bg); border-color:var(--wrong-border);}
+.quiz-fb{margin-top:10px; font-size:13px; padding:10px 12px; border-radius:5px; display:none;}
+.quiz-fb.show{display:block;}
+
+.checklist{list-style:none; margin:16px 0;}
+.checklist li{
+  display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-bottom:1px solid var(--border);
+  font-size:14px;
+}
+.checklist li::before{content:"☐"; color:var(--navy); font-size:16px;}
+
+footer{
+  background:var(--navy); color:#fff; padding:30px 5vw; text-align:center; font-size:13px; opacity:.85;
+}
+
+.pagenav{display:flex; justify-content:space-between; margin-top:50px; padding-top:24px; border-top:1px solid var(--border);}
+.pagenav button{
+  background:var(--navy); color:#fff; border:none; padding:12px 22px; border-radius:5px;
+  font-family:'Noto Sans KR'; font-weight:700; cursor:pointer; font-size:14px;
+}
+.pagenav button:disabled{opacity:.3; cursor:not-allowed;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">ASPN BAC EDUCATION · SAP ASSET ACCOUNTING SERIES · MODULE 6 / 6</div>
+  <h1>Case Study</h1>
+  <p>Module 1~5에서 배운 구조(Depreciation Area, Asset Lifecycle, Depreciation Configuration, IFRS 16,
+  Period-End Closing)를 ASPN Group의 5가지 실제 시나리오에 적용하며 전체 흐름을 통합합니다.
+  각 케이스는 동일한 질문으로 시작합니다 — "이 자산은 AA에서 어떻게 인식되고, 어떻게 결산까지 이어지는가?"</p>
+</header>
+
+<nav class="tabs" id="tabs"></nav>
+
+<main id="main"></main>
+
+<footer>ASPN BAC · Business Advisory Consulting · SAP Education Portal</footer>
+
+<script>
+const sections = [
+{
+  id:'overview',
+  title:'케이스 개관',
+  html:`
+    <div class="section-title"><span class="section-num">6.1</span>5가지 케이스 한눈에 보기</div>
+    <div class="subtitle">동일 그룹(ASPN) 안에서도 자산 성격에 따라 인식·관리 방식이 어떻게 달라지는지 비교합니다.</div>
+
+    <table>
+      <tr><th>케이스</th><th>자산 성격</th><th>리스 식별</th><th>Asset Class</th><th>핵심 학습 포인트</th></tr>
+      <tr><td>A. CNC 가공설비 구매</td><td>일반 유형자산</td><td>해당 없음</td><td>3000(기계장치)</td><td>Multi-GAAP 구조 전체 흐름</td></tr>
+      <tr><td>B. 공장 건물 임차</td><td>리스 자산</td><td>식별됨</td><td>3900(ROU Asset)</td><td>장기 리스의 ROU 인식·후속측정</td></tr>
+      <tr><td>C. 사무실 임차</td><td>리스 자산</td><td>식별됨</td><td>3900(ROU Asset)</td><td>중기 리스 + Lease Modification 적용</td></tr>
+      <tr><td>D. 영업용 차량 리스</td><td>리스 자산</td><td>식별됨</td><td>3900(ROU Asset)</td><td>다수 자산 동시 관리, 결산 통합</td></tr>
+      <tr><td>E. 단기·소액 리스</td><td>면제 대상</td><td>식별 여부와 무관하게 면제 가능</td><td>해당 없음(ROU 미인식)</td><td>면제 정책의 일관 적용 원칙</td></tr>
+    </table>
+
+    <div class="callout navy">
+      <span class="label">학습 방식</span>
+      각 케이스는 "취득/식별 → Area별 처리 → 감가상각 → 결산"이라는 동일한 틀로 설명됩니다.
+      이 틀 자체가 Module 1~5에서 배운 내용의 압축본입니다.
+    </div>
+  `
+},
+{
+  id:'caseA',
+  title:'Case A. 설비 구매',
+  html:`
+    <div class="section-title"><span class="section-num">6.2</span>Case A — ASPN Korea Manufacturing, CNC 가공설비 구매</div>
+    <div class="subtitle">일반 유형자산의 전체 생애주기를 Multi-GAAP 관점에서 끝까지 추적합니다.</div>
+
+    <div class="card">
+      <h3>시나리오</h3>
+      <p>ASPN Korea Manufacturing(K200)이 신규 CNC 가공설비를 5억원에 구매. Asset Class 3000(기계장치)으로
+      등록하며, Chart of Depreciation 0KR을 통해 Area 01(K-IFRS)/32(IFRS)/15(Tax) 3개 영역에서 동시 평가됩니다.</p>
+    </div>
+
+    <div class="flow">
+      <div class="flow-box">구매(PO→입고→MIRO)<small>취득가 5억 확정</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">Asset Master 등록<small>Area별 Key·내용연수 지정</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">월별 Depreciation Run<small>Area별 상각액 산출</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">결산 & Asset Explorer<small>Area별 장부가 비교</small></div>
+    </div>
+
+    <div class="callout warn">
+      <span class="label">판단 포인트</span>
+      구매 후 1년 뒤, 생산성 향상을 위한 주요 부품 교체에 8천만원을 추가 지출했다면? Module 2에서 다룬 대로
+      이는 자본적 지출 여부 판단이 필요하며, Sub-number(K200-XXXXX-1)로 별도 추적할지 결정해야 합니다.
+      또한 이 판단은 Area별로 자본화 기준 자체가 달라질 수 있어 결론이 Area마다 다를 수 있습니다.
+    </div>
+  `
+},
+{
+  id:'caseB',
+  title:'Case B. 공장 건물 임차',
+  html:`
+    <div class="section-title"><span class="section-num">6.3</span>Case B — ASPN Korea Manufacturing, 공장 건물 10년 임차</div>
+    <div class="subtitle">장기 리스의 ROU Asset 인식부터 후속측정까지 전체 흐름입니다.</div>
+
+    <div class="card">
+      <h3>시나리오</h3>
+      <p>특정 공장 건물을 10년 계약으로 독점 임차(매수선택권 없음, 12개월 초과). Identified Asset 요건을 충족하여
+      리스로 식별되고, Lease Accounting에서 Lease Liability와 ROU Asset 취득가가 산출되어 AA로 인계됩니다.</p>
+    </div>
+
+    <div class="flow">
+      <div class="flow-box">Lease 식별<small>독점사용+사용통제권</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">ROU Asset 인계<small>Asset Class 3900</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">감가상각(AA)<small>+ 이자비용(FI) 분리</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">결산 반영<small>Universal Journal</small></div>
+    </div>
+
+    <div class="callout navy">
+      <span class="label">Module 4 연계</span>
+      ROU Asset의 감가상각 기간은 리스기간(10년)이며, 일반 유형자산과 동일하게 Depreciation Run·Asset
+      Explorer 프로세스를 따릅니다. 다만 손익계산서에는 감가상각비(AA 산출)와 별도로 이자비용(FI 산출)이
+      구분 표시된다는 점이 일반 유형자산과의 핵심 차이입니다.
+    </div>
+  `
+},
+{
+  id:'caseC',
+  title:'Case C. 사무실 임차',
+  html:`
+    <div class="section-title"><span class="section-num">6.4</span>Case C — ASPN Tech, 서울 사무실 18개월 임차</div>
+    <div class="subtitle">계약 변경(Lease Modification)이 결합된 케이스입니다.</div>
+
+    <div class="card">
+      <h3>시나리오</h3>
+      <p>ASPN Tech가 서울 사무실을 18개월 계약으로 임차(특정 층 독점 사용 → 리스로 식별). 계약 1년 차에
+      사업 확장으로 인접 층을 추가 임차하는 계약 변경이 발생했습니다.</p>
+    </div>
+
+    <div class="callout warn">
+      <span class="label">판단 포인트 — Module 4.6 연계</span>
+      이 변경이 기존 리스의 조건 변경인지, 별도의 새로운 리스 계약(분리 리스)으로 볼 것인지는
+      Lease Accounting 영역에서 판단할 사항입니다. AA 입장에서는 그 판단 결과로 산출된 조정 금액
+      (기존 ROU Asset 장부가 조정 또는 신규 ROU Asset 추가 등록)을 받아 반영하는 역할을 수행합니다.
+    </div>
+
+    <div class="card">
+      <h3>AA 처리 포인트</h3>
+      <p style="font-size:14px;">조정 결과가 인계되면, 기존 Asset Master의 잔여 감가상각 스케줄을 재계산하거나
+      신규 Asset Master를 추가 등록합니다. 어느 쪽이든 Asset Class 3900 체계 안에서 처리되어 일반
+      유형자산과 분리된 추적이 유지됩니다.</p>
+    </div>
+  `
+},
+{
+  id:'caseD',
+  title:'Case D. 차량 리스',
+  html:`
+    <div class="section-title"><span class="section-num">6.5</span>Case D — ASPN Korea, 영업용 차량 10대 3년 리스</div>
+    <div class="subtitle">다수 자산을 동시에 관리할 때의 결산 실무 포인트입니다.</div>
+
+    <div class="card">
+      <h3>시나리오</h3>
+      <p>영업사원용 차량 10대를 특정 차량번호로 배정받아 3년간 운용리스. 각 차량이 개별 Identified Asset으로
+      식별되어, 10건의 개별 ROU Asset Master(Asset Class 3900)로 등록됩니다.</p>
+    </div>
+
+    <div class="callout warn">
+      <span class="label">Module 5 연계 — 결산 실무 포인트</span>
+      10건의 ROU Asset이 동일한 Depreciation Run 배치에 포함됩니다. 이 중 한 건이라도 Period Control이나
+      Depreciation Key 설정 오류가 있으면 Module 5에서 다룬 대로 같은 배치의 다른 자산 전표 생성에도
+      영향을 줄 수 있어, 다수 자산을 일괄 등록할 때는 설정값 일관성 사전 점검이 특히 중요합니다.
+    </div>
+
+    <div class="card">
+      <h3>차량 1대 중도 반납 시</h3>
+      <p style="font-size:14px;">계약기간 중 차량 1대를 중도 반납하면, 해당 차량의 ROU Asset만 개별적으로
+      Lease Accounting에서 산출된 조정 결과를 받아 처리하며, 나머지 9대의 ROU Asset과 감가상각 스케줄에는
+      영향을 주지 않습니다 — 개별 Asset Master 단위 관리의 장점입니다.</p>
+    </div>
+  `
+},
+{
+  id:'caseE',
+  title:'Case E. 단기·소액 리스',
+  html:`
+    <div class="section-title"><span class="section-num">6.6</span>Case E — 면제 적용 사례 비교</div>
+    <div class="subtitle">ROU Asset을 아예 인식하지 않는 두 가지 경로를 같은 그룹 안에서 비교합니다.</div>
+
+    <div class="grid2">
+      <div class="card">
+        <h3>단기리스 — ASPN Holdings 워크숍 행사장</h3>
+        <p style="font-size:14px;">6개월 계약, 매수선택권 없음 → 단기리스 면제 요건 충족. 회사가 단기리스
+        면제 정책을 채택했다면 ROU Asset 미인식, 리스료를 기간에 걸쳐 비용으로 직접 인식합니다.</p>
+      </div>
+      <div class="card">
+        <h3>소액리스 — ASPN Europe 사무용 복합기</h3>
+        <p style="font-size:14px;">신품 기준 소액자산 → 리스기간과 무관하게 소액자산 면제 적용 가능.
+        역시 회사 정책 채택이 전제되며, ROU Asset 미인식, 비용으로 직접 처리합니다.</p>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <span class="label">Module 4.7 연계 — 일관 적용 원칙</span>
+      ASPN Holdings가 단기리스 면제 정책을 "사무용 비품" 자산 유형에 채택했다면, 같은 유형의 모든 계약에
+      일관되게 적용해야 합니다. 워크숍 행사장은 면제하면서 유사한 다른 단기 사무공간 임차는 임의로
+      ROU Asset 인식 처리하는 것은 허용되지 않습니다.
+    </div>
+  `
+},
+{
+  id:'summary',
+  title:'종합 정리',
+  html:`
+    <div class="section-title"><span class="section-num">6.7</span>전체 모듈 통합 정리</div>
+    <div class="subtitle">Module 1~6에서 다룬 핵심 개념을 케이스 기준으로 마지막 한 번 더 연결합니다.</div>
+
+    <table>
+      <tr><th>모듈</th><th>핵심 개념</th><th>이번 케이스 적용 지점</th></tr>
+      <tr><td>Module 1</td><td>Chart of Depreciation → Area → Class → Master</td><td>Case A의 0KR/Area 01·32·15/3000/K200-XXXXX 계층 구조</td></tr>
+      <tr><td>Module 2</td><td>Asset Lifecycle 5단계</td><td>Case A의 구매·자본적 지출 판단</td></tr>
+      <tr><td>Module 3</td><td>Depreciation Key/Useful Life/Period Control</td><td>Case A·D의 Area별 상각액 차이, 다수 자산 일괄 설정 리스크</td></tr>
+      <tr><td>Module 4</td><td>IFRS 16, ROU Asset, Asset Class 3900</td><td>Case B·C·D의 리스 식별·후속측정·Modification</td></tr>
+      <tr><td>Module 4.7</td><td>단기·소액 리스 면제</td><td>Case E의 면제 정책 일관 적용</td></tr>
+      <tr><td>Module 5</td><td>Depreciation Run → Universal Journal → Asset Explorer → 결산</td><td>전체 케이스의 결산 마감 공통 흐름</td></tr>
+    </table>
+
+    <div class="callout correct">
+      <span class="label">시리즈 전체 핵심 메시지</span>
+      SAP Asset Accounting은 "자산을 등록하는 모듈"이 아니라, <b>여러 회계기준(K-IFRS/IFRS/Tax)을 하나의
+      마스터데이터 구조 안에서 동시에 충족시키고, 그 결과를 Universal Journal을 통해 결산까지 일관되게
+      연결하는 모듈</b>입니다. IFRS 16은 이 구조를 활용하는 대표 사례이지, AA의 본질을 바꾸는 별도 영역이
+      아닙니다.
+    </div>
+
+    <ul class="checklist">
+      <li>일반 유형자산과 ROU Asset은 동일한 Asset Master 구조를 공유하되 Asset Class로 구분된다</li>
+      <li>Area별 처리 차이(상각방법·내용연수·자본화 기준)는 오류가 아니라 의도된 Multi-GAAP 설계다</li>
+      <li>리스 관련 계산(PV, 이자비용, Modification 회계처리)은 Lease Accounting 영역이며 AA는 결과를 인계받는다</li>
+      <li>다수 자산을 일괄 관리할 때는 설정값 일관성이 결산 안정성에 직접 영향을 준다</li>
+      <li>면제 정책(단기·소액 리스)은 선택 사항이지만 일관 적용이 전제 조건이다</li>
+    </ul>
+  `
+},
+{
+  id:'finalquiz',
+  title:'Final Check',
+  html:`
+    <div class="section-title"><span class="section-num">6.8</span>종합 이해도 점검</div>
+    <div class="subtitle">시리즈 전체를 통합하는 4문항입니다.</div>
+
+    <div class="quiz-q">
+      <div class="qtext">Q1. Case A(CNC 설비)에서 1년 뒤 발생한 부품 교체 지출에 대한 가장 정확한 설명은?</div>
+      <button class="quiz-opt" data-correct="false" onclick="checkQuiz(this)">모든 Area에서 동일하게 자본적 지출로 처리된다</button>
+      <button class="quiz-opt" data-correct="true" onclick="checkQuiz(this)">Area별 자본화 기준 차이로 인해 Area마다 자본적 지출 여부 판단이 달라질 수 있다</button>
+      <button class="quiz-opt" data-correct="false" onclick="checkQuiz(this)">리스 자산이 아니므로 Sub-number를 사용할 수 없다</button>
+      <div class="quiz-fb"></div>
+    </div>
+
+    <div class="quiz-q">
+      <div class="qtext">Q2. Case C(사무실 임차)에서 계약 변경 발생 시 AA의 역할은?</div>
+      <button class="quiz-opt" data-correct="false" onclick="checkQuiz(this)">변경이 조건 변경인지 분리 리스인지 AA가 직접 판단한다</button>
+      <button class="quiz-opt" data-correct="true" onclick="checkQuiz(this)">Lease Accounting에서 산출된 조정 결과를 받아 Asset Master에 반영한다</button>
+      <button class="quiz-opt" data-correct="false" onclick="checkQuiz(this)">계약 변경은 AA에 어떤 영향도 주지 않는다</button>
+      <div class="quiz-fb"></div>
+    </div>
+
+    <div class="quiz-q">
+      <div class="qtext">Q3. Case D(차량 10대 리스)에서 일괄 등록 시 가장 주의해야 할 점은?</div>
+      <button class="quiz-opt" data-correct="false" onclick="checkQuiz(this)">차량은 리스 식별 대상이 아니므로 별도 주의가 필요 없다</button>
+      <button class="quiz-opt" data-correct="true" onclick="checkQuiz(this)">설정 오류가 동일 배치의 다른 자산 전표 생성에 영향을 줄 수 있어 사전 점검이 중요하다</button>
+      <button class="quiz-opt" data-correct="false" onclick="checkQuiz(this)">10대를 반드시 하나의 Asset Master로 통합 관리해야 한다</button>
+      <div class="quiz-fb"></div>
+    </div>
+
+    <div class="quiz-q">
+      <div class="qtext">Q4. 시리즈 전체를 관통하는 SAP AA의 본질로 가장 적절한 것은?</div>
+      <button class="quiz-opt" data-correct="false" onclick="checkQuiz(this)">단순히 자산을 등록하고 폐기하는 마스터데이터 관리 모듈이다</button>
+      <button class="quiz-opt" data-correct="true" onclick="checkQuiz(this)">여러 회계기준을 하나의 마스터데이터 구조에서 동시 충족시키고 결산까지 연결하는 모듈이다</button>
+      <button class="quiz-opt" data-correct="false" onclick="checkQuiz(this)">IFRS 16을 수행하기 위해 만들어진 전용 모듈이다</button>
+      <div class="quiz-fb"></div>
+    </div>
+  `
+}
+];
+
+function checkQuiz(btn, label){
+  const group = btn.parentElement.querySelectorAll('.quiz-opt');
+  const fb = btn.parentElement.querySelector('.quiz-fb');
+  group.forEach(b=>{
+    b.disabled = true;
+    if(b.dataset.correct === 'true'){ b.classList.add('correct'); }
+  });
+  if(btn.dataset.correct === 'false'){ btn.classList.add('wrong'); }
+  fb.classList.add('show');
+  fb.style.background = 'var(--correct-bg)';
+  fb.innerHTML = btn.dataset.correct === 'true'
+    ? '정답입니다.'
+    : '오답입니다. 정답이 위에 초록색으로 표시되어 있습니다.';
+}
+
+const tabsEl = document.getElementById('tabs');
+const mainEl = document.getElementById('main');
+
+sections.forEach((s,i)=>{
+  const b = document.createElement('button');
+  b.textContent = s.title;
+  b.onclick = ()=>showSection(i);
+  b.id = 'tabbtn-'+i;
+  tabsEl.appendChild(b);
+
+  const sec = document.createElement('section');
+  sec.className = 'panel';
+  sec.id = 'panel-'+i;
+  sec.innerHTML = s.html + `
+    <div class="pagenav">
+      <button onclick="showSection(${i-1})" ${i===0?'disabled':''}>← 이전</button>
+      <button onclick="showSection(${i+1})" ${i===sections.length-1?'disabled':''}>다음 →</button>
+    </div>`;
+  mainEl.appendChild(sec);
+});
+
+function showSection(i){
+  if(i<0 || i>=sections.length) return;
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+i).classList.add('active');
+  document.getElementById('tabbtn-'+i).classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+showSection(0);
+</script>
+</body>
+</html>
