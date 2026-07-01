@@ -208,10 +208,35 @@ footer{
   font-family:'Noto Sans KR'; font-weight:700; cursor:pointer; font-size:14px;
 }
 .pagenav button:disabled{opacity:.3; cursor:not-allowed;}
+
+.back-nav{
+  background:#fff;
+  border-bottom:1px solid var(--border);
+  padding:10px 5vw;
+  display:flex;
+  align-items:center;
+}
+.back-nav a{
+  display:inline-flex; align-items:center; gap:6px;
+  color:var(--navy); text-decoration:none;
+  font-size:13px; font-weight:700;
+  font-family:'Noto Sans KR', sans-serif;
+}
+.back-nav a:hover{text-decoration:underline;}
+.back-nav .series-label{
+  margin-left:14px; padding-left:14px;
+  border-left:1px solid var(--border);
+  color:var(--text-sub); font-size:12px;
+  font-family:'JetBrains Mono', monospace;
+}
 </style>
 </head>
 <body>
 
+<div class="back-nav">
+  <a href="index_aa_series.html">← 시리즈 목록으로</a>
+  <span class="series-label">SAP Asset Accounting Series</span>
+</div>
 <header>
   <div class="eyebrow">ASPN BAC EDUCATION · SAP ASSET ACCOUNTING SERIES · MODULE 1 / 6</div>
   <h1>SAP Asset Accounting Overview</h1>
