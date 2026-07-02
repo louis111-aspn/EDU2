@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>단계적 취득·처분 회계 | 연결결산 심화</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#003366;
+  --navy-light:#e8eef5;
+  --bg:#f0f3f8;
+  --white:#ffffff;
+  --text:#1a1a2e;
+  --text-sub:#5a6472;
+  --warn:#b8860b;
+  --warn-bg:#fdf6e3;
+  --correct:#2e7d32;
+  --correct-bg:#e8f5e9;
+  --wrong:#c0392b;
+  --wrong-bg:#fdecea;
+  --border:#d8e0ec;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html{overflow-x:hidden;}
+body{
+  font-family:'Noto Sans KR',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  font-size:15px;
+  line-height:1.7;
+  word-break:keep-all;
+  overflow-wrap:break-word;
+  overflow-x:hidden;
+  padding-bottom:80px;
+}
+.mono{font-family:'JetBrains Mono','Noto Sans KR',monospace;}
+h1,h2,h3{font-family:'DM Serif Display',serif; font-weight:400; color:var(--navy);}
+
+/* ===== Header ===== */
+.hero{
+  background:var(--navy);
+  color:#fff;
+  padding:56px 24px 40px;
+  text-align:center;
+}
+.hero .eyebrow{
+  font-size:13px; letter-spacing:2px; text-transform:uppercase;
+  color:#9fb8d9; margin-bottom:14px; font-weight:700;
+}
+.hero h1{font-size:42px; color:#fff; margin-bottom:14px;}
+.hero p{font-size:16px; color:#cdd9ea; max-width:640px; margin:0 auto;}
+
+/* ===== Sticky Nav ===== */
+.nav{
+  position:sticky; top:0; z-index:100;
+  background:#fff;
+  border-bottom:1px solid var(--border);
+  display:flex; overflow-x:auto;
+  box-shadow:0 2px 8px rgba(0,0,0,0.04);
+}
+.nav a{
+  flex:0 0 auto;
+  padding:16px 20px;
+  font-size:14px; font-weight:700;
+  color:var(--text-sub);
+  text-decoration:none;
+  border-bottom:3px solid transparent;
+  white-space:nowrap;
+}
+.nav a.active, .nav a:hover{color:var(--navy); border-bottom-color:var(--navy);}
+
+/* ===== Section ===== */
+.section{max-width:920px; margin:0 auto; padding:56px 24px;}
+.section-title{
+  font-size:30px; color:var(--navy);
+  display:flex; align-items:center; gap:12px;
+  margin-bottom:28px;
+}
+.badge{
+  background:var(--navy); color:#fff;
+  font-family:'Noto Sans KR'; font-weight:900; font-size:13px;
+  padding:4px 10px; border-radius:4px;
+}
+
+/* ===== Card ===== */
+.card{
+  background:#fff; border:1px solid var(--border); border-radius:10px;
+  padding:24px 28px; margin-bottom:20px;
+}
+.card-title{font-weight:700; font-size:16px; color:var(--navy); margin-bottom:14px;}
+
+/* ===== Callout ===== */
+.callout{
+  display:flex; gap:14px; padding:18px 20px; border-radius:8px;
+  margin-bottom:20px; border-left:4px solid var(--navy);
+  background:var(--navy-light);
+}
+.callout-icon{font-size:20px; flex:0 0 auto;}
+.callout-text{font-size:14.5px; color:var(--text);}
+.callout.warn{border-left-color:var(--warn); background:var(--warn-bg);}
+.callout.correct{border-left-color:var(--correct); background:var(--correct-bg);}
+.callout.wrong{border-left-color:var(--wrong); background:var(--wrong-bg);}
+
+/* ===== Table ===== */
+.tbl-wrap{overflow-x:auto;}
+table{width:100%; border-collapse:collapse; font-size:14px;}
+th,td{padding:10px 14px; border-bottom:1px solid var(--border); text-align:left;}
+th{background:var(--navy-light); color:var(--navy); font-weight:700; font-size:13px;}
+td.num{text-align:right; font-family:'JetBrains Mono','Noto Sans KR',monospace;}
+tr.total td{font-weight:700; border-top:2px solid var(--navy);}
+
+/* ===== Flow diagram ===== */
+.flow{display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin:18px 0;}
+.flow-box{
+  background:#fff; border:2px solid var(--navy); border-radius:8px;
+  padding:12px 16px; font-size:13.5px; font-weight:700; color:var(--navy);
+  text-align:center; min-width:120px;
+}
+.flow-box.sub{font-weight:400; font-size:12px; color:var(--text-sub); display:block; margin-top:2px;}
+.flow-arrow{color:var(--navy); font-size:20px; font-weight:700;}
+
+/* ===== MECE Grid ===== */
+.mece-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; margin:18px 0;}
+.mece-item{
+  background:#fff; border:1px solid var(--border); border-radius:8px;
+  padding:16px; border-top:4px solid var(--navy);
+}
+.mece-item .num{font-family:'DM Serif Display'; font-size:26px; color:var(--navy);}
+.mece-item .label{font-weight:700; font-size:14.5px; margin:6px 0 4px;}
+.mece-item .desc{font-size:13px; color:var(--text-sub);}
+.mece-item.highlight{border-top-color:var(--wrong); background:#fffaf9;}
+
+/* ===== Tabs ===== */
+.tabs{display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap;}
+.tab-btn{
+  padding:10px 20px; border-radius:20px; border:2px solid var(--navy);
+  background:#fff; color:var(--navy); font-weight:700; font-size:14px;
+  cursor:pointer;
+}
+.tab-btn.active{background:var(--navy); color:#fff;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* ===== Journal Entry ===== */
+.je-wrap{border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:14px;}
+.je-header{
+  background:var(--navy); color:#fff; padding:10px 16px;
+  display:flex; justify-content:space-between; align-items:center; font-size:13.5px;
+}
+.je-title{font-weight:700;}
+.je-badge{background:rgba(255,255,255,0.2); padding:2px 10px; border-radius:12px; font-size:12px;}
+.je-body{padding:14px 16px; background:#fafcff;}
+.je-line{display:grid; grid-template-columns:1fr 100px 100px; gap:8px; font-size:14px; padding:5px 0; font-family:'JetBrains Mono','Noto Sans KR',monospace;}
+.je-line .acct.debit{padding-left:0;}
+.je-line .acct.credit{padding-left:24px; color:var(--text-sub);}
+.je-line .dr{text-align:right; font-weight:700;}
+.je-line .cr{text-align:right; font-weight:700; color:var(--text-sub);}
+.je-line .empty{text-align:right; color:transparent;}
+.je-verify{font-size:12.5px; color:var(--correct); padding:8px 16px; background:var(--correct-bg); border-top:1px dashed var(--border);}
+
+/* ===== Step list ===== */
+.step-list{margin:18px 0;}
+.step-item{border:1px solid var(--border); border-radius:8px; margin-bottom:10px; overflow:hidden; background:#fff;}
+.step-hd{display:flex; align-items:center; gap:14px; padding:14px 18px; cursor:pointer;}
+.step-num{
+  width:28px; height:28px; border-radius:50%; background:var(--navy); color:#fff;
+  display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; flex:0 0 auto;
+}
+.step-hd-title{font-weight:700; font-size:14.5px;}
+.step-hd-sub{font-size:12.5px; color:var(--text-sub); margin-top:2px;}
+.step-toggle{margin-left:auto; color:var(--navy); font-size:14px;}
+.step-body{display:none; padding:0 18px 18px;}
+.step-item.open .step-body{display:block;}
+.step-item.open .step-toggle{transform:rotate(180deg);}
+
+/* ===== Checklist ===== */
+.checklist{list-style:none;}
+.checklist li{
+  display:flex; gap:10px; padding:10px 0; border-bottom:1px solid var(--border);
+  font-size:14px; align-items:flex-start;
+}
+.checklist li::before{content:"☐"; color:var(--navy); font-size:16px; flex:0 0 auto;}
+
+/* ===== Quiz ===== */
+.quiz{background:#fff; border:1px solid var(--border); border-radius:10px; padding:22px 24px; margin-bottom:18px;}
+.quiz-q{font-weight:700; font-size:15px; margin-bottom:14px;}
+.quiz-opt{
+  display:block; width:100%; text-align:left; padding:12px 16px; margin-bottom:8px;
+  border:1.5px solid var(--border); border-radius:8px; background:#fafcff;
+  cursor:pointer; font-size:14px; font-family:inherit;
+}
+.quiz-opt:hover{border-color:var(--navy);}
+.quiz-opt.correct{background:var(--correct-bg); border-color:var(--correct); color:var(--correct);}
+.quiz-opt.wrong{background:var(--wrong-bg); border-color:var(--wrong); color:var(--wrong);}
+.quiz-fb{display:none; margin-top:10px; padding:12px 14px; border-radius:8px; font-size:13.5px;}
+.quiz-fb.show{display:block;}
+
+/* ===== Auto/Manual pill ===== */
+.pill{display:inline-block; padding:2px 10px; border-radius:12px; font-size:12px; font-weight:700;}
+.pill.auto{background:var(--correct-bg); color:var(--correct);}
+.pill.manual{background:var(--warn-bg); color:var(--warn);}
+
+@media(max-width:640px){
+  .hero h1{font-size:30px;}
+  .section-title{font-size:24px;}
+  .je-line{grid-template-columns:1fr 70px 70px; font-size:12.5px;}
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="eyebrow">연결결산 심화 · 섹션 02</div>
+  <h1>단계적 취득·처분 회계</h1>
+  <p>지배력 획득/상실 시 단계취득 분개와 SAP Group Reporting 처리 흐름 — P사/T사 케이스 확장편</p>
+</div>
+
+<div class="nav" id="navBar">
+  <a href="#part1">1. 네 국면</a>
+  <a href="#part2">2. 기존 케이스 리캡</a>
+  <a href="#part3">3. 지배력 상실</a>
+  <a href="#part4">4. GR 처리 흐름</a>
+  <a href="#part5">5. 요약·퀴즈</a>
+</div>
+
+<!-- ============ PART 1 ============ -->
+<div class="section" id="part1">
+  <div class="section-title"><span class="badge">1</span>단계적 취득의 네 국면</div>
+
+  <div class="callout">
+    <div class="callout-icon">💡</div>
+    <div class="callout-text">단계적 취득·처분은 하나의 회계처리가 아니라 <strong>지분율 변동의 방향과 지배력 유지 여부에 따라 전혀 다른 4가지 회계처리</strong>로 나뉩니다. 이 구분을 먼저 명확히 하지 않으면 실무에서 손익 인식 여부를 혼동하기 쉽습니다.</div>
+  </div>
+
+  <div class="mece-grid">
+    <div class="mece-item">
+      <div class="num">①</div>
+      <div class="label">비지배 → 지배력 획득</div>
+      <div class="desc">관계기업/FVTPL 단계에서 추가취득으로 지배력 획득. 기존 보유지분을 취득일 FV로 재평가, 재평가손익을 당기손익 인식.</div>
+    </div>
+    <div class="mece-item">
+      <div class="num">②</div>
+      <div class="label">지배력 보유 중 추가취득</div>
+      <div class="desc">이미 지배력이 있는 상태에서 지분율만 상승. 자본거래로 처리 — 손익 인식 없이 NCI와 자본잉여금 조정.</div>
+    </div>
+    <div class="mece-item">
+      <div class="num">③</div>
+      <div class="label">지배력 유지, 일부처분</div>
+      <div class="desc">지분율이 낮아지지만 지배력은 유지. 역시 자본거래 — 처분대가와 NCI 증가분 차액을 자본잉여금으로 처리.</div>
+    </div>
+    <div class="mece-item highlight">
+      <div class="num">④</div>
+      <div class="label">지배력 상실</div>
+      <div class="desc">지분율 하락으로 지배력을 잃는 순간. 자회사를 <strong>통째로 제거(derecognition)</strong>하고 처분손익을 당기손익으로 인식. 이번 모듈의 핵심.</div>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <div class="callout-icon">⚠️</div>
+    <div class="callout-text">①②③은 기존 자본연결(C/I) 모듈에서 이미 다뤘습니다. 이번 모듈은 <strong>④ 지배력 상실</strong>을 심화하며, 특히 "관계기업 전환"과 "완전처분"이라는 두 서브케이스를 대조합니다.</div>
+  </div>
+</div>
+
+<!-- ============ PART 2 ============ -->
+<div class="section" id="part2">
+  <div class="section-title"><span class="badge">2</span>기존 케이스 리캡 (1~2단계)</div>
+
+  <div class="callout">
+    <div class="callout-icon">📎</div>
+    <div class="callout-text">자본연결(C/I) 모듈의 P사/T사 독립 케이스를 그대로 이어받습니다. 아래 두 단계는 이미 검증된 내용이므로 압축 요약합니다.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📋 마스터 데이터</div>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>구분</th><th>1단계 (20X1.1.1)</th><th>2단계 (20X2.1.1)</th></tr>
+        <tr><td>지분율</td><td class="num">40% (관계기업)</td><td class="num">+45% → 85% (종속기업 편입)</td></tr>
+        <tr><td>이전대가</td><td class="num">400</td><td class="num">600</td></tr>
+        <tr><td>T사 순자산 FV</td><td class="num">900</td><td class="num">1,100</td></tr>
+        <tr><td>기존지분 재평가 FV</td><td class="num">—</td><td class="num">500 (재평가익 100)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-hd" onclick="toggleStep(this)">
+        <div class="step-num">1</div>
+        <div class="step-hd-title">1단계 — 관계기업 취득 및 지분법 적용 (20X1)</div>
+        <div class="step-toggle">▾</div>
+      </div>
+      <div class="step-body">
+        <div class="je-wrap">
+          <div class="je-header"><span class="je-title">P사 별도 분개</span><span class="je-badge">20X1.1.1</span></div>
+          <div class="je-body">
+            <div class="je-line"><span class="acct debit">관계기업투자주식</span><span class="dr">400</span><span class="empty">—</span></div>
+            <div class="je-line"><span class="acct credit">현금</span><span class="empty">—</span><span class="cr">400</span></div>
+          </div>
+        </div>
+        <div class="je-wrap">
+          <div class="je-header"><span class="je-title">지분법 적용 (20X1년 중)</span><span class="je-badge">NI 200 × 40%</span></div>
+          <div class="je-body">
+            <div class="je-line"><span class="acct debit">관계기업투자주식</span><span class="dr">80</span><span class="empty">—</span></div>
+            <div class="je-line"><span class="acct credit">지분법이익</span><span class="empty">—</span><span class="cr">80</span></div>
+          </div>
+          <div class="je-verify">20X1말 지분법 장부금액: 400 + 80 = 480</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-item">
+      <div class="step-hd" onclick="toggleStep(this)">
+        <div class="step-num">2</div>
+        <div class="step-hd-title">2단계 — 추가취득으로 지배력 획득 (20X2)</div>
+        <div class="step-toggle">▾</div>
+      </div>
+      <div class="step-body">
+        <div class="je-wrap">
+          <div class="je-header"><span class="je-title">기존지분 재평가</span><span class="je-badge">20X2.1.1</span></div>
+          <div class="je-body">
+            <div class="je-line"><span class="acct debit">관계기업투자주식</span><span class="dr">20</span><span class="empty">—</span></div>
+            <div class="je-line"><span class="acct credit">재평가이익(당기손익)</span><span class="empty">—</span><span class="cr">20</span></div>
+          </div>
+          <div class="je-verify">480 + 20 = 500 (취득일 FV) — 기존지분을 취득일 공정가치로 재측정, 처분·재취득으로 간주</div>
+        </div>
+        <div class="card" style="margin-top:14px;">
+          <div class="card-title">영업권 계산</div>
+          <div class="tbl-wrap">
+            <table>
+              <tr><td>총 지분원가</td><td class="num">500(기존) + 600(신규) = 1,100</td></tr>
+              <tr><td>순자산FV 지분(85%)</td><td class="num">1,100 × 85% = 935</td></tr>
+              <tr class="total"><td>영업권</td><td class="num">1,100 − 935 = 165</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PART 3 ============ -->
+<div class="section" id="part3">
+  <div class="section-title"><span class="badge">3</span>지배력 상실 — 3단계 확장</div>
+
+  <div class="callout warn">
+    <div class="callout-icon">⚠️</div>
+    <div class="callout-text"><strong>"영업권 배분"이 아니라 "영업권 100% 제거"입니다.</strong> IFRS 10에서는 지배력을 상실하면 자회사를 통째로 제거(derecognition)합니다. 처분비율만큼 영업권을 나누는 것이 아니라, 순자산·영업권·NCI를 <strong>전액</strong> 제거하고 아래 공식으로 처분손익을 계산합니다.</div>
+  </div>
+
+  <div class="card" style="text-align:center;">
+    <div class="card-title" style="text-align:left;">IFRS 10 처분손익 공식</div>
+    <div class="mono" style="font-size:15px; color:var(--navy); font-weight:700; padding:10px 0;">
+      처분손익 = 처분대가 + 잔여지분 FV + 제거되는 NCI − 제거되는 순자산(100%) − 제거되는 Goodwill(100%)
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📋 3단계 마스터 데이터 (20X3.1.1)</div>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>항목</th><th>값</th><th>근거</th></tr>
+        <tr><td>지배력 상실 직전 지분율</td><td class="num">85%</td><td>2단계 이월</td></tr>
+        <tr><td>연결 순자산(BV)</td><td class="num">1,300</td><td>1,100 + 20X2 NI 200</td></tr>
+        <tr><td>Goodwill</td><td class="num">165</td><td>2단계 확정값, 손상 없음 가정</td></tr>
+        <tr><td>NCI 장부금액</td><td class="num">195</td><td>1,300 × 15%</td></tr>
+        <tr><td>기업 전체 공정가치(FV)</td><td class="num">1,600</td><td>두 서브케이스 공통 기준점</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'caseA')">서브케이스 A — 관계기업 전환</button>
+    <button class="tab-btn" onclick="switchTab(this,'caseB')">서브케이스 B — 완전처분</button>
+  </div>
+
+  <div class="tab-panel active" id="caseA">
+    <div class="callout">
+      <div class="callout-icon">📌</div>
+      <div class="callout-text">85% → 25%로 매각(60%p). 잔여지분 25%는 유의적 영향력을 유지하여 <strong>관계기업으로 전환</strong>됩니다.</div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>항목</th><th>값</th><th>산출</th></tr>
+        <tr><td>처분대가</td><td class="num">960</td><td>1,600 × 60%</td></tr>
+        <tr><td>잔여지분(25%) 공정가치</td><td class="num">400</td><td>1,600 × 25%</td></tr>
+      </table>
+    </div>
+    <div class="je-wrap">
+      <div class="je-header"><span class="je-title">연결조정분개 — 지배력 상실 (Case A)</span><span class="je-badge">20X3.1.1</span></div>
+      <div class="je-body">
+        <div class="je-line"><span class="acct debit">현금</span><span class="dr">960</span><span class="empty">—</span></div>
+        <div class="je-line"><span class="acct debit">관계기업투자주식(잔여)</span><span class="dr">400</span><span class="empty">—</span></div>
+        <div class="je-line"><span class="acct debit">비지배지분</span><span class="dr">195</span><span class="empty">—</span></div>
+        <div class="je-line"><span class="acct credit">T사 순자산(연결)</span><span class="empty">—</span><span class="cr">1,300</span></div>
+        <div class="je-line"><span class="acct credit">영업권</span><span class="empty">—</span><span class="cr">165</span></div>
+        <div class="je-line"><span class="acct credit">연결처분이익</span><span class="empty">—</span><span class="cr">90</span></div>
+      </div>
+      <div class="je-verify">대차검증: 960+400+195 = 1,555 / 1,300+165+90 = 1,555 ✅</div>
+    </div>
+    <div class="callout correct">
+      <div class="callout-icon">✅</div>
+      <div class="callout-text">잔여지분 25%는 지배력 상실일의 공정가치(400)를 새로운 취득원가(deemed cost)로 하여 지분법을 적용합니다. 이 400이 이후 관계기업투자주식의 시작 장부금액입니다.</div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="caseB">
+    <div class="callout">
+      <div class="callout-icon">📌</div>
+      <div class="callout-text">85% → 0%로 전량 매각. 잔여지분이 없어 계산식이 단순해집니다.</div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>항목</th><th>값</th><th>산출</th></tr>
+        <tr><td>처분대가</td><td class="num">1,360</td><td>1,600 × 85%</td></tr>
+        <tr><td>잔여지분 FV</td><td class="num">0</td><td>해당없음</td></tr>
+      </table>
+    </div>
+    <div class="je-wrap">
+      <div class="je-header"><span class="je-title">연결조정분개 — 지배력 상실 (Case B)</span><span class="je-badge">20X3.1.1</span></div>
+      <div class="je-body">
+        <div class="je-line"><span class="acct debit">현금</span><span class="dr">1,360</span><span class="empty">—</span></div>
+        <div class="je-line"><span class="acct debit">비지배지분</span><span class="dr">195</span><span class="empty">—</span></div>
+        <div class="je-line"><span class="acct credit">T사 순자산(연결)</span><span class="empty">—</span><span class="cr">1,300</span></div>
+        <div class="je-line"><span class="acct credit">영업권</span><span class="empty">—</span><span class="cr">165</span></div>
+        <div class="je-line"><span class="acct credit">연결처분이익</span><span class="empty">—</span><span class="cr">90</span></div>
+      </div>
+      <div class="je-verify">대차검증: 1,360+195 = 1,555 / 1,300+165+90 = 1,555 ✅</div>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <div class="callout-icon">🎯</div>
+    <div class="callout-text">
+      <strong>두 서브케이스의 총 처분손익이 동일한 90으로 산출된 이유는 동일한 기업가치(FV 1,600)를 전제로 설계했기 때문</strong>입니다 — 항상 동일한 것이 아닙니다. 관계기업 전환 사례(A)에서는 그 가치가 '처분대가(960) + 잔여지분 FV(400)'로 구성되고, 완전처분 사례(B)에서는 전부 처분대가(1,360)로 구성될 뿐입니다. 잔여지분 FV는 지배력 상실 시점에 <strong>공정가치로 재취득한 것으로 간주(deemed acquisition)</strong>되므로, 처분손익 계산에 포함되는 <strong>실현된 손익 구성요소</strong>이지 미실현 평가손익이 아닙니다.
+    </div>
+  </div>
+</div>
+
+<!-- ============ PART 4 ============ -->
+<div class="section" id="part4">
+  <div class="section-title"><span class="badge">4</span>SAP Group Reporting에서 IFRS 지배력 상실을 구현하는 처리 흐름</div>
+
+  <div class="callout warn">
+    <div class="callout-icon">⚠️</div>
+    <div class="callout-text">Step Disposal은 자동분개를 수행하는 <strong>실행 단계일 뿐</strong>이며, 그 전에 Ownership Data·Consolidation Method·Consolidation Unit Assignment·FS Item Mapping이 먼저 올바르게 설정되어 있어야 합니다. "Step Disposal이 모든 것을 처리한다"는 서술은 GR 실무 흐름을 과도하게 단순화한 것입니다.</div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">🧭</div>
+    <div class="callout-text"><strong>SAP Group Reporting은 IFRS 회계논리를 자동으로 판단하는 시스템이 아니라, 이미 설정된 Ownership·Method·Master Data를 기반으로 연결조정을 수행하는 엔진입니다.</strong> 따라서 정확한 회계결론(IFRS)과 올바른 Master Data 설정이 선행되어야 표준 Step이 기대한 결과를 생성합니다.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">① 전체 처리 흐름 — Ownership 변경이 출발점</div>
+    <div class="flow">
+      <div class="flow-box">Ownership Change<span class="flow-box sub">Master Data 작업</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">Consolidation Monitor<span class="flow-box sub">설정 검증</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">Step Disposal<span class="flow-box sub">자동분개 실행</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">Generated Posting</div>
+    </div>
+    <div class="callout" style="margin-top:14px; margin-bottom:0;">
+      <div class="callout-icon">💡</div>
+      <div class="callout-text">Step Disposal이 실행되어야 Goodwill·NCI 제거와 처분손익 계산이 자동분개로 생성됩니다. 다만 Disposal Amount, Remaining Investment, Ownership %, Reclassification 등 계산의 기반이 되는 데이터가 Ownership Manager에서 먼저 정확히 구성되어 있어야 합니다.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">② Consolidation Method 결정 흐름</div>
+    <div class="flow">
+      <div class="flow-box">Ownership 정보 변경 및 Consolidation Method 확인<span class="flow-box sub">Ownership Manager · 프로젝트 설계 의존</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">Consolidation Run</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">Disposal Posting</div>
+    </div>
+    <div class="tbl-wrap" style="margin-top:14px;">
+      <table>
+        <tr><th>Case</th><th>Method 변경 방향 (일반적 설계 예시)</th></tr>
+        <tr><td>A — 관계기업 전환</td><td>Purchase → Equity</td></tr>
+        <tr><td>B — 완전처분</td><td>Purchase → Not Consolidated</td></tr>
+      </table>
+    </div>
+    <div class="callout" style="margin-top:14px; margin-bottom:0;">
+      <div class="callout-icon">🕒</div>
+      <div class="callout-text">Method는 <strong>Step Disposal이 바꾸는 것이 아닙니다.</strong> Ownership 정보 변경 시 Consolidation Method가 Rule에 의해 자동 결정되는 경우도 있고, 프로젝트 설계에 따라 수동 유지·확인이 필요한 경우도 있습니다 — ECC/BW 이관 프로젝트 등에서는 커스터마이징 방식 차이가 큽니다. 확정된 Method 정보를 기반으로 다음 Consolidation Run이 Disposal Posting을 생성합니다.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">항목별 표준 지원 수준</div>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>항목</th><th>표준 지원 수준</th></tr>
+        <tr><td>Goodwill 제거</td><td><span class="pill auto">Step 실행 시 자동 계산(사전 데이터 구성 전제)</span></td></tr>
+        <tr><td>NCI 제거</td><td><span class="pill auto">Step 실행 시 자동 계산(사전 데이터 구성 전제)</span></td></tr>
+        <tr><td>Disposal Gain 계산</td><td><span class="pill auto">Step 실행 시 자동 계산(사전 데이터 구성 전제)</span></td></tr>
+        <tr><td>Consolidation Method</td><td><span class="pill manual">Ownership 설정 의존 · 프로젝트별 상이</span></td></tr>
+        <tr><td>Ownership 변경</td><td><span class="pill manual">Master Data 작업</span></td></tr>
+        <tr><td>Equity Pickup</td><td><span class="pill manual">Equity Method 구성 필요</span></td></tr>
+      </table>
+    </div>
+    <div class="callout warn" style="margin-top:14px; margin-bottom:0;">
+      <div class="callout-icon">⚠️</div>
+      <div class="callout-text">"Disposal 후 자동으로 Equity Pickup 시작"이라는 서술은 오해를 유발합니다. 정확한 표현은: <strong>Equity Method가 사전에 구성되어 있는 경우, 이후 결산부터 Equity Pickup 대상이 된다.</strong> Equity Pickup 기능 자체는 GR 표준에 존재하지만, Ownership 설정·Equity Method 구성·투자계정 매핑·Equity Income FS Item이 모두 선행되어야 동작합니다.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">③ Post Disposal — 다음 결산 기간 (사전 구성 완료 전제)</div>
+    <div class="flow" style="justify-content:center;">
+      <div class="flow-box">20X3.1.1<span class="flow-box sub">Step Disposal + Method 결정</span></div>
+    </div>
+    <div style="text-align:center; color:var(--navy); font-size:20px; margin:4px 0;">↓</div>
+    <div class="mece-grid">
+      <div class="mece-item">
+        <div class="label">Case A — 20X3.12.31</div>
+        <div class="desc">
+          · Equity Method 구성이 선행된 경우 Equity Pickup 대상 편입<br>
+          · Dividends 수취 시 투자주식 차감<br>
+          · 손상검토(Impairment Test) 대상 편입
+        </div>
+      </div>
+      <div class="mece-item">
+        <div class="label">Case B — 20X3.12.31</div>
+        <div class="desc">
+          · Consolidation 대상 아님<br>
+          · 별도 후속 처리 없음<br>
+          · (IFRS 9 금융자산 분류 검토는 GR 밖의 영역)
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PART 5 ============ -->
+<div class="section" id="part5">
+  <div class="section-title"><span class="badge">5</span>요약 & 체크리스트</div>
+
+  <div class="card">
+    <div class="card-title">4국면 판단 플로우</div>
+    <div class="flow">
+      <div class="flow-box">지분율 변동 발생</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">지배력 상실?</div>
+    </div>
+    <div class="mece-grid" style="margin-top:10px;">
+      <div class="mece-item"><div class="label">No, 최초 취득</div><div class="desc">① 재평가손익 인식 (지배력 획득)</div></div>
+      <div class="mece-item"><div class="label">No, 지배력 보유 중</div><div class="desc">②③ 자본거래, 손익 없음</div></div>
+      <div class="mece-item highlight"><div class="label">Yes</div><div class="desc">④ 전액 제거 + 처분손익 당기손익 인식</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">체크리스트</div>
+    <ul class="checklist">
+      <li>지배력 상실 여부를 먼저 판단했는가 (자본거래 vs. 손익거래 분기점)</li>
+      <li>순자산·NCI·Goodwill을 <strong>비례 배분이 아닌 전액 제거</strong>로 처리했는가</li>
+      <li>잔여지분 FV를 처분손익 계산식에 포함했는가 (관계기업 전환 시)</li>
+      <li>잔여지분 FV를 향후 지분법의 deemed cost로 설정했는가</li>
+      <li>GR에서 Consolidation Method 변경 시점을 지배력 상실일로 확인했는가</li>
+      <li>Equity Pickup 시작 여부와 Ownership 변경 반영을 수동 확인했는가</li>
+    </ul>
+  </div>
+
+  <div class="quiz">
+    <div class="quiz-q">Q1. P사가 T사 지분 85%를 보유 중이다. 60%p를 매각하여 25%를 남겼고, 잔여지분의 공정가치는 400이다. 이 400은 어디에 인식되는가?</div>
+    <button class="quiz-opt" data-answer="false" onclick="checkQuiz('q1',this,false)">기타포괄손익(OCI)에 인식된다</button>
+    <button class="quiz-opt" data-answer="true" onclick="checkQuiz('q1',this,true)">당기손익(처분손익)에 포함된다</button>
+    <div class="quiz-fb" id="q1-fb"></div>
+  </div>
+
+  <div class="quiz">
+    <div class="quiz-q">Q2. 지배력 상실 시 Goodwill은 어떻게 처리하는가?</div>
+    <button class="quiz-opt" data-answer="false" onclick="checkQuiz('q2',this,false)">매각 지분율만큼 비례 배분하여 제거한다</button>
+    <button class="quiz-opt" data-answer="true" onclick="checkQuiz('q2',this,true)">지분율과 무관하게 100% 전액 제거한다</button>
+    <div class="quiz-fb" id="q2-fb"></div>
+  </div>
+
+  <div class="quiz">
+    <div class="quiz-q">Q3. 관계기업 전환(Case A)과 완전처분(Case B)의 처분손익이 이번 사례에서 동일했던 이유는?</div>
+    <button class="quiz-opt" data-answer="false" onclick="checkQuiz('q3',this,false)">지배력 상실 시 처분손익은 항상 동일하게 산출되는 회계 원칙 때문이다</button>
+    <button class="quiz-opt" data-answer="true" onclick="checkQuiz('q3',this,true)">두 사례가 동일한 기업 전체 공정가치(1,600)를 전제로 설계되었기 때문이다</button>
+    <div class="quiz-fb" id="q3-fb"></div>
+  </div>
+</div>
+
+<script>
+function toggleStep(el){
+  el.parentElement.classList.toggle('open');
+}
+function switchTab(btn, id){
+  const tabs = btn.parentElement.querySelectorAll('.tab-btn');
+  tabs.forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  const panels = document.querySelectorAll('#part3 .tab-panel');
+  panels.forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function checkQuiz(id, el, isCorrect){
+  const opts = el.parentElement.querySelectorAll('.quiz-opt');
+  opts.forEach(o=>{
+    o.disabled = true;
+    if(o.dataset.answer === 'true') o.classList.add('correct');
+  });
+  if(!isCorrect) el.classList.add('wrong');
+  const fb = document.getElementById(id+'-fb');
+  fb.classList.add('show');
+  if(id==='q1'){
+    fb.innerHTML = isCorrect
+      ? '✅ 정답입니다. 지배력 상실 시 잔여지분을 공정가치로 재취득한 것으로 간주(deemed acquisition)하므로 처분손익에 포함되는 실현손익입니다.'
+      : '❌ 오답입니다. 잔여지분 FV는 deemed acquisition 논리에 따라 당기손익(처분손익)에 포함됩니다.';
+    fb.style.background = isCorrect ? '#e8f5e9' : '#fdecea';
+  }
+  if(id==='q2'){
+    fb.innerHTML = isCorrect
+      ? '✅ 정답입니다. IFRS 10은 지배력 상실 시 자회사를 통째로 제거(derecognition)하도록 요구하며, Goodwill도 지분율과 무관하게 전액 제거됩니다.'
+      : '❌ 오답입니다. Goodwill은 비례 배분 대상이 아니라 100% 전액 제거 대상입니다.';
+    fb.style.background = isCorrect ? '#e8f5e9' : '#fdecea';
+  }
+  if(id==='q3'){
+    fb.innerHTML = isCorrect
+      ? '✅ 정답입니다. 동일한 결과는 두 사례가 같은 기업가치를 전제로 설계됐기 때문이며, 일반화된 회계 원칙이 아닙니다.'
+      : '❌ 오답입니다. "총 처분손익이 항상 동일하다"는 일반 원칙은 존재하지 않습니다. 이번 사례는 동일한 FV(1,600)를 공통 전제로 설계했기 때문에 우연히 일치한 것입니다.';
+    fb.style.background = isCorrect ? '#e8f5e9' : '#fdecea';
+  }
+}
+
+// scroll spy for nav
+const sections = document.querySelectorAll('.section');
+const navLinks = document.querySelectorAll('.nav a');
+window.addEventListener('scroll', ()=>{
+  let current = '';
+  sections.forEach(s=>{
+    if(window.scrollY >= s.offsetTop - 80) current = s.id;
+  });
+  navLinks.forEach(a=>{
+    a.classList.toggle('active', a.getAttribute('href') === '#'+current);
+  });
+});
+</script>
+</body>
+</html>
